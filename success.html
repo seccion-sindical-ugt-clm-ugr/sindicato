@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Exitoso - UGT-CLM-UGR Granada</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .success-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .success-content {
+            background: rgba(255,255,255,0.1);
+            padding: 3rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #4CAF50;
+            background: white;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .success-message {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .payment-details {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .payment-details h4 {
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-success {
+            background: white;
+            color: #4CAF50;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #4CAF50;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(76, 175, 80, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+
+            <h1 class="success-title">¡Pago Exitoso!</h1>
+            <p class="success-message">Tu transacción ha sido procesada correctamente</p>
+
+            <div id="loadingMessage" class="payment-details">
+                <h4><div class="loading"></div> Verificando detalles del pago...</h4>
+                <p>Por favor, espera un momento mientras confirmamos tu transacción.</p>
+            </div>
+
+            <div id="paymentDetails" class="payment-details" style="display: none;">
+                <h4>Resumen del Pago</h4>
+                <div id="detailsContent"></div>
+            </div>
+
+            <div class="success-actions">
+                <a href="index.html" class="btn-success">
+                    <i class="fas fa-home"></i> Ir al Inicio
+                </a>
+                <a href="#cursos" class="btn-secondary">
+                    <i class="fas fa-graduation-cap"></i> Ver Cursos
+                </a>
+            </div>
+
+            <div class="next-steps" style="margin-top: 2rem;">
+                <h4>¿Qué pasa ahora?</h4>
+                <p>Recibirás un email de confirmación con todos los detalles.</p>
+                <p>Si te has afiliado, tu acceso de miembro estará activo en las próximas horas.</p>
+                <p>Si es un curso, recibirás las instrucciones de acceso por email.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="js/stripe-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Obtener el session_id de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session_id');
+            const courseType = urlParams.get('course');
+
+            if (!sessionId) {
+                showError('No se encontró información del pago');
+                return;
+            }
+
+            try {
+                // Verificar el estado del pago
+                const paymentData = await checkPaymentStatus(sessionId);
+
+                if (paymentData && paymentData.status === 'paid') {
+                    displayPaymentDetails(paymentData, courseType);
+                } else {
+                    showError('El pago no se pudo completar');
+                }
+            } catch (error) {
+                console.error('Error verificando pago:', error);
+                showError('Error al verificar el estado del pago');
+            }
+        });
+
+        function displayPaymentDetails(paymentData, courseType) {
+            const loadingDiv = document.getElementById('loadingMessage');
+            const detailsDiv = document.getElementById('paymentDetails');
+            const detailsContent = document.getElementById('detailsContent');
+
+            // Ocultar mensaje de carga
+            loadingDiv.style.display = 'none';
+
+            // Extraer metadata
+            let userData = {};
+            try {
+                userData = JSON.parse(paymentData.metadata.userData || '{}');
+            } catch (e) {
+                userData = {};
+            }
+
+            // Construir HTML de detalles
+            let detailsHTML = '';
+
+            if (userData.name) {
+                detailsHTML += `
+                    <div class="detail-item">
+                        <span>Nombre:</span>
+                        <span><strong>${userData.name}</strong></span>
+                    </div>
+                `;
+            }
+
+            if (userData.email) {
+                detailsHTML += `
+                    <div class="detail-item">
+                        <span>Email:</span>
+                        <span>${userData.email}</span>
+                    </div>
+                `;
+            }
+
+            if (userData.department) {
+                detailsHTML += `
+                    <div class="detail-item">
+                        <span>Departamento:</span>
+                        <span>${userData.department}</span>
+                    </div>
+                `;
+            }
+
+            // Determinar el producto comprado
+            let productName = 'Afiliación Anual UGT-CLM-UGR';
+            let productPrice = '15,00 €';
+
+            if (courseType) {
+                if (paymentData.metadata.isMember === 'true') {
+                    productName = 'Curso Inteligencia Artificial - Miembro UGT';
+                    productPrice = '15,00 €';
+                } else {
+                    productName = 'Curso Inteligencia Artificial - Externo';
+                    productPrice = '160,00 €';
+                }
+            }
+
+            detailsHTML += `
+                <div class="detail-item">
+                    <span>Producto:</span>
+                    <span><strong>${productName}</strong></span>
+                </div>
+                <div class="detail-item">
+                    <span>Total Pagado:</span>
+                    <span><strong>${productPrice}</strong></span>
+                </div>
+                <div class="detail-item">
+                    <span>Fecha:</span>
+                    <span>${new Date().toLocaleDateString('es-ES')}</span>
+                </div>
+                <div class="detail-item">
+                    <span>Estado:</span>
+                    <span style="color: #4CAF50;"><strong>✓ Pagado</strong></span>
+                </div>
+            `;
+
+            detailsContent.innerHTML = detailsHTML;
+            detailsDiv.style.display = 'block';
+
+            // Enviar datos al servidor para procesamiento
+            sendPaymentConfirmation(sessionId, paymentData);
+        }
+
+        function showError(message) {
+            const container = document.querySelector('.success-container');
+            container.innerHTML = `
+                <div class="success-content">
+                    <div class="success-icon" style="background: #f44336;">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <h1 class="success-title">Error en el Pago</h1>
+                    <p class="success-message">${message}</p>
+                    <a href="index.html" class="btn-success">
+                        <i class="fas fa-home"></i> Volver al Inicio
+                    </a>
+                </div>
+            `;
+        }
+
+        function sendPaymentConfirmation(sessionId, paymentData) {
+            // Aquí puedes enviar los datos a tu servidor
+            // para procesar la afiliación o inscripción al curso
+            console.log('Enviando confirmación de pago:', { sessionId, paymentData });
+
+            // Ejemplo de cómo podrías enviarlo a un backend:
+            /*
+            fetch('https://tu-backend.com/api/payment-confirmation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sessionId: sessionId,
+                    paymentData: paymentData
+                })
+            });
+            */
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso de Inteligencia Artificial - UGT-CLM-UGR Granada</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .course-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 150px 0 80px;
+            margin-top: 80px;
+        }
+
+        .course-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .course-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .course-meta-header {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+
+        .program-section {
+            background: white;
+            border-radius: 15px;
+            padding: 3rem;
+            margin: 2rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .module {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .module h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .module-topics {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .module-topics li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .module-topics li::before {
+            content: '✓';
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .enrollment-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 3rem;
+            border-radius: 15px;
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .price-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .price-card {
+            background: white;
+            color: var(--text-dark);
+            padding: 2rem;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .price-card.featured {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .price-card.featured::before {
+            content: 'RECOMENDADO';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .course-benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .benefit-card {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .benefit-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .course-hero h1 {
+                font-size: 2rem;
+            }
+
+            .price-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .price-card.featured {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header (mismo que index.html) -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+<<<<<<< HEAD
+                    <img src="../images/brand/ugt-logo.PNG" alt="UGT Logo" class="logo">
+=======
+                    <img src="../images/brand/logo.png" alt="UGT Logo" class="logo">
+>>>>>>> 37718c676cccacb52d4b2c759adebb55f8427bff
+                    <div class="brand-text">
+                        <h1>UGT-CLM-UGR Granada</h1>
+                        <p>Sección Sindical</p>
+                    </div>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="../index.html">Inicio</a></li>
+                    <li><a href="../index.html#cursos">Cursos</a></li>
+                    <li><a href="../index.html#afiliate">Afíliate</a></li>
+                    <li><a href="../index.html#contacto">Contacto</a></li>
+                    <li><a href="#login" class="btn-login"><i class="fas fa-user"></i> Acceso</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Course Hero -->
+    <section class="course-hero">
+        <div class="course-content">
+            <h1>Inteligencia Artificial Aplicada</h1>
+            <p class="hero-subtitle">Domina las herramientas de IA más avanzadas para potenciar tu desarrollo profesional</p>
+            <div class="course-meta-header">
+                <div class="meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span>20 horas</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-video"></i>
+                    <span>Online</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-certificate"></i>
+                    <span>Certificado</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-users"></i>
+                    <span>Plazas limitadas</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Course Overview -->
+    <section class="section">
+        <div class="course-content">
+            <div class="section-header">
+                <h2>Descripción del Curso</h2>
+                <p>Aprende a utilizar la inteligencia artificial para transformar tu forma de trabajar</p>
+            </div>
+
+            <div class="program-section">
+                <h3>¿Qué aprenderás?</h3>
+                <p>Este curso te proporcionará los conocimientos y habilidades necesarios para aprovechar las herramientas de inteligencia artificial más avanzadas en tu entorno profesional. Aprenderás desde los conceptos básicos hasta aplicaciones prácticas que podrás implementar inmediatamente en tu trabajo.</p>
+
+                <h3 style="margin-top: 2rem;">¿A quién va dirigido?</h3>
+                <ul style="margin: 1rem 0;">
+                    <li>Profesionales que quieren incorporar IA en su trabajo diario</li>
+                    <li>Trabajadores que buscan mejorar su productividad con herramientas de IA</li>
+                    <li>Personas interesadas en comprender el impacto de la IA en el mundo laboral</li>
+                    <li>Cualquier persona que quiera estar preparada para el futuro del trabajo</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program Content -->
+    <section class="section section-alt">
+        <div class="course-content">
+            <div class="section-header">
+                <h2>Programa del Curso</h2>
+                <p>Un recorrido completo por el mundo de la inteligencia artificial aplicada</p>
+            </div>
+
+            <div class="program-section">
+                <div class="module">
+                    <h3>Módulo 1: Introducción a la Inteligencia Artificial</h3>
+                    <ul class="module-topics">
+                        <li>¿Qué es la Inteligencia Artificial?</li>
+                        <li>Historia y evolución de la IA</li>
+                        <li>Tipos de IA: Débil vs Fuerte</li>
+                        <li>Machine Learning y Deep Learning explicados</li>
+                        <li>Impacto de la IA en el mundo laboral actual</li>
+                    </ul>
+                </div>
+
+                <div class="module">
+                    <h3>Módulo 2: Herramientas de IA Generativa</h3>
+                    <ul class="module-topics">
+                        <li>Introducción a ChatGPT y otros modelos de lenguaje</li>
+                        <li>Prompt engineering: Cómo obtener mejores resultados</li>
+                        <li>Generación de imágenes con DALL-E, Midjourney y Stable Diffusion</li>
+                        <li>Herramientas de IA para la creación de contenido</li>
+                        <li>Ejemplos prácticos y casos de uso</li>
+                    </ul>
+                </div>
+
+                <div class="module">
+                    <h3>Módulo 3: IA para la Productividad Profesional</h3>
+                    <ul class="module-topics">
+                        <li>Automatización de tareas repetitivas</li>
+                        <li>Análisis de datos con IA</li>
+                        <li>Herramientas de IA para la comunicación</li>
+                        <li>Gestión de proyectos asistida por IA</li>
+                        <li>Integración de IA en flujos de trabajo</li>
+                    </ul>
+                </div>
+
+                <div class="module">
+                    <h3>Módulo 4: IA en el Entorno Laboral</h3>
+                    <ul class="module-topics">
+                        <li>IA para la toma de decisiones</li>
+                        <li>Herramientas de reclutamiento y selección con IA</li>
+                        <li>IA en la formación y desarrollo profesional</li>
+                        <li>Aspectos éticos y legales de la IA en el trabajo</li>
+                        <li>Preparación para el futuro laboral con IA</li>
+                    </ul>
+                </div>
+
+                <div class="module">
+                    <h3>Módulo 5: Proyecto Práctico</h3>
+                    <ul class="module-topics">
+                        <li>Desarrollo de un proyecto personalizado</li>
+                        <li>Aplicación de conocimientos adquiridos</li>
+                        <li>Presentación y evaluación del proyecto</li>
+                        <li>Certificación final</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="section">
+        <div class="course-content">
+            <div class="section-header">
+                <h2>Beneficios del Curso</h2>
+                <p>¿Qué ganarás al completar esta formación?</p>
+            </div>
+
+            <div class="course-benefits">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Competencias Digitales</h3>
+                    <p>Desarrolla habilidades clave para el futuro del trabajo digital</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>Productividad</h3>
+                    <p>Aumenta tu eficiencia con herramientas de última generación</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Competitividad</h3>
+                    <p>Diferénciate en el mercado laboral con conocimientos de IA</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <h3>Certificación</h3>
+                    <p>Obtén un certificado reconocido de UGT-CLM-UGR</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enrollment Section -->
+    <section class="section section-alt">
+        <div class="course-content">
+            <div class="enrollment-section">
+                <h2>Inscríbete en el Curso de IA</h2>
+                <p>Elige la modalidad que mejor se adapte a tu situación</p>
+
+                <div class="price-cards">
+                    <div class="price-card">
+                        <h3>No Afiliados</h3>
+                        <div class="price-display">
+                            <span class="currency">€</span>
+                            <span class="amount">160</span>
+                            <span class="period">por módulo</span>
+                        </div>
+                        <ul class="price-features">
+                            <li><i class="fas fa-check"></i> Acceso a todos los módulos</li>
+                            <li><i class="fas fa-check"></i> Material didáctico completo</li>
+                            <li><i class="fas fa-check"></i> Certificado final</li>
+                            <li><i class="fas fa-check"></i> Soporte técnico</li>
+                        </ul>
+                        <button class="btn btn-secondary btn-full" onclick="enrollCourse('external')">
+                            Inscribirme por 160€
+                        </button>
+                    </div>
+
+                    <div class="price-card featured">
+                        <h3>Afiliados UGT</h3>
+                        <div class="price-display">
+                            <span class="currency">€</span>
+                            <span class="amount">15</span>
+                            <span class="period">por módulo</span>
+                        </div>
+                        <ul class="price-features">
+                            <li><i class="fas fa-check"></i> Todo lo anterior</li>
+                            <li><i class="fas fa-check"></i> Descuento especial</li>
+                            <li><i class="fas fa-check"></i> Sesiones exclusivas</li>
+                            <li><i class="fas fa-check"></i> Tutoría personalizada</li>
+                        </ul>
+                        <button class="btn btn-primary btn-full" onclick="enrollCourse('member')">
+                            Inscribirme por 15€
+                        </button>
+                    </div>
+                </div>
+
+                <p style="margin-top: 2rem; opacity: 0.9;">
+                    <i class="fas fa-info-circle"></i>
+                    ¿No eres afiliado? <a href="../index.html#afiliate" style="color: white; text-decoration: underline;">Afíliate ahora por solo 15€/año</a>
+                    y accede a todos los cursos con descuento
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-brand">
+<<<<<<< HEAD
+                        <img src="../images/brand/ugt-logo.PNG" alt="UGT Logo">
+=======
+                        <img src="../images/brand/logo-white.png" alt="UGT Logo">
+>>>>>>> 37718c676cccacb52d4b2c759adebb55f8427bff
+                        <h3>UGT-CLM-UGR Granada</h3>
+                        <p>Sección Sindical</p>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Enlaces</h4>
+                    <ul>
+                        <li><a href="../index.html">Inicio</a></li>
+                        <li><a href="../index.html#cursos">Más Cursos</a></li>
+                        <li><a href="../index.html#afiliate">Afíliate</a></li>
+                        <li><a href="../index.html#contacto">Contacto</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 UGT-CLM-UGR Granada. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="../js/stripe-config.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        async function enrollCourse(type) {
+            const isMember = type === 'member';
+            const price = isMember ? 15 : 160;
+            const description = isMember ? 'Curso IA - Afiliado UGT' : 'Curso IA - Externo';
+
+            // Mostrar formulario de datos del usuario
+            showEnrollmentForm({
+                courseType: 'ia',
+                isMember: isMember,
+                price: price,
+                description: description
+            });
+        }
+
+        function showEnrollmentForm(courseData) {
+            // Create enrollment modal
+            const enrollmentModal = document.createElement('div');
+            enrollmentModal.className = 'modal';
+            enrollmentModal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <div class="enrollment-form">
+                        <h3>Inscripción al Curso de IA</h3>
+                        <div class="course-summary">
+                            <h4>Detalles del curso:</h4>
+                            <p><strong>Curso de Inteligencia Artificial Aplicada</strong></p>
+                            <p>Tipo: ${courseData.isMember ? 'Afiliado UGT' : 'Externo'}</p>
+                            <div class="price-total">
+                                <span>Precio:</span>
+                                <span><strong>${courseData.price}€</strong></span>
+                            </div>
+                        </div>
+                        <form id="enrollmentForm">
+                            <div class="form-group">
+                                <input type="text" name="name" placeholder="Nombre completo" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" name="email" placeholder="Email" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="tel" name="phone" placeholder="Teléfono" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="department" placeholder="Empresa/Institución" required>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" required>
+                                    Acepto los términos y condiciones
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full">
+                                <i class="fas fa-lock"></i> Pagar con Stripe ${courseData.price}€
+                            </button>
+                        </form>
+                        <p style="margin-top: 1rem; font-size: 0.9rem; text-align: center;">
+                            <i class="fas fa-shield-alt"></i> Pago seguro mediante Stripe
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(enrollmentModal);
+            enrollmentModal.style.display = 'block';
+
+            // Handle form submission
+            const enrollmentForm = enrollmentModal.querySelector('#enrollmentForm');
+            const closeBtn = enrollmentModal.querySelector('.close');
+
+            closeBtn.addEventListener('click', () => {
+                document.body.removeChild(enrollmentModal);
+            });
+
+            enrollmentForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(enrollmentForm);
+                const userData = {
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    department: formData.get('department')
+                };
+
+                const submitBtn = enrollmentForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<div class="loading"></div> Procesando...';
+                submitBtn.disabled = true;
+
+                try {
+                    // Validate user data
+                    validateUserData(userData);
+
+                    // Create checkout session for course
+                    const session = await createCourseCheckout(
+                        courseData.courseType,
+                        userData,
+                        courseData.isMember
+                    );
+
+                    // Redirect to Stripe Checkout
+                    await redirectToStripeCheckout(session.id);
+
+                } catch (error) {
+                    console.error('Enrollment error:', error);
+                    showMessage('error', 'Error al procesar la inscripción: ' + error.message);
+                } finally {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
+        // Add CSS for price display
+        const priceStyles = document.createElement('style');
+        priceStyles.textContent = `
+            .price-display {
+                text-align: center;
+                margin: 2rem 0;
+            }
+
+            .currency {
+                font-size: 1.5rem;
+                vertical-align: top;
+            }
+
+            .amount {
+                font-size: 4rem;
+                font-weight: 700;
+                line-height: 1;
+            }
+
+            .period {
+                display: block;
+                color: var(--text-light);
+                font-size: 1rem;
+                margin-top: 0.5rem;
+            }
+
+            .price-features {
+                list-style: none;
+                padding: 0;
+                margin: 2rem 0;
+            }
+
+            .price-features li {
+                padding: 0.5rem 0;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .price-features i {
+                color: #4CAF50;
+            }
+        `;
+        document.head.appendChild(priceStyles);
+    </script>
+</body>
+</html>

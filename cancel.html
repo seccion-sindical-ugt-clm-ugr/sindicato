@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Cancelado - UGT-CLM-UGR Granada</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .cancel-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .cancel-content {
+            background: rgba(255,255,255,0.1);
+            padding: 3rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .cancel-icon {
+            font-size: 4rem;
+            color: #ff6b6b;
+            background: white;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+        }
+
+        .cancel-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .cancel-message {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #ff6b6b;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #ff6b6b;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .option-card {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .option-card:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+
+        .option-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cancel-container">
+        <div class="cancel-content">
+            <div class="cancel-icon">
+                <i class="fas fa-times"></i>
+            </div>
+
+            <h1 class="cancel-title">Pago Cancelado</h1>
+            <p class="cancel-message">Has cancelado el proceso de pago. No se ha realizado ningún cargo.</p>
+
+            <div class="options-grid">
+                <div class="option-card">
+                    <div class="option-icon">
+                        <i class="fas fa-redo"></i>
+                    </div>
+                    <h3>Intentar de Nuevo</h3>
+                    <p>Puedes volver a intentarlo cuando quieras</p>
+                    <a href="#afiliate" class="btn-primary">Reintentar Pago</a>
+                </div>
+
+                <div class="option-card">
+                    <div class="option-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h3>Necesitas Ayuda</h3>
+                    <p>Estamos aquí para ayudarte con cualquier duda</p>
+                    <a href="#contacto" class="btn-primary">Contactar Soporte</a>
+                </div>
+            </div>
+
+            <div class="cancel-actions">
+                <a href="index.html" class="btn-primary">
+                    <i class="fas fa-home"></i> Volver al Inicio
+                </a>
+                <a href="#cursos" class="btn-secondary">
+                    <i class="fas fa-graduation-cap"></i> Ver Cursos
+                </a>
+            </div>
+
+            <div class="help-info" style="margin-top: 2rem;">
+                <h4>¿Por qué se canceló el pago?</h4>
+                <ul style="list-style: none; padding: 0; text-align: left; max-width: 400px; margin: 1rem auto;">
+                    <li style="margin: 0.5rem 0;">✓ Cancelaste manualmente el proceso</li>
+                    <li style="margin: 0.5rem 0;">✓ Hubo un problema con la tarjeta</li>
+                    <li style="margin: 0.5rem 0;">✓ La sesión expiró</li>
+                    <li style="margin: 0.5rem 0;">✓ Error de conexión</li>
+                </ul>
+                <p><strong>Importante:</strong> Tu seguridad es nuestra prioridad. Si tienes problemas, contacta con nosotros.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animar las opciones con un pequeño delay
+            const options = document.querySelectorAll('.option-card');
+            options.forEach((option, index) => {
+                option.style.opacity = '0';
+                option.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    option.style.transition = 'all 0.5s ease';
+                    option.style.opacity = '1';
+                    option.style.transform = 'translateY(0)';
+                }, 200 * (index + 1));
+            });
+
+            // Smooth scroll a secciones específicas
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    } else {
+                        // Si no encontramos el elemento, redirigimos al index
+                        window.location.href = 'index.html' + this.getAttribute('href');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
