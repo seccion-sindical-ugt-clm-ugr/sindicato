@@ -191,7 +191,17 @@ async function showPaymentForm(paymentData) {
 
     } catch (error) {
         console.error('Payment error:', error);
-        showMessage('error', 'Error al procesar el pago: ' + error.message);
+
+        // Mensaje más amigable para el usuario
+        if (error.message.includes('BACKEND REQUERIDO')) {
+            showMessage('error',
+                '⚠️ Sistema de pagos en configuración. ' +
+                'Por favor, contacta con el administrador del sitio para completar tu afiliación. ' +
+                'Email: ugt.clm.ugr@ugt.org'
+            );
+        } else {
+            showMessage('error', 'Error al procesar el pago: ' + error.message);
+        }
     }
 }
 
@@ -457,8 +467,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // loadCourses();
     // loadAnalytics();
 
-    // Verificar configuración de Stripe
-    if (window.STRIPE_CONFIG && window.STRIPE_CONFIG.secretKey === 'TU_CLAVE_SECRETA_AQUI') {
-        console.warn('⚠️ Stripe no está completamente configurado. La clave secreta necesita ser establecida.');
-    }
+    // Nota: La configuración de Stripe ahora se maneja en stripe-config.js
+    // Ver advertencias en la consola sobre requisitos de backend
 });
