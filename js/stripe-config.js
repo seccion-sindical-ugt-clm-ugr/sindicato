@@ -7,15 +7,11 @@ const STRIPE_CONFIG = {
     // Clave pública de Stripe (SEGURA para el frontend)
     publishableKey: 'pk_test_5KBH6AipFVudtyqsznP9vJXo00ku526ehA',
 
-    // ❌ ELIMINADO POR SEGURIDAD: secretKey
-    // Las claves secretas NUNCA deben estar en el frontend
-    // Implementa un backend (Node.js, PHP, Python) para manejar operaciones secretas
-
     // URLs de tu sitio
     successUrl: 'https://seccion-sindical-ugt-clm-ugr.github.io/sindicato/success.html',
     cancelUrl: 'https://seccion-sindical-ugt-clm-ugr.github.io/sindicato/cancel.html',
 
-    // Configuración de productos
+    // Configuración de productos (solo información de referencia)
     products: {
         affiliation: {
             name: 'Afiliación Anual UGT-CLM-UGR',
@@ -46,138 +42,206 @@ let elements;
 function initStripe() {
     if (typeof Stripe !== 'undefined') {
         stripe = Stripe(STRIPE_CONFIG.publishableKey);
-        console.log('Stripe inicializado correctamente');
+        console.log('✅ Stripe inicializado correctamente');
     } else {
-        console.error('Stripe no está cargado');
+        console.error('❌ Stripe no está cargado. Asegúrate de incluir <script src="https://js.stripe.com/v3/"></script>');
     }
 }
 
-// ⚠️ FUNCIÓN DESHABILITADA POR SEGURIDAD
-// Esta función requiere un BACKEND para funcionar correctamente
-// NO se pueden crear sesiones de Stripe directamente desde el navegador
+/**
+ * Crear sesión de checkout para afiliación
+ * Llama al backend para crear una sesión de pago segura
+ *
+ * @param {Object} userData - Datos del usuario
+ * @param {string} userData.name - Nombre completo
+ * @param {string} userData.email - Email
+ * @param {string} userData.phone - Teléfono
+ * @param {string} userData.department - Departamento/Centro
+ * @returns {Promise<Object>} Session object con id y url
+ */
 async function createAffiliationCheckout(userData) {
-    // ❌ DESHABILITADO: Llamadas directas a la API de Stripe desde el frontend son INSEGURAS
+    try {
+        // Validar que existe la configuración del backend
+        if (!window.BACKEND_CONFIG) {
+            throw new Error('⚠️ Configuración del backend no encontrada. Asegúrate de cargar backend-config.js');
+        }
 
-    throw new Error(
-        '⚠️ BACKEND REQUERIDO: ' +
-        'Los pagos requieren un servidor backend para procesar de forma segura. ' +
-        'Por favor, implementa un endpoint de servidor que maneje la creación de sesiones de Stripe. ' +
-        'Ver documentación en stripe-setup-guide.md'
-    );
+        const backendUrl = window.BACKEND_CONFIG.apiUrl;
+        const endpoint = window.BACKEND_CONFIG.endpoints.createAffiliation;
 
-    /* CÓDIGO DE REFERENCIA PARA IMPLEMENTAR EN EL BACKEND:
+        console.log('📤 Enviando solicitud de afiliación al backend...');
 
-    // Este código debe ejecutarse en tu SERVIDOR (Node.js, PHP, Python, etc.)
-    // NUNCA en el navegador del cliente
-
-    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
-    const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [{
-            price_data: {
-                currency: 'eur',
-                product_data: {
-                    name: 'Afiliación Anual UGT-CLM-UGR',
-                    description: 'Cuota anual de afiliación'
-                },
-                unit_amount: 1500  // 15.00 EUR en centavos
+        // Llamar al endpoint del backend
+        const response = await fetch(`${backendUrl}${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
-            quantity: 1
-        }],
-        mode: 'payment',
-        success_url: 'https://tu-sitio.com/success.html?session_id={CHECKOUT_SESSION_ID}',
-        cancel_url: 'https://tu-sitio.com/cancel.html',
-        customer_email: userData.email,
-        metadata: {
-            name: userData.name,
-            phone: userData.phone,
-            department: userData.department
+            body: JSON.stringify(userData)
+        });
+
+        // Verificar respuesta
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Error del servidor: ${response.status}`);
         }
-    });
 
-    return session;
-    */
-}
+        const session = await response.json();
 
-// ⚠️ FUNCIÓN DESHABILITADA POR SEGURIDAD
-// Esta función requiere un BACKEND para funcionar correctamente
-async function createCourseCheckout(courseType, userData, isMember = false) {
-    // ❌ DESHABILITADO: Llamadas directas a la API de Stripe desde el frontend son INSEGURAS
+        console.log('✅ Sesión de afiliación creada:', session.id);
 
-    throw new Error(
-        '⚠️ BACKEND REQUERIDO: ' +
-        'Los pagos de cursos requieren un servidor backend. ' +
-        'Implementa un endpoint de servidor para crear sesiones de pago de forma segura.'
-    );
+        return session;
 
-    /* CÓDIGO DE REFERENCIA PARA IMPLEMENTAR EN EL BACKEND:
+    } catch (error) {
+        console.error('❌ Error creando sesión de afiliación:', error);
 
-    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-    const price = isMember ? 1500 : 16000; // 15€ o 160€ en centavos
-
-    const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [{
-            price_data: {
-                currency: 'eur',
-                product_data: {
-                    name: `Curso Inteligencia Artificial - ${isMember ? 'Afiliado' : 'Externo'}`,
-                    description: 'Acceso completo al curso de IA'
-                },
-                unit_amount: price
-            },
-            quantity: 1
-        }],
-        mode: 'payment',
-        success_url: 'https://tu-sitio.com/success.html?session_id={CHECKOUT_SESSION_ID}&course=' + courseType,
-        cancel_url: 'https://tu-sitio.com/cancel.html',
-        customer_email: userData.email,
-        metadata: {
-            courseType: courseType,
-            isMember: isMember.toString(),
-            name: userData.name,
-            phone: userData.phone
+        // Mensajes de error más amigables
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            throw new Error(
+                '⚠️ No se puede conectar con el servidor de pagos. ' +
+                'Verifica que el backend esté funcionando. ' +
+                'URL: ' + (window.BACKEND_CONFIG?.apiUrl || 'no configurada')
+            );
         }
-    });
 
-    return session;
-    */
-}
-
-// Redirigir a Stripe Checkout
-async function redirectToStripeCheckout(sessionId) {
-    if (stripe) {
-        const { error } = await stripe.redirectToCheckout({ sessionId });
-        if (error) {
-            console.error('Error redirecting to checkout:', error);
-            showMessage('error', 'Error al redirigir al pago: ' + error.message);
-        }
+        throw error;
     }
 }
 
-// ⚠️ FUNCIÓN DESHABILITADA POR SEGURIDAD
-// Verificación de pagos debe hacerse en el BACKEND
+/**
+ * Crear sesión de checkout para curso
+ * Llama al backend para crear una sesión de pago segura
+ *
+ * @param {string} courseType - Tipo de curso (ej: 'ia')
+ * @param {Object} userData - Datos del usuario
+ * @param {string} userData.name - Nombre completo
+ * @param {string} userData.email - Email
+ * @param {string} userData.phone - Teléfono
+ * @param {string} userData.department - Empresa/Institución
+ * @param {boolean} isMember - Si es afiliado UGT o no
+ * @returns {Promise<Object>} Session object con id y url
+ */
+async function createCourseCheckout(courseType, userData, isMember = false) {
+    try {
+        // Validar que existe la configuración del backend
+        if (!window.BACKEND_CONFIG) {
+            throw new Error('⚠️ Configuración del backend no encontrada. Asegúrate de cargar backend-config.js');
+        }
+
+        const backendUrl = window.BACKEND_CONFIG.apiUrl;
+        const endpoint = window.BACKEND_CONFIG.endpoints.createCourse;
+
+        console.log('📤 Enviando solicitud de curso al backend...', {
+            courseType,
+            isMember,
+            price: isMember ? '15€' : '160€'
+        });
+
+        // Preparar datos para el backend
+        const requestData = {
+            ...userData,
+            courseType: courseType,
+            isMember: isMember
+        };
+
+        // Llamar al endpoint del backend
+        const response = await fetch(`${backendUrl}${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        // Verificar respuesta
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Error del servidor: ${response.status}`);
+        }
+
+        const session = await response.json();
+
+        console.log('✅ Sesión de curso creada:', session.id);
+
+        return session;
+
+    } catch (error) {
+        console.error('❌ Error creando sesión de curso:', error);
+
+        // Mensajes de error más amigables
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            throw new Error(
+                '⚠️ No se puede conectar con el servidor de pagos. ' +
+                'Verifica que el backend esté funcionando. ' +
+                'URL: ' + (window.BACKEND_CONFIG?.apiUrl || 'no configurada')
+            );
+        }
+
+        throw error;
+    }
+}
+
+/**
+ * Redirigir a Stripe Checkout
+ * @param {string} sessionId - ID de la sesión de Stripe
+ */
+async function redirectToStripeCheckout(sessionId) {
+    if (!stripe) {
+        console.error('❌ Stripe no inicializado');
+        throw new Error('Stripe no está inicializado');
+    }
+
+    try {
+        const { error } = await stripe.redirectToCheckout({ sessionId });
+
+        if (error) {
+            console.error('❌ Error redirigiendo a checkout:', error);
+            showMessage('error', 'Error al redirigir al pago: ' + error.message);
+            throw error;
+        }
+    } catch (error) {
+        console.error('❌ Error en redirectToStripeCheckout:', error);
+        throw error;
+    }
+}
+
+/**
+ * Verificar estado de una sesión de pago
+ * (Solo para consultas, los webhooks manejan la confirmación real)
+ *
+ * @param {string} sessionId - ID de la sesión de Stripe
+ * @returns {Promise<Object>} Información de la sesión
+ */
 async function checkPaymentStatus(sessionId) {
-    // ❌ DESHABILITADO: Esta operación requiere clave secreta y debe ejecutarse en el servidor
+    try {
+        // Validar que existe la configuración del backend
+        if (!window.BACKEND_CONFIG) {
+            throw new Error('⚠️ Configuración del backend no encontrada');
+        }
 
-    throw new Error(
-        '⚠️ BACKEND REQUERIDO: ' +
-        'La verificación del estado de pago debe hacerse desde el servidor backend.'
-    );
+        const backendUrl = window.BACKEND_CONFIG.apiUrl;
+        const endpoint = window.BACKEND_CONFIG.endpoints.getSession;
 
-    /* CÓDIGO DE REFERENCIA PARA IMPLEMENTAR EN EL BACKEND:
+        const response = await fetch(`${backendUrl}${endpoint}/${sessionId}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
 
-    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        if (!response.ok) {
+            throw new Error(`Error obteniendo sesión: ${response.status}`);
+        }
 
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+        const sessionData = await response.json();
+        return sessionData;
 
-    return {
-        status: session.payment_status,
-        customer: session.customer_details,
-        metadata: session.metadata
-    };
-    */
+    } catch (error) {
+        console.error('❌ Error verificando estado de pago:', error);
+        throw error;
+    }
 }
 
 // Formatear precio para mostrar
@@ -217,10 +281,34 @@ function showMessage(type, text) {
     message.style.top = '20px';
     message.style.right = '20px';
     message.style.zIndex = '10000';
+    message.style.padding = '15px 20px';
+    message.style.borderRadius = '8px';
+    message.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    message.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+    message.style.fontSize = '14px';
+    message.style.maxWidth = '400px';
+
+    // Estilos según tipo
+    if (type === 'success') {
+        message.style.background = '#4CAF50';
+        message.style.color = 'white';
+    } else if (type === 'error') {
+        message.style.background = '#f44336';
+        message.style.color = 'white';
+    } else {
+        message.style.background = '#2196F3';
+        message.style.color = 'white';
+    }
 
     setTimeout(() => {
         if (document.body.contains(message)) {
-            document.body.removeChild(message);
+            message.style.opacity = '0';
+            message.style.transition = 'opacity 0.3s';
+            setTimeout(() => {
+                if (document.body.contains(message)) {
+                    document.body.removeChild(message);
+                }
+            }, 300);
         }
     }, 5000);
 }
@@ -240,20 +328,24 @@ window.showMessage = showMessage;
 document.addEventListener('DOMContentLoaded', function() {
     initStripe();
 
-    // ⚠️ ADVERTENCIA DE SEGURIDAD
-    console.warn(
-        '%c⚠️ ADVERTENCIA DE SEGURIDAD - STRIPE NO CONFIGURADO COMPLETAMENTE',
-        'background: #ff6b6b; color: white; font-size: 16px; padding: 10px; font-weight: bold;'
-    );
-    console.warn(
-        '%cLos pagos con Stripe requieren un BACKEND (servidor) para funcionar de forma segura.\n' +
-        'Actualmente, las funciones de pago están DESHABILITADAS por seguridad.\n\n' +
-        'Para habilitar pagos:\n' +
-        '1. Implementa un servidor backend (Node.js, PHP, Python, etc.)\n' +
-        '2. Mueve la clave secreta de Stripe al servidor\n' +
-        '3. Crea endpoints API en tu servidor para crear sesiones de pago\n' +
-        '4. Modifica el frontend para llamar a tus endpoints\n\n' +
-        'Ver: stripe-setup-guide.md para más información',
-        'color: #666; font-size: 12px;'
-    );
+    // Verificar configuración del backend
+    if (window.BACKEND_CONFIG) {
+        console.log('%c✅ Backend API Configurado', 'background: #4CAF50; color: white; padding: 5px; font-weight: bold;');
+        console.log('URL:', window.BACKEND_CONFIG.apiUrl);
+
+        // Verificar conexión con el backend
+        window.checkBackendConnection().then(connected => {
+            if (connected) {
+                console.log('%c✅ Sistema de Pagos Listo', 'background: #4CAF50; color: white; padding: 5px; font-weight: bold;');
+                console.log('💳 Los pagos están habilitados y funcionando correctamente');
+            } else {
+                console.warn('%c⚠️ Backend no responde', 'background: #ff9800; color: white; padding: 5px; font-weight: bold;');
+                console.warn('Asegúrate de que el backend esté corriendo en:', window.BACKEND_CONFIG.apiUrl);
+            }
+        });
+    } else {
+        console.error('%c❌ Backend NO Configurado', 'background: #f44336; color: white; padding: 5px; font-weight: bold;');
+        console.error('⚠️ Asegúrate de cargar backend-config.js ANTES de stripe-config.js');
+        console.error('Añade <script src="js/backend-config.js"></script> en tu HTML');
+    }
 });
