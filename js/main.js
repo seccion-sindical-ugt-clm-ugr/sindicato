@@ -107,8 +107,7 @@ loginForm.addEventListener('submit', async (e) => {
 affiliateForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-<<<<<<< HEAD
-    // Extraer datos del formulario
+// Extraer datos del formulario
     const nameInput = affiliateForm.querySelector('input[name="name"]');
     const emailInput = affiliateForm.querySelector('input[name="email"]');
     const phoneInput = affiliateForm.querySelector('input[name="phone"]');
@@ -120,11 +119,6 @@ affiliateForm.addEventListener('submit', async (e) => {
         phone: phoneInput ? phoneInput.value : '',
         department: departmentInput ? departmentInput.value : ''
     };
-=======
-    const formData = new FormData(affiliateForm);
-    const name = affiliateForm.querySelector('input[type="text"]').value;
-    const email = affiliateForm.querySelector('input[type="email"]').value;
->>>>>>> 37718c676cccacb52d4b2c759adebb55f8427bff
 
     // Show loading state
     const submitBtn = affiliateForm.querySelector('button[type="submit"]');
@@ -459,20 +453,17 @@ style.textContent = `
         color: #635BFF;
     }
 `;
-<<<<<<< HEAD
-document.head.appendChild(style);
-=======
 document.head.appendChild(style);
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
-    loadMembers();
-    loadCourses();
-    loadAnalytics();
+    // Cargar datos dinámicos (funciones por implementar)
+    // loadMembers();
+    // loadCourses();
+    // loadAnalytics();
 
     // Verificar configuración de Stripe
     if (window.STRIPE_CONFIG && window.STRIPE_CONFIG.secretKey === 'TU_CLAVE_SECRETA_AQUI') {
         console.warn('⚠️ Stripe no está completamente configurado. La clave secreta necesita ser establecida.');
     }
 });
->>>>>>> 37718c676cccacb52d4b2c759adebb55f8427bff
