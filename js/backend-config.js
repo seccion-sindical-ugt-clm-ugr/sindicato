@@ -16,7 +16,7 @@ const BACKEND_CONFIG = {
 
     // URL del backend en producción (Vercel)
     // ✅ CONFIGURADO: Backend desplegado exitosamente
-    production: 'https://sindicato-fn8uvvg90-javiers-projects-cc8068ed.vercel.app',
+    production: 'https://sindicato-mu.vercel.app',
 
     // Auto-detectar entorno actual
     get apiUrl() {
