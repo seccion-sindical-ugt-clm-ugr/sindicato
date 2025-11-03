@@ -14,7 +14,10 @@ const BACKEND_CONFIG = {
     // URL del backend en desarrollo (servidor local)
     development: 'http://localhost:3000',
 
-    // URL del backend en producción (reemplazar con tu URL de Vercel/Railway/Render)
+    // URL del backend en producción
+    // TODO: Después de desplegar en Vercel, reemplazar con tu URL real
+    // La URL será algo como: https://sindicato-abc123def456.vercel.app
+    // Ver DEPLOYMENT_GUIDE.md para instrucciones completas
     production: 'https://TU-BACKEND.vercel.app',
 
     // Auto-detectar entorno actual
