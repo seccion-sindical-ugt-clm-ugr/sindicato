@@ -54,18 +54,9 @@ out/
 *.crt
 *.p12
 
-<<<<<<< HEAD
-=======
-# Variables de entorno y claves API
-.env
-.env.local
-.env.production
-*.env
-
 # Stripe Configuration
 stripe-secret-key.txt
 
->>>>>>> 37718c676cccacb52d4b2c759adebb55f8427bff
 # Archivos de pago (simulados)
 payment-logs/
 transactions/

@@ -132,15 +132,10 @@ affiliateForm.addEventListener('submit', async (e) => {
 
         // Show payment form or redirect to payment
         showPaymentForm({
-<<<<<<< HEAD
             name: userData.name,
             email: userData.email,
             phone: userData.phone,
             department: userData.department,
-=======
-            name: name,
-            email: email,
->>>>>>> 37718c676cccacb52d4b2c759adebb55f8427bff
             amount: 15,
             description: 'Cuota anual UGT-CLM-UGR'
         });
