@@ -27,19 +27,39 @@ const PORT = process.env.PORT || 3000;
 // CONECTAR A MONGODB (Opcional)
 // ====================================
 
+// Variable para guardar el error de conexión si ocurre
+let mongoConnectionError = null;
+
 if (process.env.MONGODB_URI) {
+    console.log('🔄 Intentando conectar a MongoDB...');
+    console.log('📍 URI detectada (primeros 20 chars):', process.env.MONGODB_URI.substring(0, 20) + '...');
+
     mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
         console.log('✅ MongoDB conectado correctamente');
+        console.log('📊 Estado de conexión:', mongoose.connection.readyState);
     })
     .catch((error) => {
+        mongoConnectionError = error;
         console.error('❌ Error conectando a MongoDB:', error.message);
+        console.error('🔍 Tipo de error:', error.name);
+        console.error('📋 Detalles:', error.codeName || error.code || 'Sin código de error');
         console.log('⚠️ El servidor continuará sin base de datos');
-        console.log('💡 Las sugerencias no se guardarán hasta configurar MONGODB_URI');
+        console.log('💡 Las sugerencias no se guardarán hasta resolver el problema');
+
+        // Sugerencias según el tipo de error
+        if (error.message.includes('Authentication failed')) {
+            console.log('🔐 Solución: Verifica el usuario y contraseña en MONGODB_URI');
+        } else if (error.message.includes('IP') || error.message.includes('whitelist')) {
+            console.log('🌐 Solución: Añade 0.0.0.0/0 a la whitelist en MongoDB Atlas');
+        } else if (error.message.includes('ENOTFOUND') || error.message.includes('ECONNREFUSED')) {
+            console.log('🔌 Solución: Verifica que la URI de MongoDB sea correcta');
+        }
     });
 } else {
     console.log('⚠️ MONGODB_URI no configurado - sistema de sugerencias deshabilitado');
     console.log('💡 Para habilitar sugerencias, añade MONGODB_URI a las variables de entorno');
+    mongoConnectionError = new Error('MONGODB_URI no configurada');
 }
 
 // ====================================
@@ -110,13 +130,27 @@ app.use('/api', suggestionsRoutes);
 
 // Ruta raíz
 app.get('/', (req, res) => {
-    res.json({
+    const mongoState = mongoose.connection.readyState;
+    const mongoStates = {
+        0: 'desconectada',
+        1: 'conectada',
+        2: 'conectando',
+        3: 'desconectando'
+    };
+
+    const response = {
         name: 'UGT-CLM-UGR Backend API',
         version: '1.0.0',
         status: 'running',
-        database: mongoose.connection.readyState === 1 ? 'conectada' : 'desconectada',
+        database: {
+            status: mongoStates[mongoState] || 'desconocido',
+            stateCode: mongoState,
+            configured: !!process.env.MONGODB_URI,
+            error: mongoConnectionError ? mongoConnectionError.message : null
+        },
         endpoints: {
             health: '/health',
+            healthDetailed: '/health/detailed',
             createAffiliationSession: 'POST /api/create-affiliation-session',
             createCourseSession: 'POST /api/create-course-session',
             webhook: 'POST /webhook',
@@ -125,7 +159,9 @@ app.get('/', (req, res) => {
             suggestionsStats: 'GET /api/suggestions/stats'
         },
         documentation: 'Ver README.md para más información'
-    });
+    };
+
+    res.json(response);
 });
 
 // Ruta 404
