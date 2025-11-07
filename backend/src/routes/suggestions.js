@@ -87,22 +87,30 @@ router.post('/suggestions', suggestionsLimiter,
     ],
     async (req, res) => {
         try {
+            console.log('📝 Recibida petición de nueva sugerencia');
+
             // Validar entrada
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
+                console.log('❌ Validación fallida:', errors.array());
                 return res.status(400).json({
                     error: 'Datos inválidos',
                     details: errors.array()
                 });
             }
 
+            console.log('✅ Validación de datos OK');
+
             // Verificar si MongoDB está configurado
             if (!Suggestion) {
+                console.log('❌ Modelo Suggestion no disponible');
                 return res.status(503).json({
                     error: 'Base de datos no disponible',
                     message: 'El sistema de sugerencias está en mantenimiento. Por favor, contacta directamente con el sindicato.'
                 });
             }
+
+            console.log('✅ Modelo Suggestion disponible');
 
             const {
                 name,
@@ -130,11 +138,16 @@ router.post('/suggestions', suggestionsLimiter,
                 sanitizedData.department = xss(department) || null;
             }
 
+            console.log('📦 Datos sanitizados:', JSON.stringify(sanitizedData, null, 2));
+
             // Crear sugerencia
+            console.log('💾 Intentando crear documento en MongoDB...');
             const suggestion = new Suggestion(sanitizedData);
+
+            console.log('💾 Documento creado, guardando en BD...');
             await suggestion.save();
 
-            console.log('📝 Nueva sugerencia recibida:', {
+            console.log('✅ Nueva sugerencia guardada correctamente:', {
                 id: suggestion._id,
                 type: suggestion.type,
                 urgency: suggestion.urgency,
@@ -171,9 +184,32 @@ router.post('/suggestions', suggestionsLimiter,
 
         } catch (error) {
             console.error('❌ Error creando sugerencia:', error);
+            console.error('❌ Tipo de error:', error.name);
+            console.error('❌ Mensaje:', error.message);
+            console.error('❌ Stack:', error.stack);
+
+            // Si es error de validación de MongoDB, dar más detalles
+            if (error.name === 'ValidationError') {
+                console.error('❌ Errores de validación:', error.errors);
+                return res.status(400).json({
+                    error: 'Error de validación',
+                    message: 'Los datos enviados no cumplen con los requisitos',
+                    details: Object.keys(error.errors).map(key => ({
+                        field: key,
+                        message: error.errors[key].message
+                    }))
+                });
+            }
+
             res.status(500).json({
                 error: 'Error del servidor',
-                message: 'No se pudo procesar tu sugerencia. Por favor, inténtalo de nuevo.'
+                message: 'No se pudo procesar tu sugerencia. Por favor, inténtalo de nuevo.',
+                ...(process.env.NODE_ENV === 'development' && {
+                    debug: {
+                        errorName: error.name,
+                        errorMessage: error.message
+                    }
+                })
             });
         }
     }

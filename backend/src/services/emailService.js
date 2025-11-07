@@ -154,7 +154,8 @@ async function sendSuggestionConfirmation(suggestion) {
 
     } catch (error) {
         console.error('❌ Error enviando email de confirmación:', error);
-        throw error;
+        // No propagar error - el email es secundario
+        return null;
     }
 }
 
@@ -266,7 +267,8 @@ async function sendAdminNotification(suggestion) {
 
     } catch (error) {
         console.error('❌ Error enviando notificación a admin:', error);
-        throw error;
+        // No propagar error - el email es secundario
+        return null;
     }
 }
 
@@ -362,7 +364,8 @@ async function sendStatusUpdate(suggestion, newStatus, adminNotes = '') {
 
     } catch (error) {
         console.error('❌ Error enviando email de actualización:', error);
-        throw error;
+        // No propagar error - el email es secundario
+        return null;
     }
 }
 
