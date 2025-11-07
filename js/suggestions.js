@@ -276,24 +276,24 @@ async function handleSuggestionSubmit(e) {
         // Enviar sugerencia
         const result = await submitSuggestion(formData);
 
-        // Mostrar mensaje de éxito
+        // Ocultar formulario y mostrar mensaje de éxito
+        form.style.display = 'none';
         showMessage(messageDiv, 'success',
             '✅ ¡Sugerencia enviada correctamente! Gracias por tu participación.');
 
-        // Limpiar formulario
-        form.reset();
-
-        // Cerrar modal después de 2 segundos
+        // Cerrar modal después de 3 segundos
         setTimeout(() => {
             hideSuggestionsModal();
-        }, 2000);
+            // Restaurar formulario
+            form.style.display = 'block';
+            form.reset();
+        }, 3000);
 
     } catch (error) {
         // Mostrar mensaje de error
         showMessage(messageDiv, 'error',
             `❌ Error: ${error.message}. Por favor, inténtalo de nuevo.`);
-    } finally {
-        // Rehabilitar botón
+        // Rehabilitar botón en caso de error
         submitButton.disabled = false;
         submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Sugerencia';
     }
