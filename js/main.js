@@ -690,29 +690,122 @@ affiliateForm.addEventListener('submit', async (e) => {
     }
 });
 
+// SISTEMA REAL DE EMAIL CON EMAILJS
 contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(contactForm);
+    // Obtener datos del formulario
+    const nameInput = document.getElementById('contact-name');
+    const emailInput = document.getElementById('contact-email');
+    const subjectInput = document.getElementById('contact-subject');
+    const messageInput = document.getElementById('contact-message');
+
+    const formData = {
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        subject: subjectInput.value.trim(),
+        message: messageInput.value.trim()
+    };
+
+    // Validación mejorada
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+        showMessage('error', 'Por favor, completa todos los campos');
+        return;
+    }
+
+    // Validación de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+        showMessage('error', 'Por favor, introduce un email válido');
+        return;
+    }
 
     // Show loading state
     const submitBtn = contactForm.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Enviando...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
     submitBtn.disabled = true;
 
     try {
-        // Simulate API call
-        await simulateAPICall();
+        // Inicializar EmailJS (solo se hace una vez)
+        if (typeof emailjs !== 'undefined') {
+            emailjs.init("YOUR_PUBLIC_KEY"); // Se reemplazará con la clave real
+        }
 
-        showMessage('success', 'Mensaje enviado correctamente. Te responderemos pronto.');
+        // Preparar datos para EmailJS
+        const templateParams = {
+            from_name: formData.name,
+            from_email: formData.email,
+            subject: formData.subject,
+            message: formData.message,
+            to_email: 'ugtclmgranada@gmail.com',
+            reply_to: formData.email,
+            website: 'UGT-CLM Granada',
+            timestamp: new Date().toLocaleString('es-ES')
+        };
+
+        console.log('📧 Enviando email con los datos:', templateParams);
+
+        // Enviar email usando EmailJS
+        const response = await emailjs.send(
+            'YOUR_SERVICE_ID',    // Se reemplazará con el service ID real
+            'YOUR_TEMPLATE_ID',   // Se reemplazará con el template ID real
+            templateParams
+        );
+
+        console.log('✅ Email enviado exitosamente:', response);
+
+        showMessage('success', '✅ Mensaje enviado correctamente. Te responderemos pronto.');
         contactForm.reset();
 
+        // Registrar envío para estadísticas
+        logContactFormSubmission(formData);
+
     } catch (error) {
-        showMessage('error', 'Error al enviar el mensaje');
+        console.error('❌ Error al enviar email:', error);
+
+        // Mensaje de error específico según el tipo de error
+        if (error.text === 'FAILED_TO_SEND') {
+            showMessage('error', '❌ Error al enviar el mensaje. Por favor, intenta más tarde o contacta directamente por email.');
+        } else if (error.status === 400) {
+            showMessage('error', '❌ Error en el formulario. Revisa los datos e intenta nuevamente.');
+        } else {
+            showMessage('error', '❌ Error de conexión. Por favor, intenta más tarde.');
+        }
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
+    }
+});
+
+// Función para registrar envíos (para estadísticas)
+function logContactFormSubmission(formData) {
+    const submission = {
+        timestamp: new Date().toISOString(),
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        userAgent: navigator.userAgent,
+        page: window.location.href
+    };
+
+    // Guardar en localStorage para registro local
+    const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+    submissions.push(submission);
+    localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
+
+    console.log('📊 Envío registrado para estadísticas:', submission);
+}
+
+// Inicialización de EmailJS cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof emailjs !== 'undefined') {
+        console.log('📧 EmailJS cargado correctamente');
+
+        // Configuración de ejemplo (debe reemplazarse con valores reales)
+        // emailjs.init("TU_PUBLIC_KEY_AQUI");
+    } else {
+        console.warn('⚠️ EmailJS no se pudo cargar. Usando modo fallback.');
     }
 });
 
