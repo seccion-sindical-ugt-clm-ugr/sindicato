@@ -36,26 +36,37 @@ document.querySelectorAll('.nav-menu a').forEach(link => {
     });
 });
 
-// Enhanced Hero Buttons functionality
+// SOLUCIÓN DEFINITIVA - Sin scroll, navegación directa
 function initHeroButtons() {
     const heroAffiliateBtn = document.getElementById('heroAffiliateBtn');
     const heroCoursesBtn = document.getElementById('heroCoursesBtn');
 
-    // Hero Affiliate Button
+    // Hero Affiliate Button - NAVEGACIÓN DIRECTA
     if (heroAffiliateBtn) {
         heroAffiliateBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('🎯 Hero: Botón de afiliación clicado');
+            console.log('🎯 Hero: Afiliación - Navegación directa iniciada');
 
-            // Hacer scroll suave a la sección de afiliación
+            // Ocultar todas las secciones menos la de afiliación
+            const allSections = document.querySelectorAll('section');
             const affiliateSection = document.querySelector('#afiliate');
-            if (affiliateSection) {
-                affiliateSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
 
-                // Enfocar el primer campo del formulario después del scroll
+            allSections.forEach(section => {
+                if (section.id !== 'afiliate') {
+                    section.style.display = 'none';
+                }
+            });
+
+            // Mostrar sección de afiliación con animación
+            if (affiliateSection) {
+                affiliateSection.style.display = 'block';
+                affiliateSection.scrollIntoView({ behavior: 'instant', block: 'start' });
+                affiliateSection.style.animation = 'fadeIn 0.5s ease-in';
+
+                // Añadir botón de volver arriba
+                showBackToTopButton('afiliado');
+
+                // Enfocar formulario inmediatamente
                 setTimeout(() => {
                     const firstInput = document.querySelector('#affiliateForm input[name="name"]');
                     if (firstInput) {
@@ -65,26 +76,39 @@ function initHeroButtons() {
                             firstInput.classList.remove('highlight');
                         }, 2000);
                     }
-                }, 800);
+                }, 300);
+
+                showMessage('success', 'Has llegado al formulario de afiliación 🎯');
             }
         });
     }
 
-    // Hero Courses Button
+    // Hero Courses Button - NAVEGACIÓN DIRECTA
     if (heroCoursesBtn) {
         heroCoursesBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('🎯 Hero: Botón de cursos clicado');
+            console.log('🎯 Hero: Cursos - Navegación directa iniciada');
 
-            // Hacer scroll suave a la sección de cursos
+            // Ocultar todas las secciones menos la de cursos
+            const allSections = document.querySelectorAll('section');
             const coursesSection = document.querySelector('#cursos');
-            if (coursesSection) {
-                coursesSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
 
-                // Resaltar el primer curso después del scroll
+            allSections.forEach(section => {
+                if (section.id !== 'cursos') {
+                    section.style.display = 'none';
+                }
+            });
+
+            // Mostrar sección de cursos con animación
+            if (coursesSection) {
+                coursesSection.style.display = 'block';
+                coursesSection.scrollIntoView({ behavior: 'instant', block: 'start' });
+                coursesSection.style.animation = 'fadeIn 0.5s ease-in';
+
+                // Añadir botón de volver arriba
+                showBackToTopButton('cursos');
+
+                // Resaltar primer curso
                 setTimeout(() => {
                     const firstCourse = document.querySelector('.featured-course');
                     if (firstCourse) {
@@ -93,10 +117,110 @@ function initHeroButtons() {
                             firstCourse.classList.remove('highlight-course');
                         }, 2000);
                     }
-                }, 800);
+                }, 300);
+
+                showMessage('success', 'Explora nuestros cursos de formación 📚');
             }
         });
     }
+}
+
+// Botón para volver al inicio
+function showBackToTopButton(context = 'default') {
+    // Eliminar botón existente si lo hay
+    const existingBtn = document.getElementById('backToTopBtn');
+    if (existingBtn) {
+        existingBtn.remove();
+    }
+
+    // Crear nuevo botón
+    const backBtn = document.createElement('button');
+    backBtn.id = 'backToTopBtn';
+    backBtn.innerHTML = `<i class="fas fa-arrow-up"></i> Volver al inicio`;
+    backBtn.className = 'btn btn-secondary back-to-top';
+    backBtn.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 1000;
+        animation: slideInUp 0.3s ease-out;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    `;
+
+    backBtn.addEventListener('click', () => {
+        // Restaurar todas las secciones
+        const allSections = document.querySelectorAll('section');
+        allSections.forEach(section => {
+            section.style.display = 'block';
+        });
+
+        // Scroll al inicio
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Eliminar botón
+        backBtn.remove();
+
+        showMessage('info', 'Bienvenido de vuelta al inicio 🏠');
+    });
+
+    document.body.appendChild(backBtn);
+}
+
+// Animación fadeIn
+const fadeInStyle = document.createElement('style');
+fadeInStyle.textContent = `
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInUp {
+        from { transform: translateY(100px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .back-to-top {
+        border-radius: 25px;
+        padding: 12px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .back-to-top:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+    }
+`;
+document.head.appendChild(fadeInStyle);
+
+// Función de scroll alternativo MÁS robusta
+function smoothScrollTo(targetElement, offset = 0) {
+    if (!targetElement) return;
+
+    console.log('🚀 Iniciando scroll alternativo hacia:', targetElement.id);
+
+    const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset + offset;
+    const startPosition = window.pageYOffset;
+    const distance = targetPosition - startPosition;
+    const duration = 1000; // 1 segundo
+    let start = null;
+
+    function animation(currentTime) {
+        if (start === null) start = currentTime;
+        const timeElapsed = currentTime - start;
+        const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+        window.scrollTo(0, run);
+        if (timeElapsed < duration) requestAnimationFrame(animation);
+    }
+
+    function easeInOutQuad(t, b, c, d) {
+        t /= d/2;
+        if (t < 1) return c/2*t*t + b;
+        t--;
+        return -c/2 * (t*(t-2) - 1) + b;
+    }
+
+    requestAnimationFrame(animation);
 }
 
 // Login Modal - Will be updated in updateLoginState function
