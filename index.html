@@ -276,23 +276,38 @@
                         </div>
                     </div>
                 </div>
-                <div class="contact-form">
-                    <h3>Envíanos un mensaje</h3>
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <input type="text" id="contact-name" name="name" placeholder="Nombre" required>
+                <div class="contact-actions">
+                    <h3>Contacta directamente</h3>
+                    <p class="contact-description">Habla con nosotros instantáneamente o envíanos un email</p>
+
+                    <div class="contact-buttons">
+                        <a href="#" id="whatsappBtn" class="btn-whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                            <span>Escribir por WhatsApp</span>
+                            <small>Respuesta inmediata</small>
+                        </a>
+
+                        <a href="mailto:ugtclmgranada@gmail.com" class="btn-email">
+                            <i class="fas fa-envelope"></i>
+                            <span>Enviar Email</span>
+                            <small>ugtclmgranada@gmail.com</small>
+                        </a>
+                    </div>
+
+                    <div class="contact-advantages">
+                        <div class="advantage">
+                            <i class="fas fa-bolt"></i>
+                            <span>Respuesta rápida</span>
                         </div>
-                        <div class="form-group">
-                            <input type="email" id="contact-email" name="email" placeholder="Email" required>
+                        <div class="advantage">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Comunicación segura</span>
                         </div>
-                        <div class="form-group">
-                            <input type="text" id="contact-subject" name="subject" placeholder="Asunto" required>
+                        <div class="advantage">
+                            <i class="fas fa-comments"></i>
+                            <span>Atención personalizada</span>
                         </div>
-                        <div class="form-group">
-                            <textarea id="contact-message" name="message" placeholder="Mensaje" rows="5" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-full">Enviar Mensaje</button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -442,9 +457,7 @@
         <i class="fas fa-lightbulb"></i>
     </button>
 
-    <!-- EmailJS -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
+    
     <script src="https://js.stripe.com/v3/"></script>
     <script src="js/backend-config.js"></script>
     <script src="js/stripe-config.js"></script>
