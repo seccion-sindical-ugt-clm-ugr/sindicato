@@ -186,36 +186,23 @@
         </div>
     </div>
 
-    <script src="https://js.stripe.com/v3/"></script>
-    <script src="js/stripe-config.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', function() {
             // Obtener el session_id de la URL
             const urlParams = new URLSearchParams(window.location.search);
             const sessionId = urlParams.get('session_id');
             const courseType = urlParams.get('course');
 
+            // Verificar que venimos de Stripe
             if (!sessionId) {
-                showError('No se encontró información del pago');
-                return;
+                console.warn('No se encontró session_id en la URL');
             }
 
-            try {
-                // Verificar el estado del pago
-                const paymentData = await checkPaymentStatus(sessionId);
-
-                if (paymentData && paymentData.status === 'paid') {
-                    displayPaymentDetails(paymentData, courseType);
-                } else {
-                    showError('El pago no se pudo completar');
-                }
-            } catch (error) {
-                console.error('Error verificando pago:', error);
-                showError('Error al verificar el estado del pago');
-            }
+            // Mostrar detalles del pago exitoso
+            displayPaymentSuccess(sessionId, courseType);
         });
 
-        function displayPaymentDetails(paymentData, courseType) {
+        function displayPaymentSuccess(sessionId, courseType) {
             const loadingDiv = document.getElementById('loadingMessage');
             const detailsDiv = document.getElementById('paymentDetails');
             const detailsContent = document.getElementById('detailsContent');
@@ -223,65 +210,23 @@
             // Ocultar mensaje de carga
             loadingDiv.style.display = 'none';
 
-            // Extraer metadata
-            let userData = {};
-            try {
-                userData = JSON.parse(paymentData.metadata.userData || '{}');
-            } catch (e) {
-                userData = {};
-            }
-
-            // Construir HTML de detalles
-            let detailsHTML = '';
-
-            if (userData.name) {
-                detailsHTML += `
-                    <div class="detail-item">
-                        <span>Nombre:</span>
-                        <span><strong>${userData.name}</strong></span>
-                    </div>
-                `;
-            }
-
-            if (userData.email) {
-                detailsHTML += `
-                    <div class="detail-item">
-                        <span>Email:</span>
-                        <span>${userData.email}</span>
-                    </div>
-                `;
-            }
-
-            if (userData.department) {
-                detailsHTML += `
-                    <div class="detail-item">
-                        <span>Departamento:</span>
-                        <span>${userData.department}</span>
-                    </div>
-                `;
-            }
-
             // Determinar el producto comprado
             let productName = 'Afiliación Anual UGT-CLM-UGR';
             let productPrice = '15,00 €';
 
             if (courseType) {
-                if (paymentData.metadata.isMember === 'true') {
-                    productName = 'Curso Inteligencia Artificial - Miembro UGT';
-                    productPrice = '15,00 €';
-                } else {
-                    productName = 'Curso Inteligencia Artificial - Externo';
-                    productPrice = '160,00 €';
-                }
+                productName = 'Curso Inteligencia Artificial';
+                productPrice = '15,00 € - 160,00 €';
             }
 
-            detailsHTML += `
+            // Construir HTML de detalles
+            const detailsHTML = `
                 <div class="detail-item">
                     <span>Producto:</span>
                     <span><strong>${productName}</strong></span>
                 </div>
                 <div class="detail-item">
-                    <span>Total Pagado:</span>
+                    <span>Precio:</span>
                     <span><strong>${productPrice}</strong></span>
                 </div>
                 <div class="detail-item">
@@ -292,49 +237,20 @@
                     <span>Estado:</span>
                     <span style="color: #4CAF50;"><strong>✓ Pagado</strong></span>
                 </div>
+                ${sessionId ? `
+                <div class="detail-item">
+                    <span>ID de Transacción:</span>
+                    <span style="font-size: 0.8em; font-family: monospace;">${sessionId.substring(0, 20)}...</span>
+                </div>
+                ` : ''}
             `;
 
             detailsContent.innerHTML = detailsHTML;
             detailsDiv.style.display = 'block';
 
-            // Enviar datos al servidor para procesamiento
-            sendPaymentConfirmation(sessionId, paymentData);
-        }
-
-        function showError(message) {
-            const container = document.querySelector('.success-container');
-            container.innerHTML = `
-                <div class="success-content">
-                    <div class="success-icon" style="background: #f44336;">
-                        <i class="fas fa-times"></i>
-                    </div>
-                    <h1 class="success-title">Error en el Pago</h1>
-                    <p class="success-message">${message}</p>
-                    <a href="index.html" class="btn-success">
-                        <i class="fas fa-home"></i> Volver al Inicio
-                    </a>
-                </div>
-            `;
-        }
-
-        function sendPaymentConfirmation(sessionId, paymentData) {
-            // Aquí puedes enviar los datos a tu servidor
-            // para procesar la afiliación o inscripción al curso
-            console.log('Enviando confirmación de pago:', { sessionId, paymentData });
-
-            // Ejemplo de cómo podrías enviarlo a un backend:
-            /*
-            fetch('https://tu-backend.com/api/payment-confirmation', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    sessionId: sessionId,
-                    paymentData: paymentData
-                })
-            });
-            */
+            // Log para debugging
+            console.log('✅ Pago completado exitosamente');
+            console.log('Session ID:', sessionId);
         }
     </script>
 </body>

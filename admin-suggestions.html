@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Sugerencias | UGT-CLM-UGR</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        /* Header */
+        .admin-header {
+            background: linear-gradient(135deg, #E30613, #c00510);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-header h1 {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-header .logout-btn {
+            float: right;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .admin-header .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Login Screen */
+        #login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-card h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .login-card p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        .login-card button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #E30613, #c00510);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-card button:hover {
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        /* Main Content */
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #E30613;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* Suggestions List */
+        .suggestions-list {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .suggestion-item {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 20px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .suggestion-item:hover {
+            background: #f8f9fa;
+        }
+
+        .suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .suggestion-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+            flex: 1;
+        }
+
+        .suggestion-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-type {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-urgency-alta {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .badge-urgency-media {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .badge-urgency-baja {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-status {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .suggestion-meta {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .suggestion-message {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            max-height: 60px;
+            overflow: hidden;
+        }
+
+        .suggestion-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-view {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-process {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-sm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Modal Detalle */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #E30613, #c00510);
+            color: white;
+            padding: 25px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .detail-group {
+            margin-bottom: 20px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: #333;
+            font-size: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+            }
+
+            .filters select {
+                width: 100%;
+            }
+
+            .suggestion-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .suggestion-actions {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h2><i class="fas fa-lock"></i> Acceso Administrador</h2>
+            <p>Panel de gestión de sugerencias</p>
+            <div id="login-error" class="error-message"></div>
+            <form id="login-form">
+                <input type="password" id="password" placeholder="Contraseña de administrador" required>
+                <button type="submit">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel" style="display: none;">
+        <header class="admin-header">
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+            <h1>
+                <i class="fas fa-tasks"></i>
+                Panel de Sugerencias
+            </h1>
+        </header>
+
+        <div class="admin-container">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Sugerencias</h3>
+                    <div class="stat-value" id="stat-total">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Pendientes</h3>
+                    <div class="stat-value" id="stat-pending">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>En Revisión</h3>
+                    <div class="stat-value" id="stat-reviewing">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Procesadas</h3>
+                    <div class="stat-value" id="stat-processed">-</div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <select id="filter-status" onchange="loadSuggestions()">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="en-revision">En Revisión</option>
+                    <option value="procesada">Procesada</option>
+                    <option value="archivada">Archivada</option>
+                </select>
+
+                <select id="filter-type" onchange="loadSuggestions()">
+                    <option value="">Todos los tipos</option>
+                    <option value="sugerencia">Sugerencia</option>
+                    <option value="queja">Queja</option>
+                    <option value="propuesta">Propuesta</option>
+                    <option value="denuncia">Denuncia</option>
+                    <option value="consulta">Consulta</option>
+                </select>
+
+                <select id="filter-urgency" onchange="loadSuggestions()">
+                    <option value="">Todas las urgencias</option>
+                    <option value="alta">Alta</option>
+                    <option value="media">Media</option>
+                    <option value="baja">Baja</option>
+                </select>
+
+                <button class="btn-sm btn-view" onclick="loadSuggestions()">
+                    <i class="fas fa-sync"></i> Actualizar
+                </button>
+            </div>
+
+            <!-- Suggestions List -->
+            <div class="suggestions-list" id="suggestions-container">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p>Cargando sugerencias...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalle -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Detalle de Sugerencia</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Se llenará con JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/backend-config.js"></script>
+    <script>
+        // Configuración
+        const API_URL = window.BACKEND_CONFIG ? window.BACKEND_CONFIG.apiUrl : 'https://sindicato-mu.vercel.app';
+        let authToken = localStorage.getItem('adminToken');
+        let currentSuggestions = [];
+
+        // Login
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+
+            // Guardar token (la contraseña misma es el token)
+            authToken = password;
+            localStorage.setItem('adminToken', authToken);
+
+            // Intentar cargar sugerencias
+            try {
+                await loadSuggestions();
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+            } catch (error) {
+                errorDiv.textContent = '❌ Contraseña incorrecta';
+                errorDiv.style.display = 'block';
+                localStorage.removeItem('adminToken');
+                authToken = null;
+            }
+        });
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('adminToken');
+            authToken = null;
+            location.reload();
+        }
+
+        // Cargar sugerencias
+        async function loadSuggestions() {
+            const container = document.getElementById('suggestions-container');
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Cargando...</p></div>';
+
+            const status = document.getElementById('filter-status')?.value || '';
+            const type = document.getElementById('filter-type')?.value || '';
+            const urgency = document.getElementById('filter-urgency')?.value || '';
+
+            const params = new URLSearchParams();
+            if (status) params.append('status', status);
+            if (type) params.append('type', type);
+            if (urgency) params.append('urgency', urgency);
+
+            try {
+                const response = await fetch(`${API_URL}/api/suggestions/admin?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error al cargar');
+
+                const result = await response.json();
+                currentSuggestions = result.data;
+
+                renderSuggestions(currentSuggestions);
+                updateStats();
+
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error al cargar sugerencias</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+                throw error;
+            }
+        }
+
+        // Renderizar sugerencias
+        function renderSuggestions(suggestions) {
+            const container = document.getElementById('suggestions-container');
+
+            if (!suggestions || suggestions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No hay sugerencias</h3>
+                        <p>No se encontraron sugerencias con los filtros seleccionados.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = suggestions.map(s => `
+                <div class="suggestion-item">
+                    <div class="suggestion-header">
+                        <div class="suggestion-title">${s.subject}</div>
+                        <div class="suggestion-badges">
+                            <span class="badge badge-type">${s.type}</span>
+                            <span class="badge badge-urgency-${s.urgency}">${s.urgency}</span>
+                            <span class="badge badge-status">${s.status}</span>
+                        </div>
+                    </div>
+                    <div class="suggestion-meta">
+                        ${s.isAnonymous ? '👤 Anónimo' : `👤 ${s.name || 'Sin nombre'}`}
+                        ${s.department ? ` | 🏢 ${s.department}` : ''}
+                        | 📅 ${new Date(s.createdAt).toLocaleDateString('es-ES')}
+                    </div>
+                    <div class="suggestion-message">${s.message}</div>
+                    <div class="suggestion-actions">
+                        <button class="btn-sm btn-view" onclick="viewDetail('${s._id}')">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                        ${s.status !== 'procesada' ? `
+                            <button class="btn-sm btn-process" onclick="updateStatus('${s._id}', 'procesada')">
+                                <i class="fas fa-check"></i> Procesar
+                            </button>
+                        ` : ''}
+                        <button class="btn-sm btn-delete" onclick="deleteSuggestion('${s._id}')">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            const total = currentSuggestions.length;
+            const pending = currentSuggestions.filter(s => s.status === 'pendiente').length;
+            const reviewing = currentSuggestions.filter(s => s.status === 'en-revision').length;
+            const processed = currentSuggestions.filter(s => s.status === 'procesada').length;
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-pending').textContent = pending;
+            document.getElementById('stat-reviewing').textContent = reviewing;
+            document.getElementById('stat-processed').textContent = processed;
+        }
+
+        // Ver detalle
+        function viewDetail(id) {
+            const suggestion = currentSuggestions.find(s => s._id === id);
+            if (!suggestion) return;
+
+            const modal = document.getElementById('detail-modal');
+            const body = document.getElementById('modal-body');
+
+            body.innerHTML = `
+                <div class="detail-group">
+                    <div class="detail-label">Tipo</div>
+                    <div class="detail-value">${suggestion.type}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Urgencia</div>
+                    <div class="detail-value">${suggestion.urgency}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Estado</div>
+                    <div class="detail-value">${suggestion.status}</div>
+                </div>
+                ${!suggestion.isAnonymous ? `
+                    <div class="detail-group">
+                        <div class="detail-label">Nombre</div>
+                        <div class="detail-value">${suggestion.name || 'No especificado'}</div>
+                    </div>
+                    ${suggestion.email ? `
+                        <div class="detail-group">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value">${suggestion.email}</div>
+                        </div>
+                    ` : ''}
+                    ${suggestion.department ? `
+                        <div class="detail-group">
+                            <div class="detail-label">Departamento</div>
+                            <div class="detail-value">${suggestion.department}</div>
+                        </div>
+                    ` : ''}
+                ` : '<div class="detail-group"><div class="detail-value"><em>Sugerencia anónima</em></div></div>'}
+                <div class="detail-group">
+                    <div class="detail-label">Asunto</div>
+                    <div class="detail-value"><strong>${suggestion.subject}</strong></div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Mensaje</div>
+                    <div class="detail-value" style="white-space: pre-wrap;">${suggestion.message}</div>
+                </div>
+                <div class="detail-group">
+                    <div class="detail-label">Fecha de envío</div>
+                    <div class="detail-value">${new Date(suggestion.createdAt).toLocaleString('es-ES')}</div>
+                </div>
+                ${suggestion.processedAt ? `
+                    <div class="detail-group">
+                        <div class="detail-label">Fecha de procesamiento</div>
+                        <div class="detail-value">${new Date(suggestion.processedAt).toLocaleString('es-ES')}</div>
+                    </div>
+                ` : ''}
+            `;
+
+            modal.style.display = 'flex';
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('detail-modal').style.display = 'none';
+        }
+
+        // Actualizar estado
+        async function updateStatus(id, status) {
+            if (!confirm(`¿Marcar como "${status}"?`)) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/suggestions/admin/${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ status, processedBy: 'Admin' })
+                });
+
+                if (!response.ok) throw new Error('Error al actualizar');
+
+                await loadSuggestions();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Eliminar sugerencia
+        async function deleteSuggestion(id) {
+            if (!confirm('¿Eliminar esta sugerencia? Esta acción no se puede deshacer.')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/suggestions/admin/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error al eliminar');
+
+                await loadSuggestions();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Iniciar
+        if (authToken) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            loadSuggestions();
+        }
+    </script>
+</body>
+</html>

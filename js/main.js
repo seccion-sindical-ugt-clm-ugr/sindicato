@@ -104,19 +104,67 @@ logoutBtn.addEventListener('click', () => {
     updateLoginState();
 });
 
-// Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+// Smooth scrolling for navigation links - Mejorado para hero buttons
+function initSmoothScroll() {
+    const anchors = document.querySelectorAll('a[href^="#"]');
+    console.log(`✅ Smooth scroll inicializado para ${anchors.length} enlaces`);
+
+    // Debug: verificar que los botones hero están incluidos
+    const heroButtons = document.querySelectorAll('.hero-buttons a');
+    console.log(`🎯 Botones hero detectados: ${heroButtons.length}`, heroButtons);
+
+    anchors.forEach((anchor, index) => {
+        console.log(`  ${index + 1}. ${anchor.getAttribute('href')} - ${anchor.textContent.trim().substring(0, 30)}`);
+
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            console.log(`🖱️ Click detectado en: ${href}`);
+
+            // Ignorar enlaces que son solo "#" (modales, etc.)
+            if (href === '#' || href === '#!' || !href) {
+                console.log(`⏭️ Ignorando enlace: ${href}`);
+                return;
+            }
+
+            e.preventDefault();
+            console.log(`🛑 preventDefault ejecutado para: ${href}`);
+
+            const target = document.querySelector(href);
+            console.log(`🎯 Target encontrado:`, target);
+
+            if (target) {
+                console.log(`📍 Navegando a: ${href}`);
+
+                // Hacer scroll suave
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+                // Si es el formulario de afiliación, enfocar el primer campo después del scroll
+                if (href === '#afiliate') {
+                    setTimeout(() => {
+                        const firstInput = document.querySelector('#affiliateForm input[name="name"]');
+                        if (firstInput) {
+                            firstInput.focus();
+                            console.log('✅ Formulario de afiliación enfocado');
+                        }
+                    }, 800); // Esperar a que termine el scroll
+                }
+            } else {
+                console.warn(`⚠️ No se encontró el elemento: ${href}`);
+            }
+        }, true); // Usar capture phase
     });
-});
+}
+
+// Ejecutar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSmoothScroll);
+} else {
+    // DOM ya está listo, ejecutar inmediatamente
+    initSmoothScroll();
+}
 
 // Header scroll effect
 window.addEventListener('scroll', () => {
@@ -398,7 +446,17 @@ async function showPaymentForm(paymentData) {
 
     } catch (error) {
         console.error('Payment error:', error);
-        showMessage('error', 'Error al procesar el pago: ' + error.message);
+
+        // Mensaje más amigable para el usuario
+        if (error.message.includes('BACKEND REQUERIDO')) {
+            showMessage('error',
+                '⚠️ Sistema de pagos en configuración. ' +
+                'Por favor, contacta con el administrador del sitio para completar tu afiliación. ' +
+                'Email: ugt.clm.ugr@ugt.org'
+            );
+        } else {
+            showMessage('error', 'Error al procesar el pago: ' + error.message);
+        }
     }
 }
 
@@ -668,8 +726,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // loadCourses();
     // loadAnalytics();
 
-    // Verificar configuración de Stripe
-    if (window.STRIPE_CONFIG && window.STRIPE_CONFIG.secretKey === 'TU_CLAVE_SECRETA_AQUI') {
-        console.warn('⚠️ Stripe no está completamente configurado. La clave secreta necesita ser establecida.');
-    }
+    // Nota: La configuración de Stripe ahora se maneja en stripe-config.js
+    // Ver advertencias en la consola sobre requisitos de backend
 });

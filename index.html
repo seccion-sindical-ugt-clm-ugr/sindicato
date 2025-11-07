@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sección Sindical UGT-CLM-UGR Granada</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/suggestions.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -13,7 +14,7 @@
         <nav class="navbar">
             <div class="container">
                 <div class="nav-brand">
-                    <img src="images/brand/logo.PNG" alt="UGT Logo" class="logo">
+                  <img src="images/brand/ugt-logo.PNG" alt="UGT Logo" class="logo">
                     <div class="brand-text">
                         <h1>UGT-CLM-UGR Granada</h1>
                         <p>Sección Sindical</p>
@@ -209,16 +210,16 @@
                     <h3>Afíliate Ahora</h3>
                     <form id="affiliateForm">
                         <div class="form-group">
-                          <input type="text" name="name" placeholder="Nombre completo" required>
+                          <input type="text" id="affiliate-name" name="name" placeholder="Nombre completo" required>
                         </div>
                         <div class="form-group">
-                            <input type="email" name="email" placeholder="Email" required>
+                            <input type="email" id="affiliate-email" name="email" placeholder="Email" required>
                         </div>
                         <div class="form-group">
-                            <input type="tel" name="phone" placeholder="Teléfono" required>
+                            <input type="tel" id="affiliate-phone" name="phone" placeholder="Teléfono" required>
                         </div>
                         <div class="form-group">
-                            <input type="text" name="department" placeholder="Departamento/Centro" required>
+                            <input type="text" id="affiliate-department" name="department" placeholder="Departamento/Centro" required>
                         </div>
                         <button type="submit" class="btn btn-primary btn-full">
                             <i class="fas fa-lock"></i> Afiliarse por 15€/año
@@ -271,16 +272,16 @@
                     <h3>Envíanos un mensaje</h3>
                     <form id="contactForm">
                         <div class="form-group">
-                            <input type="text" placeholder="Nombre" required>
+                            <input type="text" id="contact-name" name="name" placeholder="Nombre" required>
                         </div>
                         <div class="form-group">
-                            <input type="email" placeholder="Email" required>
+                            <input type="email" id="contact-email" name="email" placeholder="Email" required>
                         </div>
                         <div class="form-group">
-                            <input type="text" placeholder="Asunto" required>
+                            <input type="text" id="contact-subject" name="subject" placeholder="Asunto" required>
                         </div>
                         <div class="form-group">
-                            <textarea placeholder="Mensaje" rows="5" required></textarea>
+                            <textarea id="contact-message" name="message" placeholder="Mensaje" rows="5" required></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary btn-full">Enviar Mensaje</button>
                     </form>
@@ -428,8 +429,15 @@
         </div>
     </footer>
 
+    <!-- Botón flotante de sugerencias -->
+    <button class="suggestions-floating-btn" onclick="showSuggestionsModal()" aria-label="Abrir buzón de sugerencias">
+        <i class="fas fa-lightbulb"></i>
+    </button>
+
     <script src="https://js.stripe.com/v3/"></script>
+    <script src="js/backend-config.js"></script>
     <script src="js/stripe-config.js"></script>
+    <script src="js/suggestions.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

@@ -54,12 +54,6 @@ out/
 *.crt
 *.p12
 
-# Variables de entorno y claves API
-.env
-.env.local
-.env.production
-*.env
-
 # Stripe Configuration
 stripe-secret-key.txt
 
