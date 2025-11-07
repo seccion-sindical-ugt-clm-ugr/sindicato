@@ -36,93 +36,175 @@ document.querySelectorAll('.nav-menu a').forEach(link => {
     });
 });
 
-// SOLUCIÓN DEFINITIVA - Sin scroll, navegación directa
+// SISTEMA DE NAVEGACIÓN INTELIGENTE
+let isSingleSectionMode = false;
+let originalSectionStates = new Map();
+
+// Guardar estados originales de todas las secciones
+function saveOriginalStates() {
+    const allSections = document.querySelectorAll('section');
+    allSections.forEach(section => {
+        originalSectionStates.set(section.id, section.style.display || 'block');
+    });
+}
+
+// Restaurar todos los estados originales
+function restoreAllSections() {
+    const allSections = document.querySelectorAll('section');
+    allSections.forEach(section => {
+        const originalDisplay = originalSectionStates.get(section.id) || 'block';
+        section.style.display = originalDisplay;
+    });
+    isSingleSectionMode = false;
+    console.log('🔄 Todos los estados restaurados');
+}
+
+// Mostrar una sola sección
+function showSingleSection(sectionId, message = '') {
+    if (isSingleSectionMode) {
+        console.log('📍 Ya estamos en modo sección única, cambiando a:', sectionId);
+    }
+
+    // Ocultar todas las secciones menos la deseada
+    const allSections = document.querySelectorAll('section');
+    const targetSection = document.querySelector(`#${sectionId}`);
+
+    allSections.forEach(section => {
+        section.style.display = 'none';
+    });
+
+    // Mostrar sección objetivo
+    if (targetSection) {
+        targetSection.style.display = 'block';
+        targetSection.scrollIntoView({ behavior: 'instant', block: 'start' });
+        targetSection.style.animation = 'fadeIn 0.5s ease-in';
+        isSingleSectionMode = true;
+
+        if (message) {
+            showMessage('success', message);
+        }
+
+        console.log(`✅ Sección ${sectionId} mostrada en modo individual`);
+    }
+}
+
+// SOLUCIÓN DEFINITIVA - Navegación directa con gestión de estado
 function initHeroButtons() {
     const heroAffiliateBtn = document.getElementById('heroAffiliateBtn');
     const heroCoursesBtn = document.getElementById('heroCoursesBtn');
 
-    // Hero Affiliate Button - NAVEGACIÓN DIRECTA
+    // Hero Affiliate Button
     if (heroAffiliateBtn) {
         heroAffiliateBtn.addEventListener('click', (e) => {
             e.preventDefault();
             console.log('🎯 Hero: Afiliación - Navegación directa iniciada');
 
-            // Ocultar todas las secciones menos la de afiliación
-            const allSections = document.querySelectorAll('section');
-            const affiliateSection = document.querySelector('#afiliate');
+            showSingleSection('afiliate', 'Has llegado al formulario de afiliación 🎯');
+            showBackToTopButton('afiliado');
 
-            allSections.forEach(section => {
-                if (section.id !== 'afiliate') {
-                    section.style.display = 'none';
+            // Enfocar formulario inmediatamente
+            setTimeout(() => {
+                const firstInput = document.querySelector('#affiliateForm input[name="name"]');
+                if (firstInput) {
+                    firstInput.focus();
+                    firstInput.classList.add('highlight');
+                    setTimeout(() => {
+                        firstInput.classList.remove('highlight');
+                    }, 2000);
                 }
-            });
-
-            // Mostrar sección de afiliación con animación
-            if (affiliateSection) {
-                affiliateSection.style.display = 'block';
-                affiliateSection.scrollIntoView({ behavior: 'instant', block: 'start' });
-                affiliateSection.style.animation = 'fadeIn 0.5s ease-in';
-
-                // Añadir botón de volver arriba
-                showBackToTopButton('afiliado');
-
-                // Enfocar formulario inmediatamente
-                setTimeout(() => {
-                    const firstInput = document.querySelector('#affiliateForm input[name="name"]');
-                    if (firstInput) {
-                        firstInput.focus();
-                        firstInput.classList.add('highlight');
-                        setTimeout(() => {
-                            firstInput.classList.remove('highlight');
-                        }, 2000);
-                    }
-                }, 300);
-
-                showMessage('success', 'Has llegado al formulario de afiliación 🎯');
-            }
+            }, 300);
         });
     }
 
-    // Hero Courses Button - NAVEGACIÓN DIRECTA
+    // Hero Courses Button
     if (heroCoursesBtn) {
         heroCoursesBtn.addEventListener('click', (e) => {
             e.preventDefault();
             console.log('🎯 Hero: Cursos - Navegación directa iniciada');
 
-            // Ocultar todas las secciones menos la de cursos
-            const allSections = document.querySelectorAll('section');
-            const coursesSection = document.querySelector('#cursos');
+            showSingleSection('cursos', 'Explora nuestros cursos de formación 📚');
+            showBackToTopButton('cursos');
 
-            allSections.forEach(section => {
-                if (section.id !== 'cursos') {
-                    section.style.display = 'none';
+            // Resaltar primer curso
+            setTimeout(() => {
+                const firstCourse = document.querySelector('.featured-course');
+                if (firstCourse) {
+                    firstCourse.classList.add('highlight-course');
+                    setTimeout(() => {
+                        firstCourse.classList.remove('highlight-course');
+                    }, 2000);
                 }
-            });
-
-            // Mostrar sección de cursos con animación
-            if (coursesSection) {
-                coursesSection.style.display = 'block';
-                coursesSection.scrollIntoView({ behavior: 'instant', block: 'start' });
-                coursesSection.style.animation = 'fadeIn 0.5s ease-in';
-
-                // Añadir botón de volver arriba
-                showBackToTopButton('cursos');
-
-                // Resaltar primer curso
-                setTimeout(() => {
-                    const firstCourse = document.querySelector('.featured-course');
-                    if (firstCourse) {
-                        firstCourse.classList.add('highlight-course');
-                        setTimeout(() => {
-                            firstCourse.classList.remove('highlight-course');
-                        }, 2000);
-                    }
-                }, 300);
-
-                showMessage('success', 'Explora nuestros cursos de formación 📚');
-            }
+            }, 300);
         });
     }
+}
+
+// Inicializar navegación del header y logo
+function initHeaderNavigation() {
+    // Navegación del logo y nombre (volver al inicio)
+    const navBrand = document.getElementById('navBrand');
+    if (navBrand) {
+        navBrand.style.cursor = 'pointer';
+        navBrand.addEventListener('click', () => {
+            console.log('🏠 Logo clicado - volviendo al inicio');
+
+            // Restaurar todas las secciones
+            restoreAllSections();
+
+            // Scroll al inicio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Eliminar botón de volver si existe
+            const backBtn = document.getElementById('backToTopBtn');
+            if (backBtn) backBtn.remove();
+
+            showMessage('info', 'Bienvenido al inicio 🏠');
+        });
+    }
+
+    // Navegación del menú principal
+    const navLinks = document.querySelectorAll('.nav-menu a[href^="#"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+
+            // Ignorar enlaces especiales como login
+            if (href === '#login' || href === '#') {
+                return;
+            }
+
+            e.preventDefault();
+            console.log(`🧭 Navegación menú: ${href}`);
+
+            const targetId = href.substring(1); // Quitar el #
+            const targetSection = document.querySelector(href);
+
+            if (targetSection) {
+                // Restaurar todas las secciones si estamos en modo individual
+                if (isSingleSectionMode) {
+                    restoreAllSections();
+                }
+
+                // Scroll suave a la sección
+                targetSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+                // Eliminar botón de volver si existe
+                const backBtn = document.getElementById('backToTopBtn');
+                if (backBtn) backBtn.remove();
+
+                // Efecto de resaltado
+                targetSection.style.animation = 'highlightSection 0.5s ease-in';
+                setTimeout(() => {
+                    targetSection.style.animation = '';
+                }, 500);
+
+                console.log(`✅ Navegado a: ${targetId}`);
+            }
+        });
+    });
 }
 
 // Botón para volver al inicio
@@ -148,11 +230,10 @@ function showBackToTopButton(context = 'default') {
     `;
 
     backBtn.addEventListener('click', () => {
-        // Restaurar todas las secciones
-        const allSections = document.querySelectorAll('section');
-        allSections.forEach(section => {
-            section.style.display = 'block';
-        });
+        console.log('🔝 Botón volver clicado - restaurando vista completa');
+
+        // Restaurar todas las secciones usando el nuevo sistema
+        restoreAllSections();
 
         // Scroll al inicio
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -166,7 +247,7 @@ function showBackToTopButton(context = 'default') {
     document.body.appendChild(backBtn);
 }
 
-// Animación fadeIn
+// Animaciones mejoradas
 const fadeInStyle = document.createElement('style');
 fadeInStyle.textContent = `
     @keyframes fadeIn {
@@ -179,6 +260,22 @@ fadeInStyle.textContent = `
         to { transform: translateY(0); opacity: 1; }
     }
 
+    @keyframes highlightSection {
+        0% {
+            background-color: transparent;
+            transform: scale(1);
+        }
+        50% {
+            background-color: rgba(227, 6, 19, 0.1);
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(227, 6, 19, 0.3);
+        }
+        100% {
+            background-color: transparent;
+            transform: scale(1);
+        }
+    }
+
     .back-to-top {
         border-radius: 25px;
         padding: 12px 20px;
@@ -189,6 +286,15 @@ fadeInStyle.textContent = `
     .back-to-top:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+    }
+
+    .nav-brand {
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .nav-brand:hover {
+        transform: scale(1.02);
     }
 `;
 document.head.appendChild(fadeInStyle);
@@ -700,17 +806,30 @@ const observer = new IntersectionObserver((entries) => {
 }, observerOptions);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize hero buttons functionality
+    console.log('🚀 Inicializando sistema de navegación completo');
+
+    // 1. Guardar estados originales de todas las secciones
+    saveOriginalStates();
+
+    // 2. Inicializar botones del hero
     initHeroButtons();
 
-    // Observe elements for scroll animations
+    // 3. Inicializar navegación del header y logo
+    initHeaderNavigation();
+
+    // 4. Inicializar botón de login (si existe)
+    initLoginBtn();
+
+    // 5. Observar elementos para animaciones de scroll
     document.querySelectorAll('.about-card, .course-card, .contact-item').forEach(el => {
         el.classList.add('scroll-animate');
         observer.observe(el);
     });
 
-    // Check login state on load
+    // 6. Verificar estado de login
     checkLoginStatus();
+
+    console.log('✅ Sistema de navegación completamente inicializado');
 });
 
 // Course enrollment handler
