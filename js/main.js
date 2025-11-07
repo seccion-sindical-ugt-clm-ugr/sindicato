@@ -43,17 +43,28 @@ function initSmoothScroll() {
     const anchors = document.querySelectorAll('a[href^="#"]');
     console.log(`✅ Smooth scroll inicializado para ${anchors.length} enlaces`);
 
-    anchors.forEach(anchor => {
+    // Debug: verificar que los botones hero están incluidos
+    const heroButtons = document.querySelectorAll('.hero-buttons a');
+    console.log(`🎯 Botones hero detectados: ${heroButtons.length}`, heroButtons);
+
+    anchors.forEach((anchor, index) => {
+        console.log(`  ${index + 1}. ${anchor.getAttribute('href')} - ${anchor.textContent.trim().substring(0, 30)}`);
+
         anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
+            console.log(`🖱️ Click detectado en: ${href}`);
 
             // Ignorar enlaces que son solo "#" (modales, etc.)
             if (href === '#' || href === '#!' || !href) {
+                console.log(`⏭️ Ignorando enlace: ${href}`);
                 return;
             }
 
             e.preventDefault();
+            console.log(`🛑 preventDefault ejecutado para: ${href}`);
+
             const target = document.querySelector(href);
+            console.log(`🎯 Target encontrado:`, target);
 
             if (target) {
                 console.log(`📍 Navegando a: ${href}`);
@@ -77,7 +88,7 @@ function initSmoothScroll() {
             } else {
                 console.warn(`⚠️ No se encontró el elemento: ${href}`);
             }
-        });
+        }, true); // Usar capture phase
     });
 }
 
