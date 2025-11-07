@@ -1,0 +1,387 @@
+/**
+ * Rutas para el sistema de sugerencias
+ * Permite a afiliados enviar sugerencias y a admins gestionarlas
+ */
+
+const express = require('express');
+const router = express.Router();
+const { body, validationResult } = require('express-validator');
+
+// Importar modelo (se cargará después de configurar MongoDB)
+let Suggestion;
+try {
+    Suggestion = require('../models/Suggestion');
+} catch (error) {
+    console.log('⚠️ MongoDB no configurado aún - endpoints de sugerencias disponibles pero no funcionales');
+}
+
+// Middleware de autenticación simple para admin
+function requireAuth(req, res, next) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(401).json({
+            error: 'No autorizado',
+            message: 'Se requiere autenticación'
+        });
+    }
+
+    // Autenticación básica: Bearer TOKEN
+    const token = authHeader.replace('Bearer ', '');
+    const adminPassword = process.env.ADMIN_PASSWORD || 'ugt2024admin';
+
+    if (token !== adminPassword) {
+        return res.status(401).json({
+            error: 'No autorizado',
+            message: 'Token inválido'
+        });
+    }
+
+    next();
+}
+
+// ====================================
+// ENDPOINTS PÚBLICOS (Sin autenticación)
+// ====================================
+
+/**
+ * POST /api/suggestions
+ * Crear una nueva sugerencia
+ */
+router.post('/suggestions',
+    [
+        body('type').isIn(['sugerencia', 'queja', 'propuesta', 'denuncia', 'consulta'])
+            .withMessage('Tipo de sugerencia inválido'),
+        body('subject').trim().isLength({ min: 5, max: 200 })
+            .withMessage('El asunto debe tener entre 5 y 200 caracteres'),
+        body('message').trim().isLength({ min: 10, max: 5000 })
+            .withMessage('El mensaje debe tener entre 10 y 5000 caracteres'),
+        body('urgency').optional().isIn(['baja', 'media', 'alta'])
+            .withMessage('Urgencia inválida'),
+        body('email').optional().isEmail()
+            .withMessage('Email inválido'),
+        body('isAnonymous').optional().isBoolean()
+            .withMessage('isAnonymous debe ser verdadero o falso')
+    ],
+    async (req, res) => {
+        try {
+            // Validar entrada
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    error: 'Datos inválidos',
+                    details: errors.array()
+                });
+            }
+
+            // Verificar si MongoDB está configurado
+            if (!Suggestion) {
+                return res.status(503).json({
+                    error: 'Base de datos no disponible',
+                    message: 'El sistema de sugerencias está en mantenimiento. Por favor, contacta directamente con el sindicato.'
+                });
+            }
+
+            const {
+                name,
+                email,
+                department,
+                type,
+                subject,
+                message,
+                urgency,
+                isAnonymous
+            } = req.body;
+
+            // Si es anónimo, no guardar datos personales
+            const suggestionData = {
+                type,
+                subject,
+                message,
+                urgency: urgency || 'media',
+                isAnonymous: isAnonymous || false
+            };
+
+            if (!isAnonymous) {
+                suggestionData.name = name || 'Anónimo';
+                suggestionData.email = email || null;
+                suggestionData.department = department || null;
+            }
+
+            // Crear sugerencia
+            const suggestion = new Suggestion(suggestionData);
+            await suggestion.save();
+
+            console.log('📝 Nueva sugerencia recibida:', {
+                id: suggestion._id,
+                type: suggestion.type,
+                urgency: suggestion.urgency,
+                isAnonymous: suggestion.isAnonymous
+            });
+
+            // Responder (no devolver datos sensibles)
+            res.status(201).json({
+                success: true,
+                message: 'Sugerencia enviada correctamente',
+                data: {
+                    id: suggestion._id,
+                    type: suggestion.type,
+                    createdAt: suggestion.createdAt
+                }
+            });
+
+        } catch (error) {
+            console.error('❌ Error creando sugerencia:', error);
+            res.status(500).json({
+                error: 'Error del servidor',
+                message: 'No se pudo procesar tu sugerencia. Por favor, inténtalo de nuevo.'
+            });
+        }
+    }
+);
+
+/**
+ * GET /api/suggestions/stats
+ * Estadísticas públicas (sin datos sensibles)
+ */
+router.get('/suggestions/stats', async (req, res) => {
+    try {
+        if (!Suggestion) {
+            return res.status(503).json({
+                error: 'Base de datos no disponible'
+            });
+        }
+
+        const stats = await Suggestion.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: 1 },
+                    pendientes: {
+                        $sum: { $cond: [{ $eq: ['$status', 'pendiente'] }, 1, 0] }
+                    },
+                    procesadas: {
+                        $sum: { $cond: [{ $eq: ['$status', 'procesada'] }, 1, 0] }
+                    }
+                }
+            }
+        ]);
+
+        res.json({
+            total: stats[0]?.total || 0,
+            pendientes: stats[0]?.pendientes || 0,
+            procesadas: stats[0]?.procesadas || 0
+        });
+
+    } catch (error) {
+        console.error('❌ Error obteniendo estadísticas:', error);
+        res.status(500).json({
+            error: 'Error del servidor'
+        });
+    }
+});
+
+// ====================================
+// ENDPOINTS DE ADMINISTRACIÓN (Requieren autenticación)
+// ====================================
+
+/**
+ * GET /api/suggestions/admin
+ * Listar todas las sugerencias (admin)
+ */
+router.get('/suggestions/admin', requireAuth, async (req, res) => {
+    try {
+        if (!Suggestion) {
+            return res.status(503).json({
+                error: 'Base de datos no disponible'
+            });
+        }
+
+        const {
+            status,
+            type,
+            urgency,
+            limit = 100,
+            skip = 0,
+            sort = '-createdAt'
+        } = req.query;
+
+        // Construir filtros
+        const filters = {};
+        if (status) filters.status = status;
+        if (type) filters.type = type;
+        if (urgency) filters.urgency = urgency;
+
+        // Obtener sugerencias
+        const suggestions = await Suggestion
+            .find(filters)
+            .sort(sort)
+            .limit(parseInt(limit))
+            .skip(parseInt(skip))
+            .lean();
+
+        // Contar total
+        const total = await Suggestion.countDocuments(filters);
+
+        res.json({
+            success: true,
+            data: suggestions,
+            pagination: {
+                total,
+                limit: parseInt(limit),
+                skip: parseInt(skip),
+                hasMore: total > (parseInt(skip) + parseInt(limit))
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error listando sugerencias:', error);
+        res.status(500).json({
+            error: 'Error del servidor'
+        });
+    }
+});
+
+/**
+ * GET /api/suggestions/admin/:id
+ * Obtener una sugerencia específica (admin)
+ */
+router.get('/suggestions/admin/:id', requireAuth, async (req, res) => {
+    try {
+        if (!Suggestion) {
+            return res.status(503).json({
+                error: 'Base de datos no disponible'
+            });
+        }
+
+        const suggestion = await Suggestion.findById(req.params.id);
+
+        if (!suggestion) {
+            return res.status(404).json({
+                error: 'No encontrada',
+                message: 'Sugerencia no encontrada'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: suggestion
+        });
+
+    } catch (error) {
+        console.error('❌ Error obteniendo sugerencia:', error);
+        res.status(500).json({
+            error: 'Error del servidor'
+        });
+    }
+});
+
+/**
+ * PATCH /api/suggestions/admin/:id
+ * Actualizar estado de una sugerencia (admin)
+ */
+router.patch('/suggestions/admin/:id', requireAuth,
+    [
+        body('status').optional().isIn(['pendiente', 'en-revision', 'procesada', 'archivada'])
+            .withMessage('Estado inválido'),
+        body('adminNotes').optional().trim().isLength({ max: 1000 })
+            .withMessage('Notas demasiado largas (máx 1000 caracteres)')
+    ],
+    async (req, res) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    error: 'Datos inválidos',
+                    details: errors.array()
+                });
+            }
+
+            if (!Suggestion) {
+                return res.status(503).json({
+                    error: 'Base de datos no disponible'
+                });
+            }
+
+            const { status, adminNotes, processedBy } = req.body;
+
+            const updateData = {};
+            if (status) {
+                updateData.status = status;
+                if (status === 'procesada' && !updateData.processedAt) {
+                    updateData.processedAt = new Date();
+                    updateData.processedBy = processedBy || 'Admin';
+                }
+            }
+            if (adminNotes !== undefined) updateData.adminNotes = adminNotes;
+
+            const suggestion = await Suggestion.findByIdAndUpdate(
+                req.params.id,
+                updateData,
+                { new: true, runValidators: true }
+            );
+
+            if (!suggestion) {
+                return res.status(404).json({
+                    error: 'No encontrada',
+                    message: 'Sugerencia no encontrada'
+                });
+            }
+
+            console.log('📝 Sugerencia actualizada:', {
+                id: suggestion._id,
+                status: suggestion.status
+            });
+
+            res.json({
+                success: true,
+                message: 'Sugerencia actualizada correctamente',
+                data: suggestion
+            });
+
+        } catch (error) {
+            console.error('❌ Error actualizando sugerencia:', error);
+            res.status(500).json({
+                error: 'Error del servidor'
+            });
+        }
+    }
+);
+
+/**
+ * DELETE /api/suggestions/admin/:id
+ * Eliminar una sugerencia (admin)
+ */
+router.delete('/suggestions/admin/:id', requireAuth, async (req, res) => {
+    try {
+        if (!Suggestion) {
+            return res.status(503).json({
+                error: 'Base de datos no disponible'
+            });
+        }
+
+        const suggestion = await Suggestion.findByIdAndDelete(req.params.id);
+
+        if (!suggestion) {
+            return res.status(404).json({
+                error: 'No encontrada',
+                message: 'Sugerencia no encontrada'
+            });
+        }
+
+        console.log('🗑️ Sugerencia eliminada:', req.params.id);
+
+        res.json({
+            success: true,
+            message: 'Sugerencia eliminada correctamente'
+        });
+
+    } catch (error) {
+        console.error('❌ Error eliminando sugerencia:', error);
+        res.status(500).json({
+            error: 'Error del servidor'
+        });
+    }
+});
+
+module.exports = router;
