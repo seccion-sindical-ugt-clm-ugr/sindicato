@@ -120,19 +120,38 @@ function initHeroButtons() {
     if (heroCoursesBtn) {
         heroCoursesBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('🎯 Hero: Cursos - Navegación directa iniciada');
+            console.log('🎯 Hero: Cursos - Navegación directa al curso de IA');
 
-            showSingleSection('cursos', 'Explora nuestros cursos de formación 📚');
+            showSingleSection('cursos', 'Descubre el curso de Inteligencia Artificial 🤖');
             showBackToTopButton('cursos');
 
-            // Resaltar primer curso
+            // Enfocar directamente en el curso de Inteligencia Artificial
             setTimeout(() => {
-                const firstCourse = document.querySelector('.featured-course');
-                if (firstCourse) {
-                    firstCourse.classList.add('highlight-course');
+                const iaCourse = document.querySelector('#ia-course');
+                if (iaCourse) {
+                    console.log('🤖 Enfocando curso de Inteligencia Artificial');
+
+                    // Scroll directo al curso de IA
+                    iaCourse.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+
+                    // Resaltado especial para el curso de IA
+                    iaCourse.classList.add('highlight-ia-course');
+
                     setTimeout(() => {
-                        firstCourse.classList.remove('highlight-course');
-                    }, 2000);
+                        iaCourse.classList.remove('highlight-ia-course');
+                    }, 3000);
+
+                    // Efecto adicional: animar la insignia "Nuevo"
+                    const badge = iaCourse.querySelector('.course-badge');
+                    if (badge) {
+                        badge.style.animation = 'pulse 2s ease-in-out';
+                        setTimeout(() => {
+                            badge.style.animation = '';
+                        }, 2000);
+                    }
                 }
             }, 300);
         });

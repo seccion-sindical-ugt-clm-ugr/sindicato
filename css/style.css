@@ -1145,6 +1145,28 @@ body {
     animation: pulseHighlightCourse 2s ease-in-out;
 }
 
+/* Highlight especial para curso de Inteligencia Artificial */
+.highlight-ia-course {
+    border: 4px solid var(--primary-color) !important;
+    box-shadow: 0 0 50px rgba(227, 6, 19, 0.6) !important;
+    transform: scale(1.03);
+    animation: highlightIACourse 3s ease-in-out;
+    position: relative;
+}
+
+.highlight-ia-course::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border: 2px solid var(--primary-color);
+    border-radius: 15px;
+    opacity: 0.5;
+    animation: borderPulse 2s ease-in-out infinite;
+}
+
 @keyframes pulseHighlight {
     0% {
         border-color: transparent;
@@ -1178,6 +1200,54 @@ body {
         border-color: transparent;
         box-shadow: none;
         transform: scale(1);
+    }
+}
+
+@keyframes highlightIACourse {
+    0% {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 20px rgba(227, 6, 19, 0.3);
+        transform: scale(1);
+    }
+    25% {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 60px rgba(227, 6, 19, 0.8);
+        transform: scale(1.04);
+    }
+    50% {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 80px rgba(255, 68, 68, 0.9);
+        transform: scale(1.03);
+    }
+    75% {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 60px rgba(227, 6, 19, 0.8);
+        transform: scale(1.02);
+    }
+    100% {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 20px rgba(227, 6, 19, 0.3);
+        transform: scale(1);
+    }
+}
+
+@keyframes borderPulse {
+    0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
     }
 }
 
