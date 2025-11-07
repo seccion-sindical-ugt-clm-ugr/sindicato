@@ -36,6 +36,69 @@ document.querySelectorAll('.nav-menu a').forEach(link => {
     });
 });
 
+// Enhanced Hero Buttons functionality
+function initHeroButtons() {
+    const heroAffiliateBtn = document.getElementById('heroAffiliateBtn');
+    const heroCoursesBtn = document.getElementById('heroCoursesBtn');
+
+    // Hero Affiliate Button
+    if (heroAffiliateBtn) {
+        heroAffiliateBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('🎯 Hero: Botón de afiliación clicado');
+
+            // Hacer scroll suave a la sección de afiliación
+            const affiliateSection = document.querySelector('#afiliate');
+            if (affiliateSection) {
+                affiliateSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+                // Enfocar el primer campo del formulario después del scroll
+                setTimeout(() => {
+                    const firstInput = document.querySelector('#affiliateForm input[name="name"]');
+                    if (firstInput) {
+                        firstInput.focus();
+                        firstInput.classList.add('highlight');
+                        setTimeout(() => {
+                            firstInput.classList.remove('highlight');
+                        }, 2000);
+                    }
+                }, 800);
+            }
+        });
+    }
+
+    // Hero Courses Button
+    if (heroCoursesBtn) {
+        heroCoursesBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('🎯 Hero: Botón de cursos clicado');
+
+            // Hacer scroll suave a la sección de cursos
+            const coursesSection = document.querySelector('#cursos');
+            if (coursesSection) {
+                coursesSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+                // Resaltar el primer curso después del scroll
+                setTimeout(() => {
+                    const firstCourse = document.querySelector('.featured-course');
+                    if (firstCourse) {
+                        firstCourse.classList.add('highlight-course');
+                        setTimeout(() => {
+                            firstCourse.classList.remove('highlight-course');
+                        }, 2000);
+                    }
+                }, 800);
+            }
+        });
+    }
+}
+
 // Login Modal - Will be updated in updateLoginState function
 function initLoginBtn() {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -513,6 +576,9 @@ const observer = new IntersectionObserver((entries) => {
 }, observerOptions);
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize hero buttons functionality
+    initHeroButtons();
+
     // Observe elements for scroll animations
     document.querySelectorAll('.about-card, .course-card, .contact-item').forEach(el => {
         el.classList.add('scroll-animate');
