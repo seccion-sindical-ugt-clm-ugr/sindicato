@@ -13,11 +13,7 @@
         <nav class="navbar">
             <div class="container">
                 <div class="nav-brand">
-<<<<<<< HEAD
-                    <img src="images/brand/ugt-logo.PNG" alt="UGT Logo" class="logo">
-=======
                     <img src="images/brand/logo.PNG" alt="UGT Logo" class="logo">
->>>>>>> 37718c676cccacb52d4b2c759adebb55f8427bff
                     <div class="brand-text">
                         <h1>UGT-CLM-UGR Granada</h1>
                         <p>Sección Sindical</p>
@@ -301,10 +297,12 @@
                 <h3>Acceso Afiliados</h3>
                 <form id="loginForm">
                     <div class="form-group">
-                        <input type="email" placeholder="Email" required>
+                        <input type="email" name="email" placeholder="Email" required>
+                        <span class="error-message"></span>
                     </div>
                     <div class="form-group">
-                        <input type="password" placeholder="Contraseña" required>
+                        <input type="password" name="password" placeholder="Contraseña" required>
+                        <span class="error-message"></span>
                     </div>
                     <div class="form-options">
                         <label class="checkbox">
@@ -312,7 +310,7 @@
                             <span class="checkmark"></span>
                             Recordarme
                         </label>
-                        <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                        <a href="#" class="forgot-password" id="forgotPasswordLink">¿Olvidaste tu contraseña?</a>
                     </div>
                     <button type="submit" class="btn btn-primary btn-full">Iniciar Sesión</button>
                 </form>
@@ -322,6 +320,77 @@
             </div>
         </div>
     </div>
+
+    <!-- Password Recovery Modal -->
+    <div id="recoveryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeRecovery">&times;</span>
+            <div class="recovery-form">
+                <h3>Recuperar Contraseña</h3>
+                <p>Introduce tu email y te enviaremos instrucciones para recuperar tu contraseña</p>
+                <form id="recoveryForm">
+                    <div class="form-group">
+                        <input type="email" name="recoveryEmail" placeholder="Tu email" required>
+                        <span class="error-message"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Enviar Instrucciones</button>
+                </form>
+                <div class="recovery-footer">
+                    <p><a href="#" id="backToLogin">Volver al login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Dashboard (Hidden by default) -->
+    <section id="memberDashboard" class="section" style="display: none;">
+        <div class="container">
+            <div class="dashboard-header">
+                <h2>Bienvenido, <span id="userName">Afiliado</span></h2>
+                <button id="logoutBtn" class="btn btn-secondary">Cerrar Sesión</button>
+            </div>
+
+            <div class="dashboard-content">
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>Mis Datos</h3>
+                        <p>Gestiona tu información personal</p>
+                        <button class="btn btn-outline">Ver Perfil</button>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>Mis Cursos</h3>
+                        <p>Consulta tus inscripciones y certificados</p>
+                        <button class="btn btn-outline">Ver Cursos</button>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h3>Documentos</h3>
+                        <p>Accede a tu documentación sindical</p>
+                        <button class="btn btn-outline">Ver Documentos</button>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <h3>Eventos</h3>
+                        <p>Próximas actividades y reuniones</p>
+                        <button class="btn btn-outline">Ver Eventos</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Footer -->
     <footer class="footer">

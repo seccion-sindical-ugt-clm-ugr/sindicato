@@ -7,6 +7,20 @@ const closeModal = document.querySelector('.close');
 const loginForm = document.querySelector('#loginForm');
 const affiliateForm = document.querySelector('#affiliateForm');
 const contactForm = document.querySelector('#contactForm');
+const recoveryModal = document.querySelector('#recoveryModal');
+const recoveryForm = document.querySelector('#recoveryForm');
+const memberDashboard = document.querySelector('#memberDashboard');
+const logoutBtn = document.querySelector('#logoutBtn');
+const forgotPasswordLink = document.querySelector('#forgotPasswordLink');
+const closeRecoveryBtn = document.querySelector('#closeRecovery');
+const backToLoginBtn = document.querySelector('#backToLogin');
+
+// Base de datos simulada de usuarios
+const usersDatabase = [
+    { email: 'afiliado@ugt.org', password: 'ugt2024', name: 'Juan Pérez', member: true },
+    { email: 'test@ugt.org', password: 'test123', name: 'María García', member: true },
+    { email: 'admin@ugt.org', password: 'admin123', name: 'Administrador', member: true, admin: true }
+];
 
 // Toggle Mobile Menu
 hamburger.addEventListener('click', () => {
@@ -22,11 +36,25 @@ document.querySelectorAll('.nav-menu a').forEach(link => {
     });
 });
 
-// Login Modal
-loginBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    loginModal.style.display = 'block';
-});
+// Login Modal - Will be updated in updateLoginState function
+function initLoginBtn() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+    if (isLoggedIn) {
+        const userName = localStorage.getItem('userName') || 'Afiliado';
+        loginBtn.innerHTML = `<i class="fas fa-user"></i> ${userName.split(' ')[0]}`;
+        loginBtn.onclick = (e) => {
+            e.preventDefault();
+            showMemberDashboard();
+        };
+    } else {
+        loginBtn.innerHTML = '<i class="fas fa-user"></i> Acceso Afiliados';
+        loginBtn.onclick = (e) => {
+            e.preventDefault();
+            loginModal.style.display = 'block';
+        };
+    }
+}
 
 closeModal.addEventListener('click', () => {
     loginModal.style.display = 'none';
@@ -36,6 +64,44 @@ window.addEventListener('click', (e) => {
     if (e.target === loginModal) {
         loginModal.style.display = 'none';
     }
+    if (e.target === recoveryModal) {
+        recoveryModal.style.display = 'none';
+    }
+});
+
+// Recovery Modal handlers
+forgotPasswordLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    loginModal.style.display = 'none';
+    recoveryModal.style.display = 'block';
+});
+
+closeRecoveryBtn.addEventListener('click', () => {
+    recoveryModal.style.display = 'none';
+});
+
+backToLoginBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    recoveryModal.style.display = 'none';
+    loginModal.style.display = 'block';
+});
+
+// Logout handler
+logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+    showMessage('success', 'Sesión cerrada correctamente');
+
+    // Hide dashboard and show main site
+    memberDashboard.style.display = 'none';
+    document.querySelectorAll('.section').forEach(section => {
+        if (section.id !== 'memberDashboard') {
+            section.style.display = 'block';
+        }
+    });
+
+    updateLoginState();
 });
 
 // Smooth scrolling for navigation links
@@ -64,40 +130,103 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Form handlers
+// Enhanced validation functions
+function validateEmail(email) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+}
+
+function validatePassword(password) {
+    return password.length >= 6;
+}
+
+function showError(input, message) {
+    const formGroup = input.parentElement;
+    const errorMessage = formGroup.querySelector('.error-message');
+    errorMessage.textContent = message;
+    errorMessage.style.display = 'block';
+    input.classList.add('error');
+}
+
+function clearErrors() {
+    document.querySelectorAll('.error-message').forEach(error => {
+        error.textContent = '';
+        error.style.display = 'none';
+    });
+    document.querySelectorAll('input.error').forEach(input => {
+        input.classList.remove('error');
+    });
+}
+
+// Enhanced login handler
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    clearErrors();
 
-    const formData = new FormData(loginForm);
-    const email = formData.get('email') || loginForm.querySelector('input[type="email"]').value;
-    const password = formData.get('password') || loginForm.querySelector('input[type="password"]').value;
+    const emailInput = loginForm.querySelector('input[name="email"]');
+    const passwordInput = loginForm.querySelector('input[name="password"]');
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    // Client-side validation
+    let isValid = true;
+
+    if (!email) {
+        showError(emailInput, 'El email es obligatorio');
+        isValid = false;
+    } else if (!validateEmail(email)) {
+        showError(emailInput, 'Introduce un email válido');
+        isValid = false;
+    }
+
+    if (!password) {
+        showError(passwordInput, 'La contraseña es obligatoria');
+        isValid = false;
+    } else if (!validatePassword(password)) {
+        showError(passwordInput, 'La contraseña debe tener al menos 6 caracteres');
+        isValid = false;
+    }
+
+    if (!isValid) return;
 
     // Show loading state
     const submitBtn = loginForm.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Iniciando sesión...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
     submitBtn.disabled = true;
 
     try {
-        // Simulate API call - Replace with actual API endpoint
+        // Simulate API call with real authentication
         await simulateAPICall();
 
-        // Store login state
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userEmail', email);
+        // Check credentials against database
+        const user = usersDatabase.find(u => u.email === email && u.password === password);
 
-        showMessage('success', '¡Inicio de sesión exitoso!');
+        if (user) {
+            // Store login state
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userEmail', user.email);
+            localStorage.setItem('userName', user.name);
+            localStorage.setItem('isAdmin', user.admin || false);
 
-        // Redirect to dashboard or update UI
-        setTimeout(() => {
-            loginModal.style.display = 'none';
-            updateLoginState();
-            // Redirect to member area
-            window.location.href = '#member-dashboard';
-        }, 1500);
+            showMessage('success', `¡Bienvenido de nuevo, ${user.name}!`);
+
+            // Close modal and show dashboard
+            setTimeout(() => {
+                loginModal.style.display = 'none';
+                showMemberDashboard();
+                loginForm.reset();
+            }, 1500);
+
+        } else {
+            showMessage('error', 'Email o contraseña incorrectos');
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
 
     } catch (error) {
-        showMessage('error', 'Email o contraseña incorrectos');
+        showMessage('error', 'Error de conexión. Inténtalo de nuevo.');
+        console.error('Login error:', error);
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
@@ -132,15 +261,10 @@ affiliateForm.addEventListener('submit', async (e) => {
 
         // Show payment form or redirect to payment
         showPaymentForm({
-<<<<<<< HEAD
             name: userData.name,
             email: userData.email,
             phone: userData.phone,
             department: userData.department,
-=======
-            name: name,
-            email: email,
->>>>>>> 37718c676cccacb52d4b2c759adebb55f8427bff
             amount: 15,
             description: 'Cuota anual UGT-CLM-UGR'
         });
@@ -178,6 +302,84 @@ contactForm.addEventListener('submit', async (e) => {
         submitBtn.disabled = false;
     }
 });
+
+// Password recovery handler
+recoveryForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const emailInput = recoveryForm.querySelector('input[name="recoveryEmail"]');
+    const email = emailInput.value.trim();
+
+    // Validation
+    if (!email) {
+        showError(emailInput, 'El email es obligatorio');
+        return;
+    } else if (!validateEmail(email)) {
+        showError(emailInput, 'Introduce un email válido');
+        return;
+    }
+
+    // Show loading state
+    const submitBtn = recoveryForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    submitBtn.disabled = true;
+
+    try {
+        // Simulate API call
+        await simulateAPICall();
+
+        // Check if email exists in database
+        const userExists = usersDatabase.some(user => user.email === email);
+
+        if (userExists) {
+            showMessage('success', 'Se han enviado instrucciones a tu email');
+            setTimeout(() => {
+                recoveryModal.style.display = 'none';
+                loginModal.style.display = 'block';
+                recoveryForm.reset();
+            }, 2000);
+        } else {
+            // Security: Don't reveal if email exists or not
+            showMessage('success', 'Si el email está registrado, recibirás instrucciones');
+            setTimeout(() => {
+                recoveryModal.style.display = 'none';
+                loginModal.style.display = 'block';
+                recoveryForm.reset();
+            }, 2000);
+        }
+
+    } catch (error) {
+        showMessage('error', 'Error al enviar el email. Inténtalo de nuevo.');
+        console.error('Recovery error:', error);
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+// Show member dashboard
+function showMemberDashboard() {
+    const userName = localStorage.getItem('userName') || 'Afiliado';
+    document.getElementById('userName').textContent = userName;
+
+    // Hide all sections except dashboard
+    document.querySelectorAll('.section').forEach(section => {
+        if (section.id !== 'memberDashboard') {
+            section.style.display = 'none';
+        }
+    });
+
+    // Show dashboard
+    memberDashboard.style.display = 'block';
+
+    // Update login button
+    updateLoginState();
+
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
 
 // Payment handler with Stripe integration
 async function showPaymentForm(paymentData) {
@@ -224,14 +426,18 @@ function simulateAPICall() {
 }
 
 function updateLoginState() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    const loginBtn = document.querySelector('.btn-login');
+    initLoginBtn();
+}
 
+// Check if user is logged in on page load
+function checkLoginStatus() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     if (isLoggedIn) {
-        const userEmail = localStorage.getItem('userEmail');
-        loginBtn.innerHTML = `<i class="fas fa-user"></i> ${userEmail}`;
-        loginBtn.href = '#dashboard';
+        const userName = localStorage.getItem('userName') || 'Afiliado';
+        document.getElementById('userName').textContent = userName;
+        showMemberDashboard();
     }
+    initLoginBtn();
 }
 
 // Scroll animations
@@ -256,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Check login state on load
-    updateLoginState();
+    checkLoginStatus();
 });
 
 // Course enrollment handler

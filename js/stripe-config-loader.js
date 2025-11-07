@@ -30,8 +30,8 @@ const STRIPE_CONFIG = {
     ...loadStripeConfig(),
 
     // URLs del sitio
-    successUrl: 'https://seccion-sindical-ugt-clm-ugr.github.io/sindicato/success.html',
-    cancelUrl: 'https://seccion-sindical-ugt-clm-ugr.github.io/sindicato/cancel.html',
+    successUrl: 'https://sindicato-mu.vercel.app/success.html',
+    cancelUrl: 'https://sindicato-mu.vercel.app/cancel.html',
 
     // Configuración de productos
     products: {

@@ -10,8 +10,8 @@ const STRIPE_CONFIG = {
     // secretKey: 'sk_live_1234567890abcdef',     // Solo para backend
 
     // URLs de tu sitio
-    successUrl: 'https://seccion-sindical-ugt-clm-ugr.github.io/sindicato/success.html',
-    cancelUrl: 'https://seccion-sindical-ugt-clm-ugr.github.io/sindicato/cancel.html',
+    successUrl: 'https://sindicato-mu.vercel.app/success.html',
+    cancelUrl: 'https://sindicato-mu.vercel.app/cancel.html',
 
     // Configuración de productos
     products: {
@@ -53,33 +53,13 @@ function initStripe() {
 // Crear checkout session para afiliación
 async function createAffiliationCheckout(userData) {
     try {
-        const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        const response = await fetch('https://sindicato-mu.vercel.app/api/create-affiliation-session', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${STRIPE_CONFIG.secretKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                payment_method_types: ['card'],
-                line_items: [{
-                    price_data: {
-                        currency: STRIPE_CONFIG.products.affiliation.currency,
-                        product_data: {
-                            name: STRIPE_CONFIG.products.affiliation.name,
-                            description: STRIPE_CONFIG.products.affiliation.description
-                        },
-                        unit_amount: STRIPE_CONFIG.products.affiliation.price
-                    },
-                    quantity: 1
-                }],
-                mode: 'payment',
-                success_url: STRIPE_CONFIG.successUrl + '?session_id={CHECKOUT_SESSION_ID}',
-                cancel_url: STRIPE_CONFIG.cancelUrl,
-                customer_email: userData.email,
-                metadata: {
-                    userData: JSON.stringify(userData),
-                    source: 'ugt-clm-ugr-website'
-                }
+                userData: userData
             })
         });
 
@@ -99,38 +79,15 @@ async function createAffiliationCheckout(userData) {
 // Crear checkout session para cursos
 async function createCourseCheckout(courseType, userData, isMember = false) {
     try {
-        const productKey = isMember ? 'courseIA' : 'courseIAExternal';
-        const product = STRIPE_CONFIG.products[productKey];
-
-        const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        const response = await fetch('https://sindicato-mu.vercel.app/api/create-course-session', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${STRIPE_CONFIG.secretKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                payment_method_types: ['card'],
-                line_items: [{
-                    price_data: {
-                        currency: product.currency,
-                        product_data: {
-                            name: product.name,
-                            description: product.description
-                        },
-                        unit_amount: product.price
-                    },
-                    quantity: 1
-                }],
-                mode: 'payment',
-                success_url: STRIPE_CONFIG.successUrl + '?session_id={CHECKOUT_SESSION_ID}&course=' + courseType,
-                cancel_url: STRIPE_CONFIG.cancelUrl,
-                customer_email: userData.email,
-                metadata: {
-                    userData: JSON.stringify(userData),
-                    courseType: courseType,
-                    isMember: isMember.toString(),
-                    source: 'ugt-clm-ugr-website'
-                }
+                courseType: courseType,
+                userData: userData,
+                isMember: isMember
             })
         });
 
