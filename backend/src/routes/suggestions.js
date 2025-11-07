@@ -6,6 +6,28 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
+const { initializeEmailService, sendSuggestionConfirmation, sendAdminNotification, sendStatusUpdate } = require('../services/emailService');
+const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss');
+
+// Inicializar servicio de email
+initializeEmailService();
+
+// Rate limiting para prevenir spam
+const suggestionsLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 3, // máximo 3 sugerencias por IP en 15 minutos
+    message: {
+        error: 'Demasiadas solicitudes',
+        message: 'Por seguridad, solo puedes enviar 3 sugerencias cada 15 minutos. Intenta más tarde.'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Middleware de sanitización
+router.use(mongoSanitize());
 
 // Importar modelo (se cargará después de configurar MongoDB)
 let Suggestion;
@@ -48,7 +70,7 @@ function requireAuth(req, res, next) {
  * POST /api/suggestions
  * Crear una nueva sugerencia
  */
-router.post('/suggestions',
+router.post('/suggestions', suggestionsLimiter,
     [
         body('type').isIn(['sugerencia', 'queja', 'propuesta', 'denuncia', 'consulta'])
             .withMessage('Tipo de sugerencia inválido'),
@@ -93,23 +115,23 @@ router.post('/suggestions',
                 isAnonymous
             } = req.body;
 
-            // Si es anónimo, no guardar datos personales
-            const suggestionData = {
-                type,
-                subject,
-                message,
+            // Sanitizar datos para prevenir XSS
+            const sanitizedData = {
+                type: xss(type),
+                subject: xss(subject),
+                message: xss(message),
                 urgency: urgency || 'media',
                 isAnonymous: isAnonymous || false
             };
 
             if (!isAnonymous) {
-                suggestionData.name = name || 'Anónimo';
-                suggestionData.email = email || null;
-                suggestionData.department = department || null;
+                sanitizedData.name = xss(name) || 'Anónimo';
+                sanitizedData.email = email || null;
+                sanitizedData.department = xss(department) || null;
             }
 
             // Crear sugerencia
-            const suggestion = new Suggestion(suggestionData);
+            const suggestion = new Suggestion(sanitizedData);
             await suggestion.save();
 
             console.log('📝 Nueva sugerencia recibida:', {
@@ -119,6 +141,22 @@ router.post('/suggestions',
                 isAnonymous: suggestion.isAnonymous
             });
 
+            // Enviar notificaciones por email (en background, no bloquear)
+            setImmediate(async () => {
+                try {
+                    // Email de confirmación al usuario (si no es anónimo y tiene email)
+                    if (!suggestion.isAnonymous && suggestion.email) {
+                        await sendSuggestionConfirmation(suggestion);
+                    }
+
+                    // Email de notificación a administradores
+                    await sendAdminNotification(suggestion);
+                } catch (emailError) {
+                    console.error('❌ Error enviando emails:', emailError);
+                    // No fallar el request si hay error en email
+                }
+            });
+
             // Responder (no devolver datos sensibles)
             res.status(201).json({
                 success: true,
@@ -126,7 +164,8 @@ router.post('/suggestions',
                 data: {
                     id: suggestion._id,
                     type: suggestion.type,
-                    createdAt: suggestion.createdAt
+                    createdAt: suggestion.createdAt,
+                    trackingId: '#' + suggestion._id.toString().slice(-8)
                 }
             });
 
@@ -306,6 +345,8 @@ router.patch('/suggestions/admin/:id', requireAuth,
             const { status, adminNotes, processedBy } = req.body;
 
             const updateData = {};
+            const oldStatus = (await Suggestion.findById(req.params.id))?.status;
+
             if (status) {
                 updateData.status = status;
                 if (status === 'procesada' && !updateData.processedAt) {
@@ -332,6 +373,17 @@ router.patch('/suggestions/admin/:id', requireAuth,
                 id: suggestion._id,
                 status: suggestion.status
             });
+
+            // Enviar email de actualización (en background)
+            if (status && status !== oldStatus) {
+                setImmediate(async () => {
+                    try {
+                        await sendStatusUpdate(suggestion, status, adminNotes);
+                    } catch (emailError) {
+                        console.error('❌ Error enviando email de actualización:', emailError);
+                    }
+                });
+            }
 
             res.json({
                 success: true,

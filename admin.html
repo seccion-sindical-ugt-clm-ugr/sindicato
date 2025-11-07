@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Sugerencias UGT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .login-section {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .dashboard {
+            display: none;
+            padding: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .filters {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+        }
+
+        .filter-group label {
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .filter-group select {
+            padding: 8px;
+            border: 2px solid #e1e5e9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .suggestions-list {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .suggestion-item {
+            border-bottom: 1px solid #e1e5e9;
+            padding: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .suggestion-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .suggestion-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-en-revision {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .badge-procesada {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-archivada {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-alta {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-media {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-baja {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .suggestion-content {
+            margin: 15px 0;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .suggestion-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .suggestion-info {
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .suggestion-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-view {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #0056b3;
+        }
+
+        .btn-edit {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #1e7e34;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #dc3545;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-color: #17a2b8;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .dashboard {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .suggestion-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .suggestion-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🏛️ Panel de Administración</h1>
+            <p>Sistema de Gestión de Sugerencias - UGT Centro Lenguas Modernas - UGR</p>
+        </header>
+
+        <!-- Sección de Login -->
+        <section class="login-section" id="loginSection">
+            <div class="login-form">
+                <h2>🔐 Acceso Administrador</h2>
+                <p style="margin: 20px 0; color: #666;">Ingresa tu contraseña para acceder al panel de administración</p>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="password">Contraseña de Administrador</label>
+                        <input type="password" id="password" name="password" required placeholder="Ingresa tu contraseña">
+                    </div>
+                    <button type="submit" class="btn" id="loginBtn">
+                        Iniciar Sesión
+                    </button>
+                </form>
+                
+                <div id="loginError" class="alert alert-error" style="display: none; margin-top: 20px;">
+                    Contraseña incorrecta. Por favor, inténtalo de nuevo.
+                </div>
+            </div>
+        </section>
+
+        <!-- Panel de Administración -->
+        <main class="dashboard" id="dashboardSection">
+            <!-- Estadísticas -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSuggestions">-</div>
+                    <div class="stat-label">Total Sugerencias</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingSuggestions">-</div>
+                    <div class="stat-label">Pendientes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="inReviewSuggestions">-</div>
+                    <div class="stat-label">En Revisión</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="processedSuggestions">-</div>
+                    <div class="stat-label">Procesadas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="urgentSuggestions">-</div>
+                    <div class="stat-label">Urgentes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="anonymousSuggestions">-</div>
+                    <div class="stat-label">Anónimas</div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="filterStatus">Estado</label>
+                    <select id="filterStatus">
+                        <option value="">Todos</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="en-revision">En Revisión</option>
+                        <option value="procesada">Procesada</option>
+                        <option value="archivada">Archivada</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterType">Tipo</label>
+                    <select id="filterType">
+                        <option value="">Todos</option>
+                        <option value="sugerencia">Sugerencia</option>
+                        <option value="queja">Queja</option>
+                        <option value="propuesta">Propuesta</option>
+                        <option value="denuncia">Denuncia</option>
+                        <option value="consulta">Consulta</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterUrgency">Urgencia</label>
+                    <select id="filterUrgency">
+                        <option value="">Todas</option>
+                        <option value="alta">Alta</option>
+                        <option value="media">Media</option>
+                        <option value="baja">Baja</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn" onclick="applyFilters()">Aplicar Filtros</button>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="btn" onclick="refreshData()" style="background: #6c757d;">🔄 Actualizar</button>
+                </div>
+            </div>
+
+            <!-- Lista de Sugerencias -->
+            <div class="suggestions-list" id="suggestionsList">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Cargando sugerencias...</p>
+                </div>
+            </div>
+
+            <!-- Paginación -->
+            <div class="pagination" id="pagination" style="display: none;">
+                <button id="prevBtn" onclick="loadPreviousPage()">← Anterior</button>
+                <span class="pagination-info" id="paginationInfo">Página 1 de 1</span>
+                <button id="nextBtn" onclick="loadNextPage()">Siguiente →</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para ver/editar sugerencia -->
+    <div id="suggestionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Detalles de Sugerencia</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            
+            <div id="modalBody">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración global
+        const API_BASE = window.location.origin + '/api';
+        let authToken = localStorage.getItem('adminToken');
+        let currentPage = 0;
+        const pageSize = 20;
+        let currentFilters = {};
+        let totalSuggestions = 0;
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            if (authToken) {
+                showDashboard();
+            } else {
+                showLogin();
+            }
+        });
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const loginError = document.getElementById('loginError');
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Verificando...';
+            loginError.style.display = 'none';
+            
+            try {
+                // Probar autenticación con una llamada a la API
+                const response = await fetch(`${API_BASE}/suggestions/admin`, {
+                    headers: {
+                        'Authorization': `Bearer ${password}`
+                    }
+                });
+                
+                if (response.ok) {
+                    authToken = password;
+                    localStorage.setItem('adminToken', authToken);
+                    showDashboard();
+                } else {
+                    throw new Error('Credenciales inválidas');
+                }
+            } catch (error) {
+                loginError.style.display = 'block';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Iniciar Sesión';
+            }
+        });
+
+        function showLogin() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('dashboardSection').style.display = 'none';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+            loadStats();
+            loadSuggestions();
+        }
+
+        function logout() {
+            authToken = null;
+            localStorage.removeItem('adminToken');
+            showLogin();
+        }
+
+        // Cargar estadísticas
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/suggestions/admin`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const suggestions = data.data || [];
+                    
+                    // Calcular estadísticas
+                    const stats = {
+                        total: suggestions.length,
+                        pendiente: suggestions.filter(s => s.status === 'pendiente').length,
+                        'en-revision': suggestions.filter(s => s.status === 'en-revision').length,
+                        procesada: suggestions.filter(s => s.status === 'procesada').length,
+                        archivada: suggestions.filter(s => s.status === 'archivada').length,
+                        urgentes: suggestions.filter(s => s.urgency === 'alta').length,
+                        anonimas: suggestions.filter(s => s.isAnonymous).length
+                    };
+                    
+                    // Actualizar UI
+                    document.getElementById('totalSuggestions').textContent = stats.total;
+                    document.getElementById('pendingSuggestions').textContent = stats.pendiente;
+                    document.getElementById('inReviewSuggestions').textContent = stats['en-revision'];
+                    document.getElementById('processedSuggestions').textContent = stats.procesada;
+                    document.getElementById('urgentSuggestions').textContent = stats.urgentes;
+                    document.getElementById('anonymousSuggestions').textContent = stats.anonimas;
+                }
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        // Cargar sugerencias
+        async function loadSuggestions() {
+            const suggestionsList = document.getElementById('suggestionsList');
+            
+            suggestionsList.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Cargando sugerencias...</p>
+                </div>
+            `;
+            
+            try {
+                const params = new URLSearchParams({
+                    limit: pageSize,
+                    skip: currentPage * pageSize,
+                    ...currentFilters
+                });
+                
+                const response = await fetch(`${API_BASE}/suggestions/admin?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    totalSuggestions = data.pagination?.total || 0;
+                    displaySuggestions(data.data || []);
+                    updatePagination();
+                } else {
+                    throw new Error('Error cargando sugerencias');
+                }
+            } catch (error) {
+                suggestionsList.innerHTML = `
+                    <div class="alert alert-error">
+                        Error al cargar las sugerencias. Por favor, inténtalo de nuevo.
+                    </div>
+                `;
+            }
+        }
+
+        function displaySuggestions(suggestions) {
+            const suggestionsList = document.getElementById('suggestionsList');
+            
+            if (suggestions.length === 0) {
+                suggestionsList.innerHTML = `
+                    <div class="alert alert-info">
+                        No se encontraron sugerencias con los filtros seleccionados.
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = suggestions.map(suggestion => `
+                <div class="suggestion-item">
+                    <div class="suggestion-header">
+                        <div class="suggestion-title">${escapeHtml(suggestion.subject)}</div>
+                        <div class="suggestion-meta">
+                            <span class="badge badge-${suggestion.status}">${suggestion.status}</span>
+                            <span class="badge badge-${suggestion.urgency}">${suggestion.urgency}</span>
+                            <span class="badge" style="background: #e9ecef; color: #495057;">${suggestion.type}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="suggestion-content">
+                        ${escapeHtml(suggestion.message.substring(0, 200))}${suggestion.message.length > 200 ? '...' : ''}
+                    </div>
+                    
+                    <div class="suggestion-footer">
+                        <div class="suggestion-info">
+                            <strong>ID:</strong> ${suggestion.trackingId || '#' + suggestion._id?.slice(-8)} | 
+                            <strong>Fecha:</strong> ${formatDate(suggestion.createdAt)} | 
+                            <strong>Remitente:</strong> ${suggestion.isAnonymous ? 'Anónimo' : escapeHtml(suggestion.name || 'N/A')}
+                        </div>
+                        <div class="suggestion-actions">
+                            <button class="btn-small btn-view" onclick="viewSuggestion('${suggestion._id}')">Ver</button>
+                            <button class="btn-small btn-edit" onclick="editSuggestion('${suggestion._id}')">Editar</button>
+                            <button class="btn-small btn-delete" onclick="deleteSuggestion('${suggestion._id}')">Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            suggestionsList.innerHTML = html;
+        }
+
+        function updatePagination() {
+            const pagination = document.getElementById('pagination');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const paginationInfo = document.getElementById('paginationInfo');
+            
+            const totalPages = Math.ceil(totalSuggestions / pageSize);
+            const currentPageNum = currentPage + 1;
+            
+            prevBtn.disabled = currentPage === 0;
+            nextBtn.disabled = currentPage >= totalPages - 1;
+            
+            paginationInfo.textContent = `Página ${currentPageNum} de ${totalPages} (${totalSuggestions} sugerencias)`;
+            
+            pagination.style.display = totalPages > 1 ? 'flex' : 'none';
+        }
+
+        function loadPreviousPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                loadSuggestions();
+            }
+        }
+
+        function loadNextPage() {
+            const totalPages = Math.ceil(totalSuggestions / pageSize);
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                loadSuggestions();
+            }
+        }
+
+        function applyFilters() {
+            currentFilters = {
+                status: document.getElementById('filterStatus').value,
+                type: document.getElementById('filterType').value,
+                urgency: document.getElementById('filterUrgency').value
+            };
+            
+            // Eliminar filtros vacíos
+            Object.keys(currentFilters).forEach(key => {
+                if (!currentFilters[key]) {
+                    delete currentFilters[key];
+                }
+            });
+            
+            currentPage = 0;
+            loadSuggestions();
+        }
+
+        function refreshData() {
+            loadStats();
+            loadSuggestions();
+        }
+
+        // Ver sugerencia
+        async function viewSuggestion(id) {
+            try {
+                const response = await fetch(`${API_BASE}/suggestions/admin/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const suggestion = await response.json();
+                    showSuggestionModal(suggestion.data, false);
+                } else {
+                    throw new Error('Error cargando sugerencia');
+                }
+            } catch (error) {
+                alert('Error al cargar la sugerencia');
+            }
+        }
+
+        // Editar sugerencia
+        async function editSuggestion(id) {
+            try {
+                const response = await fetch(`${API_BASE}/suggestions/admin/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const suggestion = await response.json();
+                    showSuggestionModal(suggestion.data, true);
+                } else {
+                    throw new Error('Error cargando sugerencia');
+                }
+            } catch (error) {
+                alert('Error al cargar la sugerencia');
+            }
+        }
+
+        function showSuggestionModal(suggestion, isEdit) {
+            const modal = document.getElementById('suggestionModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = isEdit ? 'Editar Sugerencia' : 'Detalles de Sugerencia';
+            
+            if (isEdit) {
+                modalBody.innerHTML = `
+                    <form id="editForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="editStatus">Estado</label>
+                                <select id="editStatus" required>
+                                    <option value="pendiente" ${suggestion.status === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                                    <option value="en-revision" ${suggestion.status === 'en-revision' ? 'selected' : ''}>En Revisión</option>
+                                    <option value="procesada" ${suggestion.status === 'procesada' ? 'selected' : ''}>Procesada</option>
+                                    <option value="archivada" ${suggestion.status === 'archivada' ? 'selected' : ''}>Archivada</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editProcessedBy">Procesado por</label>
+                                <input type="text" id="editProcessedBy" value="${suggestion.processedBy || ''}" placeholder="Nombre del administrador">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editAdminNotes">Notas del Administrador</label>
+                            <textarea id="editAdminNotes" rows="4" placeholder="Añade notas internas sobre esta sugerencia...">${suggestion.adminNotes || ''}</textarea>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px; color: #333;">Información Original</h4>
+                            <p><strong>Tipo:</strong> ${suggestion.type}</p>
+                            <p><strong>Urgencia:</strong> ${suggestion.urgency}</p>
+                            <p><strong>Asunto:</strong> ${escapeHtml(suggestion.subject)}</p>
+                            <p><strong>Mensaje:</strong> ${escapeHtml(suggestion.message)}</p>
+                            <p><strong>Remitente:</strong> ${suggestion.isAnonymous ? 'Anónimo' : escapeHtml(suggestion.name || 'N/A')}</p>
+                            <p><strong>Email:</strong> ${suggestion.isAnonymous ? 'No disponible' : escapeHtml(suggestion.email || 'N/A')}</p>
+                            <p><strong>Departamento:</strong> ${suggestion.isAnonymous ? 'No disponible' : escapeHtml(suggestion.department || 'N/A')}</p>
+                            <p><strong>Fecha:</strong> ${formatDate(suggestion.createdAt)}</p>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button type="button" class="btn" onclick="closeModal()" style="background: #6c757d;">Cancelar</button>
+                            <button type="submit" class="btn">Guardar Cambios</button>
+                        </div>
+                    </form>
+                `;
+                
+                document.getElementById('editForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    saveSuggestionChanges(suggestion._id);
+                });
+            } else {
+                modalBody.innerHTML = `
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 6px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <strong>ID:</strong> ${suggestion.trackingId || '#' + suggestion._id?.slice(-8)}
+                            </div>
+                            <div>
+                                <strong>Fecha:</strong> ${formatDate(suggestion.createdAt)}
+                            </div>
+                            <div>
+                                <strong>Estado:</strong> <span class="badge badge-${suggestion.status}">${suggestion.status}</span>
+                            </div>
+                            <div>
+                                <strong>Urgencia:</strong> <span class="badge badge-${suggestion.urgency}">${suggestion.urgency}</span>
+                            </div>
+                            <div>
+                                <strong>Tipo:</strong> ${suggestion.type}
+                            </div>
+                            <div>
+                                <strong>Remitente:</strong> ${suggestion.isAnonymous ? 'Anónimo' : escapeHtml(suggestion.name || 'N/A')}
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px;">Asunto</h4>
+                            <p>${escapeHtml(suggestion.subject)}</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px;">Mensaje</h4>
+                            <p style="line-height: 1.6; white-space: pre-wrap;">${escapeHtml(suggestion.message)}</p>
+                        </div>
+                        
+                        ${!suggestion.isAnonymous ? `
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="margin-bottom: 10px;">Información de Contacto</h4>
+                                <p><strong>Email:</strong> ${escapeHtml(suggestion.email || 'No proporcionado')}</p>
+                                <p><strong>Departamento:</strong> ${escapeHtml(suggestion.department || 'No especificado')}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${suggestion.adminNotes ? `
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="margin-bottom: 10px;">Notas del Administrador</h4>
+                                <p style="line-height: 1.6; white-space: pre-wrap;">${escapeHtml(suggestion.adminNotes)}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${suggestion.processedAt ? `
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="margin-bottom: 10px;">Información de Procesamiento</h4>
+                                <p><strong>Procesado por:</strong> ${escapeHtml(suggestion.processedBy || 'N/A')}</p>
+                                <p><strong>Fecha de procesamiento:</strong> ${formatDate(suggestion.processedAt)}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button class="btn" onclick="closeModal()">Cerrar</button>
+                        <button class="btn" onclick="editSuggestion('${suggestion._id}')" style="background: #28a745;">Editar</button>
+                    </div>
+                `;
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        async function saveSuggestionChanges(id) {
+            const status = document.getElementById('editStatus').value;
+            const processedBy = document.getElementById('editProcessedBy').value;
+            const adminNotes = document.getElementById('editAdminNotes').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/suggestions/admin/${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        status,
+                        processedBy,
+                        adminNotes
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('Sugerencia actualizada correctamente');
+                    closeModal();
+                    refreshData();
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + (error.message || 'No se pudo actualizar la sugerencia'));
+                }
+            } catch (error) {
+                alert('Error de conexión. Por favor, inténtalo de nuevo.');
+            }
+        }
+
+        async function deleteSuggestion(id) {
+            if (!confirm('¿Estás seguro de que quieres eliminar esta sugerencia? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/suggestions/admin/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    alert('Sugerencia eliminada correctamente');
+                    refreshData();
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + (error.message || 'No se pudo eliminar la sugerencia'));
+                }
+            } catch (error) {
+                alert('Error de conexión. Por favor, inténtalo de nuevo.');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('suggestionModal').style.display = 'none';
+        }
+
+        // Utilidades
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('suggestionModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
