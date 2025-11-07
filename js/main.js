@@ -704,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
 
             // Número de WhatsApp (debes reemplazarlo con el número real)
-            const phoneNumber = '34XXXXXXXXXX'; // Reemplazar con número real
+            const phoneNumber = '34690026370'; // Reemplazar con número real
 
             // Construir URL de WhatsApp
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
