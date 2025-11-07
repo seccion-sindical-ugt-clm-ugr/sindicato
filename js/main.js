@@ -38,19 +38,56 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+// Smooth scrolling for navigation links - Mejorado para hero buttons
+function initSmoothScroll() {
+    const anchors = document.querySelectorAll('a[href^="#"]');
+    console.log(`✅ Smooth scroll inicializado para ${anchors.length} enlaces`);
+
+    anchors.forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+
+            // Ignorar enlaces que son solo "#" (modales, etc.)
+            if (href === '#' || href === '#!' || !href) {
+                return;
+            }
+
+            e.preventDefault();
+            const target = document.querySelector(href);
+
+            if (target) {
+                console.log(`📍 Navegando a: ${href}`);
+
+                // Hacer scroll suave
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+                // Si es el formulario de afiliación, enfocar el primer campo después del scroll
+                if (href === '#afiliate') {
+                    setTimeout(() => {
+                        const firstInput = document.querySelector('#affiliateForm input[name="name"]');
+                        if (firstInput) {
+                            firstInput.focus();
+                            console.log('✅ Formulario de afiliación enfocado');
+                        }
+                    }, 800); // Esperar a que termine el scroll
+                }
+            } else {
+                console.warn(`⚠️ No se encontró el elemento: ${href}`);
+            }
+        });
     });
-});
+}
+
+// Ejecutar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSmoothScroll);
+} else {
+    // DOM ya está listo, ejecutar inmediatamente
+    initSmoothScroll();
+}
 
 // Header scroll effect
 window.addEventListener('scroll', () => {
