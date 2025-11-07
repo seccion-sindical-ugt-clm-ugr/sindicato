@@ -76,13 +76,23 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(cors({
     origin: function(origin, callback) {
+        // Log de debug para CORS
+        console.log('🔍 CORS check - Origin:', origin);
+        console.log('🔍 CORS check - Allowed origins:', allowedOrigins);
+
         // Permitir requests sin origin (como Postman o mismo servidor)
-        if (!origin) return callback(null, true);
+        if (!origin) {
+            console.log('✅ CORS: Request sin origin permitido');
+            return callback(null, true);
+        }
 
         if (allowedOrigins.indexOf(origin) === -1) {
             const msg = 'La política CORS no permite el acceso desde este origen.';
+            console.log(`❌ CORS BLOQUEADO: ${origin} no está en la lista de orígenes permitidos`);
             return callback(new Error(msg), false);
         }
+
+        console.log(`✅ CORS: Origin ${origin} permitido`);
         return callback(null, true);
     },
     credentials: true,
