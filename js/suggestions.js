@@ -276,18 +276,26 @@ async function handleSuggestionSubmit(e) {
         // Enviar sugerencia
         const result = await submitSuggestion(formData);
 
-        // Ocultar formulario y mostrar mensaje de éxito
+        // Ocultar formulario completamente
         form.style.display = 'none';
-        showMessage(messageDiv, 'success',
-            '✅ ¡Sugerencia enviada correctamente! Gracias por tu participación.');
 
-        // Cerrar modal después de 3 segundos
+        // Limpiar mensaje anterior si existe
+        messageDiv.style.display = 'none';
+
+        // Pequeño delay para asegurar que el DOM se actualiza
+        setTimeout(() => {
+            // Mostrar mensaje de éxito prominente
+            showMessage(messageDiv, 'success',
+                '✅ ¡Sugerencia recibida! Gracias por tu participación. Tu opinión es muy importante para nosotros.');
+        }, 100);
+
+        // Cerrar modal después de 4 segundos (dar más tiempo para leer)
         setTimeout(() => {
             hideSuggestionsModal();
             // Restaurar formulario
             form.style.display = 'block';
             form.reset();
-        }, 3000);
+        }, 4000);
 
     } catch (error) {
         // Mostrar mensaje de error
