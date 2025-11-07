@@ -23,6 +23,10 @@ const logger = require('./middleware/logger');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configurar confianza en proxies (necesario para Vercel, Heroku, etc.)
+// Permite que express-rate-limit y otros middlewares obtengan la IP real del cliente
+app.set('trust proxy', true);
+
 // ====================================
 // CONECTAR A MONGODB (Opcional)
 // ====================================
