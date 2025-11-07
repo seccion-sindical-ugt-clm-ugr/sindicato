@@ -1059,6 +1059,77 @@ body {
     }
 }
 
+/* About Section Styles */
+.about-content {
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.about-main {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    text-align: justify;
+}
+
+.about-quote {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    font-style: italic;
+    margin-top: 2rem;
+    padding: 1rem;
+    background: rgba(227, 6, 19, 0.05);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 8px;
+}
+
+/* Updated About Card Styles */
+.about-card .card-icon {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    transition: var(--transition);
+}
+
+.about-card:hover .card-icon {
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(227, 6, 19, 0.3);
+}
+
+.about-card h3 {
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+}
+
+.about-card p {
+    color: var(--text-light);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* Mobile responsiveness for About Section */
+@media (max-width: 768px) {
+    .about-description {
+        font-size: 1rem;
+        text-align: left;
+    }
+
+    .about-quote {
+        font-size: 1.1rem;
+        margin: 1.5rem 0;
+    }
+
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
 /* Password strength indicator (for future implementation) */
 .password-strength {
     height: 4px;
