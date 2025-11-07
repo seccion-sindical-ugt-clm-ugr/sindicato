@@ -1,6 +1,7 @@
 /**
  * Backend Server - UGT-CLM-UGR Granada
  * Maneja pagos con Stripe y gestión de afiliaciones
+ * Última actualización: Verificación de conexión MongoDB
  */
 
 require('dotenv').config();
