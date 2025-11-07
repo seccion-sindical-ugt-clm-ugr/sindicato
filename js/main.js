@@ -160,11 +160,16 @@ function initHeroButtons() {
 
 // Inicializar navegación del header y logo
 function initHeaderNavigation() {
-    // Navegación del logo y nombre (volver al inicio)
+    // Navegación del logo y nombre (volver al inicio) - VERSIÓN MEJORADA
     const navBrand = document.getElementById('navBrand');
     if (navBrand) {
+        // Estilos para asegurar clicabilidad
         navBrand.style.cursor = 'pointer';
-        navBrand.addEventListener('click', () => {
+        navBrand.style.position = 'relative';
+        navBrand.style.zIndex = '1000';
+
+        // Función para volver al inicio
+        function goToHome() {
             console.log('🏠 Logo clicado - volviendo al inicio');
 
             // Restaurar todas las secciones
@@ -177,8 +182,56 @@ function initHeaderNavigation() {
             const backBtn = document.getElementById('backToTopBtn');
             if (backBtn) backBtn.remove();
 
+            // Cerrar menú móvil si está abierto
+            const navMenu = document.querySelector('.nav-menu');
+            const hamburger = document.querySelector('.hamburger');
+            if (navMenu && hamburger) {
+                navMenu.classList.remove('active');
+                hamburger.classList.remove('active');
+            }
+
             showMessage('info', 'Bienvenido al inicio 🏠');
+        }
+
+        // Event listeners para todos los dispositivos
+        navBrand.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            goToHome();
         });
+
+        // Soporte táctil para móviles
+        navBrand.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            console.log('📱 Touch detectado en logo');
+        }, { passive: false });
+
+        navBrand.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            goToHome();
+        }, { passive: false });
+
+        // Prevenir propagación desde elementos internos
+        const logoImage = navBrand.querySelector('.logo');
+        const brandText = navBrand.querySelector('.brand-text');
+
+        [logoImage, brandText].forEach(element => {
+            if (element) {
+                element.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    goToHome();
+                });
+
+                element.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    goToHome();
+                }, { passive: false });
+            }
+        });
+
+        console.log('✅ Logo configurado para navegación completa');
     }
 
     // Navegación del menú principal
