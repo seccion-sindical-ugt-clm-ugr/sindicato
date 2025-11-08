@@ -84,7 +84,7 @@ function showSingleSection(sectionId, message = '') {
             console.log('📍 Ancla encontrada:', titleAnchor);
 
             if (titleAnchor) {
-                const offset = 80; // Offset para el header fijo
+                const offset = 40; // Offset reducido para que el título esté más arriba
                 const targetPosition = titleAnchor.getBoundingClientRect().top + window.pageYOffset - offset;
                 console.log(`📐 Calculando scroll: anchor.getBoundingClientRect().top=${titleAnchor.getBoundingClientRect().top}, offset=${offset}, targetPosition=${targetPosition}`);
 
@@ -92,7 +92,7 @@ function showSingleSection(sectionId, message = '') {
                     top: targetPosition,
                     behavior: 'instant'
                 });
-                console.log('✅ Scroll ejecutado hacia el ancla #por-que-afiliarse');
+                console.log('✅ Scroll ejecutado hacia el ancla #por-que-afiliarse con offset reducido');
             } else {
                 console.log('❌ NO se encontró el ancla #por-que-afiliarse - usando fallback');
                 // Fallback al método anterior si no encuentra el ancla
