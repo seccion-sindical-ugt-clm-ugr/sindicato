@@ -461,24 +461,38 @@
                 <div class="footer-section">
                     <h4>Enlaces Rápidos</h4>
                     <ul>
-                        <li><a href="#inicio">Inicio</a></li>
-                        <li><a href="#cursos">Cursos</a></li>
-                        <li><a href="#afiliate">Afíliate</a></li>
-                        <li><a href="#contacto">Contacto</a></li>
+                        <li><a href="#inicio" onclick="showSingleSection('inicio'); return false;">Inicio</a></li>
+                        <li><a href="#cursos" onclick="showSingleSection('cursos'); return false;">Cursos</a></li>
+                        <li><a href="#afiliate" onclick="showSingleSection('afiliate'); return false;">Afíliate</a></li>
+                        <li><a href="#contacto" onclick="showSingleSection('contacto'); return false;">Contacto</a></li>
+                        <li><a href="#quienes-somos" onclick="showSingleSection('quienes-somos'); return false;">Quiénes Somos</a></li>
                     </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contacto Rápido</h4>
+                    <div class="footer-contact">
+                        <a href="#" onclick="event.preventDefault(); window.location.href='https://wa.me/34690026370?text=¡Hola! He visitado la web de UGT-CLM Granada y me gustaría más información.'" class="footer-whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                            <span>WhatsApp</span>
+                        </a>
+                        <a href="mailto:ugtclmgranada@gmail.com" class="footer-email">
+                            <i class="fas fa-envelope"></i>
+                            <span>Email</span>
+                        </a>
+                    </div>
                 </div>
                 <div class="footer-section">
                     <h4>Síguenos</h4>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.facebook.com/UGTGranada" target="_blank" rel="noopener noreferrer" aria-label="Facebook UGT Granada"><i class="fab fa-facebook"></i></a>
+                        <a href="https://twitter.com/UGT_Espana" target="_blank" rel="noopener noreferrer" aria-label="Twitter UGT"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.instagram.com/ugt_espana" target="_blank" rel="noopener noreferrer" aria-label="Instagram UGT"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/company/ugt-union-general-de-trabajadores" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn UGT"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 UGT-CLM-UGR Granada. Todos los derechos reservados.</p>
+                <p>&copy; 2025 UGT-CLM-UGR Granada. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>

@@ -2474,3 +2474,63 @@ body {
         text-align: center;
     }
 }
+
+/* Footer Contact Styles */
+.footer-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.footer-whatsapp,
+.footer-email {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    text-decoration: none;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.footer-whatsapp:hover {
+    background: #25D366;
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+.footer-email:hover {
+    background: var(--accent-color);
+    transform: translateY(-2px);
+    color: white;
+    text-decoration: none;
+}
+
+.footer-whatsapp i,
+.footer-email i {
+    font-size: 1.2rem;
+    width: 20px;
+    text-align: center;
+}
+
+/* Responsive Footer Contact */
+@media (max-width: 768px) {
+    .footer-contact {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .footer-whatsapp,
+    .footer-email {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+}
