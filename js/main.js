@@ -37,13 +37,14 @@ const closeMyCourses = document.querySelector('#closeMyCourses');
 const closeMyDocuments = document.querySelector('#closeMyDocuments');
 const closeMyEvents = document.querySelector('#closeMyEvents');
 
-// Base de datos simulada de usuarios
-const usersDatabase = [
-    { email: 'afiliado@ugt.org', password: 'ugt2024', name: 'Juan Pérez', member: true },
-    { email: 'test@ugt.org', password: 'test123', name: 'María García', member: true },
-    { email: 'admin@ugt.org', password: 'admin123', name: 'Administrador', member: true, admin: true },
-    { email: 'ugtclmgranada@gmail.com', password: 'ugt123456', name: 'UGT-CLM Granada Oficial', member: true, admin: true }
-];
+// ============================================
+// SISTEMA DE AUTENTICACIÓN CON API REAL
+// ============================================
+// NOTA: usersDatabase ya no se usa, ahora se usa authAPI (ver js/auth-api.js)
+// Los usuarios ahora se almacenan en MongoDB y se autentican con JWT
+
+// Variable global para el usuario actual
+let currentUser = null;
 
 // Toggle Mobile Menu
 hamburger.addEventListener('click', () => {
@@ -636,16 +637,32 @@ function handleProfilePhotoUpload(file) {
     reader.readAsDataURL(file);
 }
 
-// Remove profile photo
-function removeProfilePhoto() {
-    // Hide the image and show default avatar
-    profileImagePreview.style.display = 'none';
-    profileImagePreview.src = '';
-    defaultAvatar.style.display = 'flex';
-    profilePhotoInput.value = '';
-    removePhotoBtn.style.display = 'none';
-    changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
-    console.log('🗑️ Foto de perfil eliminada');
+// ============================================
+// ELIMINAR FOTO DE PERFIL - CON API REAL
+// ============================================
+async function removeProfilePhoto() {
+    try {
+        // Eliminar foto usando API real
+        const result = await authAPI.deletePhoto();
+
+        if (result.success) {
+            // Hide the image and show default avatar
+            profileImagePreview.style.display = 'none';
+            profileImagePreview.src = '';
+            defaultAvatar.style.display = 'flex';
+            profilePhotoInput.value = '';
+            removePhotoBtn.style.display = 'none';
+            changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
+
+            showMessage('success', 'Foto de perfil eliminada');
+            console.log('✅ Foto de perfil eliminada del backend');
+        } else {
+            showMessage('error', result.error || 'Error al eliminar foto');
+        }
+    } catch (error) {
+        console.error('❌ Error eliminando foto:', error);
+        showMessage('error', 'Error al eliminar foto');
+    }
 }
 
 // Dashboard modals close handlers
@@ -676,7 +693,9 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Edit Profile Form handler
+// ============================================
+// ACTUALIZAR PERFIL - CON API REAL
+// ============================================
 editProfileForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();
@@ -687,36 +706,14 @@ editProfileForm.addEventListener('submit', async (e) => {
 
     // Extract form data
     const profileData = {
-        name: formData.get('name')?.trim(),
-        email: formData.get('email')?.trim(),
-        phone: formData.get('phone')?.trim(),
-        department: formData.get('department')?.trim(),
-        notifications: formData.get('notifications') === 'on',
-        publicProfile: formData.get('publicProfile') === 'on',
-        profilePhoto: null
+        nombre: formData.get('name')?.trim(),
+        telefono: formData.get('phone')?.trim(),
+        departamento: formData.get('department')?.trim()
     };
 
-    // Add profile photo if exists
-    const hasPhoto = profileImagePreview.style.display === 'block' &&
-                    profileImagePreview.src &&
-                    !profileImagePreview.src.includes('data:') === false;
-
-    if (hasPhoto) {
-        profileData.profilePhoto = profileImagePreview.src;
-        console.log('📸 Foto detectada para guardar:', profileImagePreview.src.substring(0, 50) + '...');
-    } else {
-        profileData.profilePhoto = null;
-        console.log('👤 Sin foto para guardar');
-    }
-
     // Validation
-    if (!profileData.name) {
+    if (!profileData.nombre) {
         showMessage('error', 'El nombre es obligatorio');
-        return;
-    }
-
-    if (!profileData.email) {
-        showMessage('error', 'El email es obligatorio');
         return;
     }
 
@@ -725,29 +722,30 @@ editProfileForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
 
     try {
-        // Simulate API call
-        await simulateAPICall();
+        // Actualizar perfil usando API real
+        const result = await authAPI.updateProfile(profileData);
 
-        // Update user in database
-        const userIndex = usersDatabase.findIndex(u => u.email === profileData.email);
-        if (userIndex !== -1) {
-            // Update user data
-            usersDatabase[userIndex] = {
-                ...usersDatabase[userIndex],
-                name: profileData.name,
-                phone: profileData.phone,
-                department: profileData.department,
-                notifications: profileData.notifications,
-                publicProfile: profileData.publicProfile,
-                profilePhoto: profileData.profilePhoto
-            };
-            console.log('💾 Guardando foto en base de datos:', profileData.profilePhoto ? 'Sí' : 'No');
+        if (result.success) {
+            currentUser = result.data.user;
 
-            // Update localStorage
-            localStorage.setItem('userName', profileData.name);
+            // Actualizar foto si existe
+            const hasPhoto = profileImagePreview.style.display === 'block' &&
+                            profileImagePreview.src &&
+                            profileImagePreview.src.startsWith('data:');
+
+            if (hasPhoto) {
+                console.log('📸 Subiendo foto de perfil...');
+                const photoResult = await authAPI.uploadPhoto(profileImagePreview.src);
+
+                if (photoResult.success) {
+                    console.log('✅ Foto actualizada');
+                } else {
+                    console.error('❌ Error al subir foto:', photoResult.error);
+                }
+            }
 
             // Update dashboard display
-            document.getElementById('userName').textContent = profileData.name;
+            document.getElementById('userName').textContent = currentUser.nombre;
             updateLoginState();
 
             showMessage('success', '¡Perfil actualizado correctamente!');
@@ -756,35 +754,50 @@ editProfileForm.addEventListener('submit', async (e) => {
             editProfileModal.style.display = 'none';
             editProfileForm.reset();
 
+            console.log('✅ Perfil actualizado:', currentUser);
+
         } else {
-            showMessage('error', 'No se encontró el usuario en la base de datos');
+            showMessage('error', result.error || 'Error al actualizar el perfil');
         }
 
     } catch (error) {
         showMessage('error', 'Error al actualizar el perfil');
-        console.error('Profile update error:', error);
+        console.error('❌ Profile update error:', error);
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
 });
 
-// Logout handler
-logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
-    showMessage('success', 'Sesión cerrada correctamente');
+// ============================================
+// LOGOUT CON API REAL
+// ============================================
+logoutBtn.addEventListener('click', async () => {
+    try {
+        // Logout usando API real
+        await authAPI.logout();
+        currentUser = null;
 
-    // Hide dashboard and show main site
-    memberDashboard.style.display = 'none';
-    document.querySelectorAll('.section').forEach(section => {
-        if (section.id !== 'memberDashboard') {
-            section.style.display = 'block';
-        }
-    });
+        showMessage('success', 'Sesión cerrada correctamente');
 
-    updateLoginState();
+        // Hide dashboard and show main site
+        memberDashboard.style.display = 'none';
+        document.querySelectorAll('.section').forEach(section => {
+            if (section.id !== 'memberDashboard') {
+                section.style.display = 'block';
+            }
+        });
+
+        updateLoginState();
+
+        console.log('✅ Logout exitoso');
+    } catch (error) {
+        console.error('❌ Error en logout:', error);
+        // Incluso si hay error, limpiamos localmente
+        authAPI.clearTokens();
+        currentUser = null;
+        updateLoginState();
+    }
 });
 
 // Smooth scrolling for navigation links - Mejorado para hero buttons
@@ -888,7 +901,9 @@ function clearErrors() {
     });
 }
 
-// Enhanced login handler
+// ============================================
+// LOGIN CON API REAL
+// ============================================
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();
@@ -926,20 +941,14 @@ loginForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
 
     try {
-        // Simulate API call with real authentication
-        await simulateAPICall();
+        // Login usando API real
+        const result = await authAPI.login(email, password);
 
-        // Check credentials against database
-        const user = usersDatabase.find(u => u.email === email && u.password === password);
+        if (result.success) {
+            currentUser = result.data.user;
+            showMessage('success', `¡Bienvenido de nuevo, ${currentUser.nombre}!`);
 
-        if (user) {
-            // Store login state
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userEmail', user.email);
-            localStorage.setItem('userName', user.name);
-            localStorage.setItem('isAdmin', user.admin || false);
-
-            showMessage('success', `¡Bienvenido de nuevo, ${user.name}!`);
+            console.log('✅ Login exitoso:', currentUser);
 
             // Close modal and show dashboard
             setTimeout(() => {
@@ -949,14 +958,15 @@ loginForm.addEventListener('submit', async (e) => {
             }, 1500);
 
         } else {
-            showMessage('error', 'Email o contraseña incorrectos');
+            // Mostrar error específico del backend
+            showMessage('error', result.error || 'Email o contraseña incorrectos');
             passwordInput.value = '';
             passwordInput.focus();
         }
 
     } catch (error) {
         showMessage('error', 'Error de conexión. Inténtalo de nuevo.');
-        console.error('Login error:', error);
+        console.error('❌ Login error:', error);
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
@@ -1133,9 +1143,12 @@ recoveryForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Show member dashboard
+// ============================================
+// MOSTRAR DASHBOARD CON DATOS REALES
+// ============================================
 function showMemberDashboard() {
-    const userName = localStorage.getItem('userName') || 'Afiliado';
+    // Usar currentUser de la API real
+    const userName = currentUser ? currentUser.nombre : 'Afiliado';
     document.getElementById('userName').textContent = userName;
 
     // Hide all main content sections except dashboard, but keep header visible
@@ -1164,6 +1177,8 @@ function showMemberDashboard() {
 
     // Scroll to top
     window.scrollTo(0, 0);
+
+    console.log('✅ Dashboard mostrado para:', userName);
 }
 
 // Initialize dashboard buttons functionality
@@ -1191,51 +1206,46 @@ function initDashboardButtons() {
     });
 }
 
-// Show edit profile modal
+// ============================================
+// MOSTRAR MODAL DE PERFIL CON DATOS REALES
+// ============================================
 function showEditProfileModal() {
-    // Load current user data
-    const userEmail = localStorage.getItem('userEmail');
-    const userName = localStorage.getItem('userName');
-
-    // Find user in database
-    const user = usersDatabase.find(u => u.email === userEmail);
-
-    if (user) {
-        // Populate form with current data
-        document.getElementById('profileName').value = user.name || '';
-        document.getElementById('profileEmail').value = user.email || '';
-        document.getElementById('profilePhone').value = user.phone || '';
-        document.getElementById('profileDepartment').value = user.department || '';
-        document.getElementById('notificationsEnabled').checked = user.notifications || false;
-        document.getElementById('publicProfile').checked = user.publicProfile || false;
-
-        // Load profile photo if exists
-        console.log('🔍 Verificando foto de perfil para usuario:', user.email);
-        console.log('📸 Foto guardada:', user.profilePhoto ? 'Sí - ' + user.profilePhoto.substring(0, 50) + '...' : 'No');
-
-        if (user.profilePhoto && user.profilePhoto.trim() !== '') {
-            profileImagePreview.src = user.profilePhoto;
-            profileImagePreview.style.display = 'block';
-            defaultAvatar.style.display = 'none';
-            removePhotoBtn.style.display = 'inline-flex';
-            changePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
-            console.log('✅ Foto de perfil cargada correctamente');
-        } else {
-            // Show default avatar
-            profileImagePreview.style.display = 'none';
-            profileImagePreview.src = '';
-            defaultAvatar.style.display = 'flex';
-            removePhotoBtn.style.display = 'none';
-            changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
-            console.log('👤 Mostrando avatar predeterminado');
-        }
-
-        // Show modal
-        editProfileModal.style.display = 'block';
-        console.log('📝 Modal de edición de perfil abierto para:', user.name);
-    } else {
+    // Usar currentUser de la API real
+    if (!currentUser) {
         showMessage('error', 'No se encontraron los datos del usuario');
+        return;
     }
+
+    // Populate form with current data
+    document.getElementById('profileName').value = currentUser.nombre || '';
+    document.getElementById('profileEmail').value = currentUser.email || '';
+    document.getElementById('profilePhone').value = currentUser.telefono || '';
+    document.getElementById('profileDepartment').value = currentUser.departamento || '';
+
+    // Load profile photo if exists
+    console.log('🔍 Verificando foto de perfil para:', currentUser.email);
+    console.log('📸 Foto guardada:', currentUser.profilePhoto ? 'Sí' : 'No');
+
+    if (currentUser.profilePhoto && currentUser.profilePhoto.trim() !== '') {
+        profileImagePreview.src = currentUser.profilePhoto;
+        profileImagePreview.style.display = 'block';
+        defaultAvatar.style.display = 'none';
+        removePhotoBtn.style.display = 'inline-flex';
+        changePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
+        console.log('✅ Foto de perfil cargada correctamente');
+    } else {
+        // Show default avatar
+        profileImagePreview.style.display = 'none';
+        profileImagePreview.src = '';
+        defaultAvatar.style.display = 'flex';
+        removePhotoBtn.style.display = 'none';
+        changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
+        console.log('👤 Mostrando avatar predeterminado');
+    }
+
+    // Show modal
+    editProfileModal.style.display = 'block';
+    console.log('📝 Modal de edición de perfil abierto para:', currentUser.nombre);
 }
 
 // Show my courses modal
@@ -1358,14 +1368,38 @@ function updateLoginState() {
     initLoginBtn();
 }
 
-// Check if user is logged in on page load
-function checkLoginStatus() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (isLoggedIn) {
-        const userName = localStorage.getItem('userName') || 'Afiliado';
-        document.getElementById('userName').textContent = userName;
-        showMemberDashboard();
+// ============================================
+// VERIFICACIÓN DE SESIÓN AL CARGAR - CON API REAL
+// ============================================
+async function checkLoginStatus() {
+    console.log('🔍 Verificando estado de autenticación...');
+
+    // Verificar si hay tokens guardados
+    if (authAPI.isAuthenticated()) {
+        try {
+            // Validar token con el backend
+            const result = await authAPI.me();
+
+            if (result.success) {
+                currentUser = result.data.user;
+                document.getElementById('userName').textContent = currentUser.nombre;
+                showMemberDashboard();
+                console.log('✅ Sesión válida:', currentUser.email);
+            } else {
+                // Token inválido, limpiar
+                authAPI.clearTokens();
+                currentUser = null;
+                console.log('⚠️ Token inválido, limpiando sesión');
+            }
+        } catch (error) {
+            console.error('❌ Error verificando sesión:', error);
+            authAPI.clearTokens();
+            currentUser = null;
+        }
+    } else {
+        console.log('ℹ️ No hay sesión activa');
     }
+
     initLoginBtn();
 }
 
