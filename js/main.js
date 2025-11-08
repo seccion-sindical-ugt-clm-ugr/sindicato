@@ -11,6 +11,7 @@ const recoveryModal = document.querySelector('#recoveryModal');
 const recoveryForm = document.querySelector('#recoveryForm');
 const memberDashboard = document.querySelector('#memberDashboard');
 const logoutBtn = document.querySelector('#logoutBtn');
+const exitDashboardBtn = document.querySelector('#exitDashboardBtn');
 const forgotPasswordLink = document.querySelector('#forgotPasswordLink');
 const closeRecoveryBtn = document.querySelector('#closeRecovery');
 const backToLoginBtn = document.querySelector('#backToLogin');
@@ -257,8 +258,18 @@ function initHeaderNavigation() {
         function goToHome() {
             console.log('🏠 Logo clicado - volviendo al inicio');
 
-            // Restaurar todas las secciones
-            restoreAllSections();
+            // Check if user is logged in and in dashboard mode
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const isDashboardVisible = memberDashboard && memberDashboard.style.display === 'block';
+
+            if (isLoggedIn && isDashboardVisible) {
+                // Exit dashboard mode
+                exitDashboardMode();
+                showMessage('info', 'Has salido del área de afiliados 🏠');
+            } else {
+                // Normal home navigation
+                restoreAllSections();
+            }
 
             // Scroll al inicio
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -274,8 +285,6 @@ function initHeaderNavigation() {
                 navMenu.classList.remove('active');
                 hamburger.classList.remove('active');
             }
-
-            showMessage('info', 'Bienvenido al inicio 🏠');
         }
 
         // Event listeners para todos los dispositivos
@@ -650,6 +659,12 @@ editProfileForm.addEventListener('submit', async (e) => {
     }
 });
 
+// Exit dashboard handler
+exitDashboardBtn.addEventListener('click', () => {
+    exitDashboardMode();
+    showMessage('info', 'Has salido del área de afiliados 🏠');
+});
+
 // Logout handler
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('isLoggedIn');
@@ -1019,11 +1034,9 @@ function showMemberDashboard() {
     const userName = localStorage.getItem('userName') || 'Afiliado';
     document.getElementById('userName').textContent = userName;
 
-    // Hide all sections except dashboard
-    document.querySelectorAll('.section').forEach(section => {
-        if (section.id !== 'memberDashboard') {
-            section.style.display = 'none';
-        }
+    // Hide all main content sections except dashboard, but keep header visible
+    document.querySelectorAll('.section:not(#memberDashboard)').forEach(section => {
+        section.style.display = 'none';
     });
 
     // Show dashboard
@@ -1032,8 +1045,18 @@ function showMemberDashboard() {
     // Initialize dashboard buttons
     initDashboardButtons();
 
+    // Re-initialize navigation to ensure menu links work
+    initHeaderNavigation();
+    initSmoothScroll();
+
     // Update login button
     updateLoginState();
+
+    // Hide the "Afíliate por 15€/año" button when user is logged in
+    const heroAffiliateBtn = document.getElementById('heroAffiliateBtn');
+    if (heroAffiliateBtn) {
+        heroAffiliateBtn.style.display = 'none';
+    }
 
     // Scroll to top
     window.scrollTo(0, 0);
@@ -1111,13 +1134,9 @@ function showMyEventsModal() {
 // Close modal and navigate to courses section
 function closeModalAndNavigateToCourses() {
     myCoursesModal.style.display = 'none';
-    // Hide dashboard and show main site
-    memberDashboard.style.display = 'none';
-    document.querySelectorAll('.section').forEach(section => {
-        if (section.id !== 'memberDashboard') {
-            section.style.display = 'block';
-        }
-    });
+    // Exit dashboard mode and show main site
+    exitDashboardMode();
+
     // Navigate to courses section
     const coursesSection = document.querySelector('#cursos');
     if (coursesSection) {
@@ -1127,6 +1146,33 @@ function closeModalAndNavigateToCourses() {
         });
     }
     showMessage('info', 'Explorando sección de cursos 📚');
+}
+
+// Exit dashboard mode and return to normal site navigation
+function exitDashboardMode() {
+    // Hide dashboard
+    memberDashboard.style.display = 'none';
+
+    // Show all sections
+    document.querySelectorAll('.section').forEach(section => {
+        section.style.display = 'block';
+    });
+
+    // Show the "Afíliate por 15€/año" button again
+    const heroAffiliateBtn = document.getElementById('heroAffiliateBtn');
+    if (heroAffiliateBtn) {
+        heroAffiliateBtn.style.display = 'inline-flex';
+    }
+
+    // Re-initialize navigation for normal mode
+    initHeaderNavigation();
+    initSmoothScroll();
+    initHeroButtons();
+
+    // Update login state
+    updateLoginState();
+
+    console.log('🚪 Salido del modo dashboard, navegación normal restaurada');
 }
 
 // Payment handler with Stripe integration
