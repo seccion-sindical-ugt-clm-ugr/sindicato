@@ -17,21 +17,22 @@
   "author": "UGT-CLM-UGR Granada",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "stripe": "^14.10.0",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "body-parser": "^1.20.2",
-    "helmet": "^7.1.0",
+    "express": "^4.18.2",
+    "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^7.1.5",
     "express-validator": "^7.0.1",
-    "mongoose": "^8.0.3",
-    "nodemailer": "^6.9.7",
-    "express-mongo-sanitize": "^2.2.0",
-    "xss": "^1.0.14",
-    "bcrypt": "^5.1.1",
+    "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
-    "multer": "^1.4.5-lts.1"
+    "mongoose": "^8.0.3",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.7",
+    "pdfkit": "^0.17.2",
+    "stripe": "^14.10.0",
+    "xss": "^1.0.14"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

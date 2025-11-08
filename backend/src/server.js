@@ -18,6 +18,7 @@ const suggestionsRoutes = require('./routes/suggestions');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const completeRegistrationRoutes = require('./routes/complete-registration');
+const documentsRoutes = require('./routes/documents');
 
 // Importar middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -155,6 +156,9 @@ app.use('/api', stripeRoutes);
 // Rutas de Sugerencias
 app.use('/api', suggestionsRoutes);
 
+// Rutas de Documentos
+app.use('/api', documentsRoutes);
+
 // Ruta raíz
 app.get('/', (req, res) => {
     const mongoState = mongoose.connection.readyState;
@@ -191,6 +195,11 @@ app.get('/', (req, res) => {
             deletePhoto: 'DELETE /api/user/photo',
             changePassword: 'PUT /api/user/password',
             membership: 'GET /api/user/membership',
+            // Documentos
+            documents: 'GET /api/user/documents',
+            documentDownload: 'GET /api/user/documents/:id',
+            generateDocument: 'POST /api/user/documents/generate',
+            deleteDocument: 'DELETE /api/user/documents/:id',
             // Pagos
             createAffiliationSession: 'POST /api/create-affiliation-session',
             createCourseSession: 'POST /api/create-course-session',

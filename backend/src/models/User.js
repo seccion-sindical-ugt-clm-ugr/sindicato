@@ -91,6 +91,28 @@ const userSchema = new mongoose.Schema({
         }
     }],
 
+    // Historial de pagos
+    paymentHistory: [{
+        stripeSessionId: String,
+        amount: Number,
+        currency: { type: String, default: 'eur' },
+        description: String,
+        status: { type: String, default: 'completed' },
+        date: { type: Date, default: Date.now }
+    }],
+
+    // Sugerencias del usuario
+    suggestions: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Suggestion'
+    }],
+
+    // Documentos generados
+    documents: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Document'
+    }],
+
     lastLogin: {
         type: Date,
         default: null

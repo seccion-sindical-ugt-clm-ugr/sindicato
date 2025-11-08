@@ -7,7 +7,9 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const Document = require('../models/Document');
 const { generateAccessToken, generateRefreshToken } = require('../middleware/auth');
+const { generateCertificadoAfiliado, generateFichaAfiliacion } = require('../services/pdfService');
 
 /**
  * POST /api/complete-registration
@@ -99,7 +101,46 @@ router.post('/complete-registration',
             });
             await user.save();
 
-            // 8. Enviar respuesta
+            // 8. Auto-generar documentos de afiliación
+            try {
+                console.log('📄 Generando documentos iniciales para nuevo afiliado...');
+
+                // Generar Ficha de Afiliación
+                const fichaResult = await generateFichaAfiliacion(user);
+                const fichaDocument = new Document({
+                    userId: user._id,
+                    type: 'ficha-afiliacion',
+                    title: 'Ficha de Afiliación',
+                    description: `Ficha de afiliación de ${user.nombre}`,
+                    fileData: fichaResult.fileData,
+                    fileSize: fichaResult.fileSize
+                });
+                await fichaDocument.save();
+
+                // Generar Certificado de Afiliado
+                const certificadoResult = await generateCertificadoAfiliado(user);
+                const certificadoDocument = new Document({
+                    userId: user._id,
+                    type: 'certificado-afiliado',
+                    title: 'Certificado de Afiliación',
+                    description: `Certificado de afiliación para ${user.nombre}`,
+                    fileData: certificadoResult.fileData,
+                    fileSize: certificadoResult.fileSize
+                });
+                await certificadoDocument.save();
+
+                // Agregar documentos al usuario
+                user.documents.push(fichaDocument._id, certificadoDocument._id);
+                await user.save();
+
+                console.log(`✅ Documentos generados: Ficha (${fichaDocument._id}) y Certificado (${certificadoDocument._id})`);
+
+            } catch (docError) {
+                console.error('⚠️ Error generando documentos iniciales:', docError.message);
+                // No fallar el registro si hay error en documentos
+            }
+
+            // 9. Enviar respuesta
             res.status(201).json({
                 success: true,
                 message: '¡Registro completado! Ya puedes iniciar sesión',

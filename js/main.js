@@ -1325,9 +1325,121 @@ function showMyCoursesModal() {
 }
 
 // Show my documents modal
-function showMyDocumentsModal() {
+async function showMyDocumentsModal() {
     myDocumentsModal.style.display = 'block';
     console.log('📁 Modal de "Mis Documentos" abierto');
+
+    // Cargar documentos del usuario
+    await loadUserDocuments();
+}
+
+// Cargar documentos del usuario
+async function loadUserDocuments() {
+    try {
+        const response = await authAPI.getDocuments();
+
+        if (!response.success) {
+            throw new Error(response.error || 'Error al cargar documentos');
+        }
+
+        const documents = response.data.documents || [];
+        const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
+
+        if (documents.length === 0) {
+            // Mostrar estado vacío
+            documentsContent.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h4>No hay documentos disponibles</h4>
+                    <p>Cuando completes actividades o realices pagos, tus documentos aparecerán aquí</p>
+                </div>
+            `;
+        } else {
+            // Mostrar lista de documentos
+            documentsContent.innerHTML = `
+                <div class="documents-list">
+                    ${documents.map(doc => `
+                        <div class="document-card" data-document-id="${doc._id}">
+                            <div class="document-icon">
+                                <i class="fas ${getDocumentIcon(doc.type)}"></i>
+                            </div>
+                            <div class="document-info">
+                                <h4>${doc.title}</h4>
+                                <p>${doc.description}</p>
+                                <div class="document-meta">
+                                    <span><i class="fas fa-calendar"></i> ${formatDate(doc.generatedAt)}</span>
+                                    <span><i class="fas fa-file-pdf"></i> ${formatFileSize(doc.fileSize)}</span>
+                                </div>
+                            </div>
+                            <div class="document-actions">
+                                <button class="btn btn-primary btn-sm" onclick="downloadDocument('${doc._id}', '${doc.title}')">
+                                    <i class="fas fa-download"></i> Descargar
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+    } catch (error) {
+        console.error('❌ Error cargando documentos:', error);
+        const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
+        documentsContent.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h4>Error al cargar documentos</h4>
+                <p>${error.message}</p>
+                <button class="btn btn-primary" onclick="loadUserDocuments()">
+                    <i class="fas fa-sync"></i> Reintentar
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Descargar documento
+async function downloadDocument(documentId, title) {
+    try {
+        console.log(`📥 Descargando documento: ${title}`);
+        await authAPI.downloadDocument(documentId, `${title}.pdf`);
+        showMessage('success', 'Documento descargado correctamente');
+    } catch (error) {
+        console.error('❌ Error descargando documento:', error);
+        showMessage('error', 'Error al descargar documento');
+    }
+}
+
+// Obtener icono según tipo de documento
+function getDocumentIcon(type) {
+    const icons = {
+        'certificado-afiliado': 'fa-certificate',
+        'recibo-pago': 'fa-receipt',
+        'certificado-curso': 'fa-graduation-cap',
+        'ficha-afiliacion': 'fa-id-card'
+    };
+    return icons[type] || 'fa-file-alt';
+}
+
+// Formatear fecha
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+}
+
+// Formatear tamaño de archivo
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
 }
 
 // Show my events modal

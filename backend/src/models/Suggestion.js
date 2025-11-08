@@ -6,6 +6,14 @@
 const mongoose = require('mongoose');
 
 const suggestionSchema = new mongoose.Schema({
+    // Usuario vinculado (si está registrado)
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: false,
+        default: null
+    },
+
     // Información del remitente
     name: {
         type: String,

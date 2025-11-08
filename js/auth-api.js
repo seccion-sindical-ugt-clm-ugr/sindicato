@@ -389,6 +389,78 @@ class AuthAPI {
             method: 'DELETE'
         });
     }
+
+    // ==================== GESTIÓN DE DOCUMENTOS ====================
+
+    /**
+     * Obtener documentos del usuario
+     */
+    async getDocuments() {
+        return this.request('/api/user/documents', { method: 'GET' });
+    }
+
+    /**
+     * Obtener un documento específico (con contenido para descargar)
+     */
+    async getDocument(documentId) {
+        return this.request(`/api/user/documents/${documentId}`, { method: 'GET' });
+    }
+
+    /**
+     * Generar un documento manualmente
+     */
+    async generateDocument(type, additionalData = {}) {
+        return this.request('/api/user/documents/generate', {
+            method: 'POST',
+            body: JSON.stringify({
+                type,
+                ...additionalData
+            })
+        });
+    }
+
+    /**
+     * Eliminar un documento
+     */
+    async deleteDocument(documentId) {
+        return this.request(`/api/user/documents/${documentId}`, {
+            method: 'DELETE'
+        });
+    }
+
+    /**
+     * Descargar un documento como PDF
+     */
+    async downloadDocument(documentId, filename) {
+        const response = await this.getDocument(documentId);
+
+        if (response.success && response.data.document) {
+            const doc = response.data.document;
+
+            // Convertir Base64 a Blob
+            const byteCharacters = atob(doc.fileData);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+            // Crear enlace de descarga
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename || `${doc.title}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            return { success: true };
+        }
+
+        return response;
+    }
 }
 
 // Crear instancia global
