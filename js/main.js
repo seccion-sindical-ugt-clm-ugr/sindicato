@@ -954,14 +954,27 @@ document.addEventListener('DOMContentLoaded', () => {
 // Sistema de inscripción para cursos
 function initCourseEnrollment() {
     const enrollIaBtn = document.getElementById('enrollIaBtn');
+    const preinscribeIaBtn = document.getElementById('preinscribeIaBtn');
 
+    // Botón "Ver Programa Completo"
     if (enrollIaBtn) {
         enrollIaBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('📚 Botón de inscripción IA clicado');
+            console.log('📚 Botón "Ver Programa Completo" clicado');
 
-            // Mostrar modal de inscripción personalizado
+            // Mostrar modal de inscripción personalizado con programa completo
             showCourseEnrollmentModal();
+        });
+    }
+
+    // Botón "Preinscribirse"
+    if (preinscribeIaBtn) {
+        preinscribeIaBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('📝 Botón "Preinscribirse" clicado');
+
+            // Mostrar modal de preinscripción simplificado
+            showCoursePreinscriptionModal();
         });
     }
 }
@@ -1190,6 +1203,208 @@ function showCourseEnrollmentModal() {
     }
 
     console.log('📋 Modal de inscripción creado');
+}
+
+// Modal de preinscripción simplificado
+function showCoursePreinscriptionModal() {
+    // Crear modal dinámicamente
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'coursePreinscriptionModal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close" id="closePreinscriptionModal">&times;</span>
+            <div class="enrollment-form">
+                <div class="course-header">
+                    <h3>🚀 Preinscripción Rápida</h3>
+                    <div class="course-summary">
+                        <div class="summary-item">
+                            <i class="fas fa-bolt"></i>
+                            <span>Reserva tu plaza en 1 minuto</span>
+                        </div>
+                        <div class="summary-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Sin compromiso</span>
+                        </div>
+                        <div class="summary-item">
+                            <i class="fas fa-users"></i>
+                            <span>Plazas limitadas CLM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="coursePreinscriptionForm">
+                    <div class="form-section">
+                        <h4>👤 Datos para Preinscripción</h4>
+                        <div class="form-group">
+                            <input type="text" name="fullName" placeholder="Nombre completo" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" name="email" placeholder="Email" required>
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" name="phone" placeholder="Teléfono (opcional)">
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <select name="department" required>
+                                <option value="">Selecciona tu departamento/rol</option>
+                                <option value="profesor-ele">Profesor de Español (ELE)</option>
+                                <option value="profesor-lenguas">Profesor de Lenguas Modernas</option>
+                                <option value="administrativo">Personal Administrativo</option>
+                                <option value="servicios">Personal de Servicios</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                            <span class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="preinscription-note">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Al completar la preinscripción, recibirás por email toda la información del curso, fechas de inicio y formulario de inscripción definitiva.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-user-plus"></i> Completar Preinscripción
+                    </button>
+                </form>
+
+                <div class="course-inquiries">
+                    <div class="inquiry-divider">
+                        <span>¿Dudas urgentes?</span>
+                    </div>
+                    <a href="#" id="whatsappPreinscribeBtn" class="btn-whatsapp-course">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>Consultar por WhatsApp</span>
+                        <small>Respuesta inmediata</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+
+    // Event listeners del modal
+    const closeBtn = document.getElementById('closePreinscriptionModal');
+    const preinscribeForm = document.getElementById('coursePreinscriptionForm');
+    const whatsappBtn = document.getElementById('whatsappPreinscribeBtn');
+
+    // Cerrar modal
+    closeBtn.addEventListener('click', () => {
+        modal.remove();
+    });
+
+    // Click fuera del modal para cerrar
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+
+    // WhatsApp preinscripción
+    if (whatsappBtn) {
+        whatsappBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const message = encodeURIComponent(
+                '¡Hola! Estoy interesado/a en preinscribirme al curso "Inteligencia Artificial Aplicada al Sector Educativo del CLM". Me gustaría saber más sobre las fechas de inicio.'
+            );
+
+            const phoneNumber = '34690026370';
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+
+            window.open(whatsappUrl, '_blank');
+            showMessage('success', '📱 Abriendo WhatsApp... En breve te atenderemos.');
+            logCourseInquiry();
+        });
+    }
+
+    // Envío del formulario de preinscripción
+    if (preinscribeForm) {
+        preinscribeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleCoursePreinscription(preinscribeForm);
+        });
+    }
+
+    console.log('📋 Modal de preinscripción creado');
+}
+
+// Manejar preinscripción al curso
+async function handleCoursePreinscription(form) {
+    const formData = new FormData(form);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+
+    // Validación básica
+    const fullName = formData.get('fullName')?.trim();
+    const email = formData.get('email')?.trim();
+
+    if (!fullName || !email) {
+        showMessage('error', 'Por favor, completa los campos obligatorios');
+        return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showMessage('error', 'Por favor, introduce un email válido');
+        return;
+    }
+
+    // Estado de carga
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando preinscripción...';
+    submitBtn.disabled = true;
+
+    try {
+        // Simular envío
+        await simulateAPICall();
+
+        // Datos de preinscripción
+        const preinscribeData = {
+            name: fullName,
+            email: email,
+            phone: formData.get('phone')?.trim() || '',
+            department: formData.get('department') || '',
+            courseType: 'Inteligencia Artificial Aplicada al Sector Educativo del CLM',
+            timestamp: new Date().toISOString(),
+            type: 'preinscripcion'
+        };
+
+        console.log('📝 Datos de preinscripción:', preinscribeData);
+
+        // Guardar en localStorage
+        const preinscriptions = JSON.parse(localStorage.getItem('coursePreinscriptions') || '[]');
+        preinscriptions.push(preinscribeData);
+        localStorage.setItem('coursePreinscriptions', JSON.stringify(preinscriptions));
+
+        // Cerrar modal
+        document.getElementById('coursePreinscriptionModal').remove();
+
+        // Mostrar mensaje de éxito
+        showMessage('success', '✅ ¡Preinscripción completada! Recibirás un email con toda la información del curso.');
+
+        // Abrir WhatsApp para confirmación
+        setTimeout(() => {
+            const message = encodeURIComponent(
+                `¡Hola! He completado mi preinscripción al curso de IA para el CLM Granada. Mi nombre es ${fullName} y mi email es ${email}.`
+            );
+            const phoneNumber = '34690026370';
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+            window.open(whatsappUrl, '_blank');
+        }, 2000);
+
+    } catch (error) {
+        showMessage('error', 'Error al procesar la preinscripción. Inténtalo de nuevo.');
+        console.error('Preinscripción error:', error);
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
 }
 
 // Manejar inscripción al curso

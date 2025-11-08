@@ -2139,6 +2139,43 @@ body {
     color: white;
 }
 
+/* Course Buttons Layout */
+.course-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.course-buttons .btn {
+    flex: 1;
+    min-width: 140px;
+    justify-content: center;
+    text-align: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.course-buttons .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(227, 6, 19, 0.3);
+}
+
+.course-buttons .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(44, 82, 130, 0.3);
+}
+
+.course-buttons .btn-secondary {
+    background: var(--gradient-ugt);
+    color: white;
+    border: none;
+}
+
+.course-buttons .btn-secondary:hover {
+    background: var(--gradient-hero);
+}
+
 /* Responsive Design for Course Elements */
 @media (max-width: 768px) {
     .curriculum-grid {
@@ -2171,5 +2208,50 @@ body {
 
     .btn-whatsapp-course small {
         font-size: 0.75rem;
+    }
+}
+
+/* Preinscription Note Styles */
+.preinscription-note {
+    background: linear-gradient(135deg, #e8f4f8, #d1e7dd);
+    border-left: 4px solid #198754;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.preinscription-note i {
+    color: #198754;
+    font-size: 1.1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.preinscription-note p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    line-height: 1.5;
+}
+
+/* Modal responsive for preinscription */
+@media (max-width: 768px) {
+    .preinscription-note {
+        padding: 0.8rem;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .preinscription-note i {
+        align-self: center;
+        margin-top: 0;
+    }
+
+    .preinscription-note p {
+        font-size: 0.85rem;
+        text-align: center;
     }
 }
