@@ -998,7 +998,7 @@ function showCourseEnrollmentModal() {
                         </div>
                         <div class="summary-item">
                             <i class="fas fa-calendar-check"></i>
-                            <span>5 semanas (jueves y viernes)</span>
+                            <span>Inicio: Viernes 21 de noviembre 2024</span>
                         </div>
                         <div class="summary-item">
                             <i class="fas fa-users"></i>
@@ -1022,7 +1022,7 @@ function showCourseEnrollmentModal() {
 
                             <div class="day-sessions">
                                 <div class="day">
-                                    <strong>Jueves - Día 1</strong>
+                                    <strong>Viernes 21 - Día 1</strong>
                                     <ul>
                                         <li><strong>Sesión 1:</strong> Bienvenida e Introducción a la IA (40 min)</li>
                                         <li><strong>Sesión 2:</strong> Herramientas de IA Accesibles (40 min)</li>
@@ -1030,7 +1030,7 @@ function showCourseEnrollmentModal() {
                                     </ul>
                                 </div>
                                 <div class="day">
-                                    <strong>Viernes - Día 2</strong>
+                                    <strong>Jueves 27 - Día 2</strong>
                                     <ul>
                                         <li><strong>Sesión 4:</strong> IA para Profesores de Idiomas I (40 min)</li>
                                         <li><strong>Sesión 5:</strong> IA para Personal Administrativo I (40 min)</li>
@@ -1051,7 +1051,7 @@ function showCourseEnrollmentModal() {
 
                             <div class="day-sessions">
                                 <div class="day">
-                                    <strong>Jueves - Día 3</strong>
+                                    <strong>Viernes 28 - Día 3</strong>
                                     <ul>
                                         <li><strong>Sesión 7:</strong> Procesamiento de Lenguaje Natural (40 min)</li>
                                         <li><strong>Sesión 8:</strong> Generación de Imágenes con IA (40 min)</li>
@@ -1059,7 +1059,7 @@ function showCourseEnrollmentModal() {
                                     </ul>
                                 </div>
                                 <div class="day">
-                                    <strong>Viernes - Día 4</strong>
+                                    <strong>Jueves 5 dic - Día 4</strong>
                                     <ul>
                                         <li><strong>Sesión 10:</strong> IA para Personal Administrativo II (40 min)</li>
                                         <li><strong>Sesión 11:</strong> Ética y Responsabilidad en el Uso de la IA (40 min)</li>
@@ -1080,7 +1080,7 @@ function showCourseEnrollmentModal() {
 
                             <div class="day-sessions">
                                 <div class="day">
-                                    <strong>Jueves - Día 5</strong>
+                                    <strong>Viernes 6 dic - Día 5</strong>
                                     <ul>
                                         <li><strong>Sesión 13:</strong> IA para Profesores de Idiomas III (40 min)</li>
                                         <li><strong>Sesión 14:</strong> IA para Personal Administrativo III (40 min)</li>
@@ -1088,7 +1088,7 @@ function showCourseEnrollmentModal() {
                                     </ul>
                                 </div>
                                 <div class="day">
-                                    <strong>Viernes - Día 6</strong>
+                                    <strong>Jueves 12 dic - Día 6</strong>
                                     <ul>
                                         <li><strong>Sesión 16:</strong> Herramientas Multimedia con IA (40 min)</li>
                                         <li><strong>Sesión 17:</strong> Traducción y Localización con IA (40 min)</li>
@@ -1109,7 +1109,7 @@ function showCourseEnrollmentModal() {
 
                             <div class="day-sessions">
                                 <div class="day">
-                                    <strong>Jueves - Día 7</strong>
+                                    <strong>Viernes 13 dic - Día 7</strong>
                                     <ul>
                                         <li><strong>Sesión 19:</strong> Asistentes Virtuales Personalizados (40 min)</li>
                                         <li><strong>Sesión 20:</strong> IA para Profesores de Idiomas IV (40 min)</li>
@@ -1117,7 +1117,7 @@ function showCourseEnrollmentModal() {
                                     </ul>
                                 </div>
                                 <div class="day">
-                                    <strong>Viernes - Día 8</strong>
+                                    <strong>Jueves 19 dic - Día 8</strong>
                                     <ul>
                                         <li><strong>Sesión 22:</strong> Detección de Plagio y Uso Ético (40 min)</li>
                                         <li><strong>Sesión 23:</strong> Personalización del Aprendizaje con IA (40 min)</li>
@@ -1138,7 +1138,7 @@ function showCourseEnrollmentModal() {
 
                             <div class="day-sessions">
                                 <div class="day">
-                                    <strong>Jueves - Día 9</strong>
+                                    <strong>Viernes 20 dic - Día 9</strong>
                                     <ul>
                                         <li><strong>Sesión 25:</strong> Tendencias Futuras en IA Educativa (40 min)</li>
                                         <li><strong>Sesión 26:</strong> Integración de IA en el Plan Estratégico (40 min)</li>
@@ -1146,7 +1146,7 @@ function showCourseEnrollmentModal() {
                                     </ul>
                                 </div>
                                 <div class="day">
-                                    <strong>Viernes - Día 10</strong>
+                                    <strong>Jueves 9 ene - Día 10</strong>
                                     <ul>
                                         <li><strong>Sesión 28:</strong> Presentaciones de Proyectos I (40 min)</li>
                                         <li><strong>Sesión 29:</strong> Presentaciones de Proyectos II (40 min)</li>
