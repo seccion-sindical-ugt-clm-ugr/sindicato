@@ -176,22 +176,36 @@ function initHeroButtons() {
     if (heroCoursesBtn) {
         heroCoursesBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('🎯 Hero: Cursos - Navegación directa al curso de IA');
+            console.log('🎯 Hero: Cursos - Navegación normal a Cursos de Formación');
 
-            showSingleSection('cursos', 'Descubre el curso de Inteligencia Artificial 🤖');
-            showBackToTopButton('cursos');
+            // En lugar de showSingleSection, hacer scroll normal al título
+            const targetAnchor = document.querySelector('#cursos-formacion');
+            if (targetAnchor) {
+                const offset = 80; // Offset para el título de sección
+                const targetPosition = targetAnchor.getBoundingClientRect().top + window.pageYOffset - offset;
 
-            // Enfocar directamente en el curso de Inteligencia Artificial
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+
+                console.log('✅ Scroll normal ejecutado hacia #cursos-formacion');
+            } else {
+                // Fallback a la sección general
+                const targetSection = document.querySelector('#cursos');
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }
+
+            // Después de llegar al título, resaltar suavemente el curso de IA
             setTimeout(() => {
                 const iaCourse = document.querySelector('#ia-course');
                 if (iaCourse) {
-                    console.log('🤖 Enfocando curso de Inteligencia Artificial');
-
-                    // Scroll directo al curso de IA
-                    iaCourse.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
+                    console.log('🤖 Resaltando curso de Inteligencia Artificial');
 
                     // Resaltado especial para el curso de IA
                     iaCourse.classList.add('highlight-ia-course');
@@ -209,7 +223,7 @@ function initHeroButtons() {
                         }, 2000);
                     }
                 }
-            }, 300);
+            }, 1000);
         });
     }
 }
