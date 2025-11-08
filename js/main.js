@@ -192,56 +192,78 @@ function initHeroButtons() {
     if (heroCoursesBtn) {
         heroCoursesBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('🎯 Hero: Cursos - Navegación normal a Cursos de Formación');
+            console.log('🎯 Hero: Cursos - Navegación mejorada');
 
-            // En lugar de showSingleSection, hacer scroll normal al título
-            const targetAnchor = document.querySelector('#cursos-formacion');
-            if (targetAnchor) {
-                const offset = 80; // Offset para el título de sección
-                const targetPosition = targetAnchor.getBoundingClientRect().top + window.pageYOffset - offset;
+            // Check if user is in dashboard mode
+            const isDashboardVisible = memberDashboard && memberDashboard.style.display === 'block';
 
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
+            if (isDashboardVisible) {
+                // Exit dashboard mode first
+                exitDashboardMode();
+                showMessage('info', 'Saliendo del área de afiliados 📚');
 
-                console.log('✅ Scroll normal ejecutado hacia #cursos-formacion');
+                // Navigate to courses after a short delay
+                setTimeout(() => {
+                    navigateToCoursesSection();
+                }, 300);
             } else {
-                // Fallback a la sección general
-                const targetSection = document.querySelector('#cursos');
-                if (targetSection) {
-                    targetSection.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+                // Normal navigation
+                navigateToCoursesSection();
             }
-
-            // Después de llegar al título, resaltar suavemente el curso de IA
-            setTimeout(() => {
-                const iaCourse = document.querySelector('#ia-course');
-                if (iaCourse) {
-                    console.log('🤖 Resaltando curso de Inteligencia Artificial');
-
-                    // Resaltado especial para el curso de IA
-                    iaCourse.classList.add('highlight-ia-course');
-
-                    setTimeout(() => {
-                        iaCourse.classList.remove('highlight-ia-course');
-                    }, 3000);
-
-                    // Efecto adicional: animar la insignia "Nuevo"
-                    const badge = iaCourse.querySelector('.course-badge');
-                    if (badge) {
-                        badge.style.animation = 'pulse 2s ease-in-out';
-                        setTimeout(() => {
-                            badge.style.animation = '';
-                        }, 2000);
-                    }
-                }
-            }, 1000);
         });
     }
+
+// Helper function to navigate to courses section
+function navigateToCoursesSection() {
+    console.log('🎯 Navegando a sección de cursos');
+
+    // En lugar de showSingleSection, hacer scroll normal al título
+    const targetAnchor = document.querySelector('#cursos-formacion');
+    if (targetAnchor) {
+        const offset = 80; // Offset para el título de sección
+        const targetPosition = targetAnchor.getBoundingClientRect().top + window.pageYOffset - offset;
+
+        window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+        });
+
+        console.log('✅ Scroll ejecutado hacia #cursos-formacion');
+    } else {
+        // Fallback a la sección general
+        const targetSection = document.querySelector('#cursos');
+        if (targetSection) {
+            targetSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    }
+
+    // Después de llegar al título, resaltar suavemente el curso de IA
+    setTimeout(() => {
+        const iaCourse = document.querySelector('#ia-course');
+        if (iaCourse) {
+            console.log('🤖 Resaltando curso de Inteligencia Artificial');
+
+            // Resaltado especial para el curso de IA
+            iaCourse.classList.add('highlight-ia-course');
+
+            setTimeout(() => {
+                iaCourse.classList.remove('highlight-ia-course');
+            }, 3000);
+
+            // Efecto adicional: animar la insignia "Nuevo"
+            const badge = iaCourse.querySelector('.course-badge');
+            if (badge) {
+                badge.style.animation = 'pulse 2s ease-in-out';
+                setTimeout(() => {
+                    badge.style.animation = '';
+                }, 2000);
+            }
+        }
+    }, 1000);
+}
 }
 
 // Inicializar navegación del header y logo
