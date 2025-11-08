@@ -374,7 +374,44 @@
                     <button type="submit" class="btn btn-primary btn-full">Iniciar Sesión</button>
                 </form>
                 <div class="login-footer">
-                    <p>¿No eres afiliado? <a href="#afiliate">Afíliate ahora</a></p>
+                    <p>¿No tienes cuenta? <a href="#" id="showRegisterLink">Registrarse</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeRegister">&times;</span>
+            <div class="login-form">
+                <h3>Crear Cuenta</h3>
+                <p style="margin-bottom: 20px; color: #666;">Únete a UGT-CLM Granada</p>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <input type="text" name="nombre" placeholder="Nombre completo" required>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="Email" required>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" placeholder="Contraseña (mínimo 6 caracteres)" required minlength="6">
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" name="telefono" placeholder="Teléfono (opcional)" pattern="[0-9]{9,15}">
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="departamento" placeholder="Departamento (opcional)">
+                        <span class="error-message"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Crear Cuenta</button>
+                </form>
+                <div class="login-footer">
+                    <p>¿Ya tienes cuenta? <a href="#" id="backToLoginFromRegister">Iniciar sesión</a></p>
                 </div>
             </div>
         </div>
@@ -551,7 +588,45 @@
                         <button type="button" class="btn btn-secondary" id="cancelEdit">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                     </div>
+
+                    <div class="form-footer" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+                        <a href="#" id="changePasswordLink" style="color: var(--primary-color); text-decoration: none;">
+                            🔐 Cambiar contraseña
+                        </a>
+                    </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeChangePassword">&times;</span>
+            <div class="login-form">
+                <h3>🔐 Cambiar Contraseña</h3>
+                <p style="margin-bottom: 20px; color: #666;">Ingresa tu contraseña actual y elige una nueva</p>
+                <form id="changePasswordForm">
+                    <div class="form-group">
+                        <input type="password" name="currentPassword" placeholder="Contraseña actual" required>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="newPassword" placeholder="Nueva contraseña (mínimo 6 caracteres)" required minlength="6">
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="confirmPassword" placeholder="Confirmar nueva contraseña" required minlength="6">
+                        <span class="error-message"></span>
+                    </div>
+                    <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 12px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9rem;">
+                        ⚠️ <strong>Importante:</strong> Al cambiar tu contraseña, cerrarás sesión en todos tus dispositivos por seguridad.
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Cambiar Contraseña</button>
+                </form>
+                <div class="login-footer">
+                    <p><a href="#" id="backToProfile">Volver al perfil</a></p>
+                </div>
             </div>
         </div>
     </div>

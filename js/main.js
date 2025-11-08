@@ -37,6 +37,20 @@ const closeMyCourses = document.querySelector('#closeMyCourses');
 const closeMyDocuments = document.querySelector('#closeMyDocuments');
 const closeMyEvents = document.querySelector('#closeMyEvents');
 
+// Register Modal Elements
+const registerModal = document.querySelector('#registerModal');
+const closeRegister = document.querySelector('#closeRegister');
+const registerForm = document.querySelector('#registerForm');
+const showRegisterLink = document.querySelector('#showRegisterLink');
+const backToLoginFromRegister = document.querySelector('#backToLoginFromRegister');
+
+// Change Password Modal Elements
+const changePasswordModal = document.querySelector('#changePasswordModal');
+const closeChangePassword = document.querySelector('#closeChangePassword');
+const changePasswordForm = document.querySelector('#changePasswordForm');
+const changePasswordLink = document.querySelector('#changePasswordLink');
+const backToProfile = document.querySelector('#backToProfile');
+
 // ============================================
 // SISTEMA DE AUTENTICACIÓN CON API REAL
 // ============================================
@@ -556,6 +570,12 @@ window.addEventListener('click', (e) => {
     if (e.target === recoveryModal) {
         recoveryModal.style.display = 'none';
     }
+    if (e.target === registerModal) {
+        registerModal.style.display = 'none';
+    }
+    if (e.target === changePasswordModal) {
+        changePasswordModal.style.display = 'none';
+    }
 });
 
 // Recovery Modal handlers
@@ -574,6 +594,56 @@ backToLoginBtn.addEventListener('click', (e) => {
     recoveryModal.style.display = 'none';
     loginModal.style.display = 'block';
 });
+
+// ============================================
+// REGISTER MODAL HANDLERS (Solo para admins)
+// ============================================
+if (showRegisterLink) {
+    showRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginModal.style.display = 'none';
+        registerModal.style.display = 'block';
+    });
+}
+
+if (closeRegister) {
+    closeRegister.addEventListener('click', () => {
+        registerModal.style.display = 'none';
+    });
+}
+
+if (backToLoginFromRegister) {
+    backToLoginFromRegister.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerModal.style.display = 'none';
+        loginModal.style.display = 'block';
+    });
+}
+
+// ============================================
+// CHANGE PASSWORD MODAL HANDLERS
+// ============================================
+if (changePasswordLink) {
+    changePasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        editProfileModal.style.display = 'none';
+        changePasswordModal.style.display = 'block';
+    });
+}
+
+if (closeChangePassword) {
+    closeChangePassword.addEventListener('click', () => {
+        changePasswordModal.style.display = 'none';
+    });
+}
+
+if (backToProfile) {
+    backToProfile.addEventListener('click', (e) => {
+        e.preventDefault();
+        changePasswordModal.style.display = 'none';
+        editProfileModal.style.display = 'block';
+    });
+}
 
 // Edit Profile Modal handlers
 closeEditProfile.addEventListener('click', () => {
@@ -2286,6 +2356,134 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// ============================================
+// REGISTER FORM HANDLER (Solo admins)
+// ============================================
+if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        const formData = new FormData(registerForm);
+        const userData = {
+            nombre: formData.get('nombre').trim(),
+            email: formData.get('email').trim(),
+            password: formData.get('password'),
+            telefono: formData.get('telefono')?.trim(),
+            departamento: formData.get('departamento')?.trim()
+        };
+
+        // Validación
+        if (!userData.nombre || !userData.email || !userData.password) {
+            showMessage('error', 'Todos los campos obligatorios deben estar completos');
+            return;
+        }
+
+        // Show loading
+        const submitBtn = registerForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando cuenta...';
+        submitBtn.disabled = true;
+
+        try {
+            const result = await authAPI.register(userData);
+
+            if (result.success) {
+                currentUser = result.data.user;
+                showMessage('success', `¡Cuenta creada! Bienvenido ${currentUser.nombre}`);
+
+                setTimeout(() => {
+                    registerModal.style.display = 'none';
+                    showMemberDashboard();
+                    registerForm.reset();
+                }, 1500);
+            } else {
+                showMessage('error', result.error || 'Error al crear la cuenta');
+            }
+        } catch (error) {
+            showMessage('error', 'Error de conexión. Inténtalo de nuevo.');
+            console.error('❌ Register error:', error);
+        } finally {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+}
+
+// ============================================
+// CHANGE PASSWORD FORM HANDLER
+// ============================================
+if (changePasswordForm) {
+    changePasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        const formData = new FormData(changePasswordForm);
+        const currentPassword = formData.get('currentPassword');
+        const newPassword = formData.get('newPassword');
+        const confirmPassword = formData.get('confirmPassword');
+
+        // Validación
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            showMessage('error', 'Todos los campos son obligatorios');
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            showMessage('error', 'La nueva contraseña debe tener al menos 6 caracteres');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showMessage('error', 'Las contraseñas no coinciden');
+            return;
+        }
+
+        if (currentPassword === newPassword) {
+            showMessage('error', 'La nueva contraseña debe ser diferente a la actual');
+            return;
+        }
+
+        // Show loading
+        const submitBtn = changePasswordForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cambiando contraseña...';
+        submitBtn.disabled = true;
+
+        try {
+            const result = await authAPI.changePassword(currentPassword, newPassword);
+
+            if (result.success) {
+                showMessage('success', '¡Contraseña cambiada! Inicia sesión con tu nueva contraseña');
+
+                setTimeout(() => {
+                    changePasswordModal.style.display = 'none';
+                    changePasswordForm.reset();
+
+                    // El backend invalida todos los tokens, así que hacemos logout
+                    currentUser = null;
+                    memberDashboard.style.display = 'none';
+                    document.querySelectorAll('.section').forEach(section => {
+                        if (section.id !== 'memberDashboard') {
+                            section.style.display = 'block';
+                        }
+                    });
+                    updateLoginState();
+                    loginModal.style.display = 'block';
+                }, 2000);
+            } else {
+                showMessage('error', result.error || 'Error al cambiar contraseña');
+            }
+        } catch (error) {
+            showMessage('error', 'Error de conexión. Inténtalo de nuevo.');
+            console.error('❌ Change password error:', error);
+        } finally {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+}
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
