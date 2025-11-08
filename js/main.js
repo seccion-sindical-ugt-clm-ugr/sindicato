@@ -697,10 +697,16 @@ editProfileForm.addEventListener('submit', async (e) => {
     };
 
     // Add profile photo if exists
-    if (profileImagePreview.style.display === 'block' && profileImagePreview.src) {
+    const hasPhoto = profileImagePreview.style.display === 'block' &&
+                    profileImagePreview.src &&
+                    !profileImagePreview.src.includes('data:') === false;
+
+    if (hasPhoto) {
         profileData.profilePhoto = profileImagePreview.src;
+        console.log('📸 Foto detectada para guardar:', profileImagePreview.src.substring(0, 50) + '...');
     } else {
         profileData.profilePhoto = null;
+        console.log('👤 Sin foto para guardar');
     }
 
     // Validation
@@ -732,8 +738,10 @@ editProfileForm.addEventListener('submit', async (e) => {
                 phone: profileData.phone,
                 department: profileData.department,
                 notifications: profileData.notifications,
-                publicProfile: profileData.publicProfile
+                publicProfile: profileData.publicProfile,
+                profilePhoto: profileData.profilePhoto
             };
+            console.log('💾 Guardando foto en base de datos:', profileData.profilePhoto ? 'Sí' : 'No');
 
             // Update localStorage
             localStorage.setItem('userName', profileData.name);
@@ -1202,12 +1210,16 @@ function showEditProfileModal() {
         document.getElementById('publicProfile').checked = user.publicProfile || false;
 
         // Load profile photo if exists
-        if (user.profilePhoto) {
+        console.log('🔍 Verificando foto de perfil para usuario:', user.email);
+        console.log('📸 Foto guardada:', user.profilePhoto ? 'Sí - ' + user.profilePhoto.substring(0, 50) + '...' : 'No');
+
+        if (user.profilePhoto && user.profilePhoto.trim() !== '') {
             profileImagePreview.src = user.profilePhoto;
             profileImagePreview.style.display = 'block';
             defaultAvatar.style.display = 'none';
             removePhotoBtn.style.display = 'inline-flex';
             changePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
+            console.log('✅ Foto de perfil cargada correctamente');
         } else {
             // Show default avatar
             profileImagePreview.style.display = 'none';
@@ -1215,6 +1227,7 @@ function showEditProfileModal() {
             defaultAvatar.style.display = 'flex';
             removePhotoBtn.style.display = 'none';
             changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
+            console.log('👤 Mostrando avatar predeterminado');
         }
 
         // Show modal
