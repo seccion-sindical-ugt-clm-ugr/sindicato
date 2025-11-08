@@ -134,15 +134,33 @@ function initHeroButtons() {
     if (heroAffiliateBtn) {
         heroAffiliateBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('🎯 Hero: Afiliación - Navegación directa iniciada');
+            console.log('🎯 Hero: Afiliación - Navegación normal iniciada');
 
-            showSingleSection('afiliate', 'Has llegado a la sección de afiliación 🎯');
-            showBackToTopButton('afiliado');
+            // En lugar de showSingleSection, hacer scroll normal
+            const targetAnchor = document.querySelector('#por-que-afiliarse');
+            if (targetAnchor) {
+                const offset = 40; // Offset optimizado
+                const targetPosition = targetAnchor.getBoundingClientRect().top + window.pageYOffset - offset;
 
-            // NO enfocar el formulario inmediatamente
-            // Dejar que el usuario lea primero el título y beneficios
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+
+                console.log('✅ Scroll normal ejecutado hacia #por-que-afiliarse');
+            } else {
+                // Fallback a la sección general
+                const targetSection = document.querySelector('#afiliate');
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }
+
+            // Resaltar suavemente el primer campo sin enfocar
             setTimeout(() => {
-                // Solo resaltar suavemente el primer campo sin enfocar
                 const firstInput = document.querySelector('#affiliateForm input[name="name"]');
                 if (firstInput) {
                     firstInput.classList.add('highlight');
