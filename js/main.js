@@ -21,6 +21,13 @@ const closeEditProfile = document.querySelector('#closeEditProfile');
 const editProfileForm = document.querySelector('#editProfileForm');
 const cancelEditBtn = document.querySelector('#cancelEdit');
 
+// Profile Photo Elements
+const profilePhotoInput = document.querySelector('#profilePhoto');
+const profileImagePreview = document.querySelector('#profileImagePreview');
+const changePhotoBtn = document.querySelector('#changePhotoBtn');
+const removePhotoBtn = document.querySelector('#removePhotoBtn');
+const photoPreview = document.querySelector('#photoPreview');
+
 // My Dashboard Modals Elements
 const myCoursesModal = document.querySelector('#myCoursesModal');
 const myDocumentsModal = document.querySelector('#myDocumentsModal');
@@ -575,6 +582,65 @@ cancelEditBtn.addEventListener('click', () => {
     editProfileModal.style.display = 'none';
 });
 
+// Profile Photo functionality
+if (changePhotoBtn && profilePhotoInput) {
+    changePhotoBtn.addEventListener('click', () => {
+        profilePhotoInput.click();
+    });
+
+    photoPreview.addEventListener('click', () => {
+        profilePhotoInput.click();
+    });
+
+    profilePhotoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            handleProfilePhotoUpload(file);
+        }
+    });
+}
+
+if (removePhotoBtn) {
+    removePhotoBtn.addEventListener('click', () => {
+        removeProfilePhoto();
+    });
+}
+
+// Handle profile photo upload
+function handleProfilePhotoUpload(file) {
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+        showMessage('error', 'Por favor, selecciona una imagen válida (JPG, PNG, GIF)');
+        return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+        showMessage('error', 'La imagen no puede ser mayor de 5MB');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        profileImagePreview.src = e.target.result;
+        removePhotoBtn.style.display = 'inline-flex';
+        changePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
+        console.log('📷 Foto de perfil cargada:', file.name);
+    };
+    reader.readAsDataURL(file);
+}
+
+// Remove profile photo
+function removeProfilePhoto() {
+    profileImagePreview.src = 'https://via.placeholder.com/150x150/cccccc/666666?text=Foto';
+    profilePhotoInput.value = '';
+    removePhotoBtn.style.display = 'none';
+    changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
+    console.log('🗑️ Foto de perfil eliminada');
+}
+
 // Dashboard modals close handlers
 closeMyCourses.addEventListener('click', () => {
     myCoursesModal.style.display = 'none';
@@ -619,8 +685,15 @@ editProfileForm.addEventListener('submit', async (e) => {
         phone: formData.get('phone')?.trim(),
         department: formData.get('department')?.trim(),
         notifications: formData.get('notifications') === 'on',
-        publicProfile: formData.get('publicProfile') === 'on'
+        publicProfile: formData.get('publicProfile') === 'on',
+        profilePhoto: null
     };
+
+    // Add profile photo if exists
+    const currentSrc = profileImagePreview.src;
+    if (currentSrc && !currentSrc.includes('placeholder')) {
+        profileData.profilePhoto = currentSrc;
+    }
 
     // Validation
     if (!profileData.name) {
@@ -1119,6 +1192,18 @@ function showEditProfileModal() {
         document.getElementById('profileDepartment').value = user.department || '';
         document.getElementById('notificationsEnabled').checked = user.notifications || false;
         document.getElementById('publicProfile').checked = user.publicProfile || false;
+
+        // Load profile photo if exists
+        if (user.profilePhoto) {
+            profileImagePreview.src = user.profilePhoto;
+            removePhotoBtn.style.display = 'inline-flex';
+            changePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
+        } else {
+            // Reset to default photo
+            profileImagePreview.src = 'https://via.placeholder.com/150x150/cccccc/666666?text=Foto';
+            removePhotoBtn.style.display = 'none';
+            changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
+        }
 
         // Show modal
         editProfileModal.style.display = 'block';

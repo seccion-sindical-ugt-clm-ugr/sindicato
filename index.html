@@ -464,6 +464,28 @@
                         <h4>Información Personal</h4>
 
                         <div class="form-group">
+                            <label for="profilePhoto">Foto de Perfil</label>
+                            <div class="photo-upload-container">
+                                <div class="photo-preview" id="photoPreview">
+                                    <img id="profileImagePreview" src="https://via.placeholder.com/150x150/cccccc/666666?text=Foto" alt="Foto de perfil">
+                                    <div class="photo-overlay">
+                                        <i class="fas fa-camera"></i>
+                                        <span>Cambiar foto</span>
+                                    </div>
+                                </div>
+                                <input type="file" id="profilePhoto" name="photo" accept="image/*" style="display: none;">
+                                <button type="button" class="btn btn-outline btn-sm" id="changePhotoBtn">
+                                    <i class="fas fa-upload"></i> Subir Foto
+                                </button>
+                                <button type="button" class="btn btn-outline btn-sm btn-danger" id="removePhotoBtn" style="display: none;">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </div>
+                            <small style="color: var(--text-light);">Formatos aceptados: JPG, PNG, GIF (Máx. 5MB)</small>
+                            <span class="error-message"></span>
+                        </div>
+
+                        <div class="form-group">
                             <label for="profileName">Nombre Completo</label>
                             <input type="text" id="profileName" name="name" required>
                             <span class="error-message"></span>
