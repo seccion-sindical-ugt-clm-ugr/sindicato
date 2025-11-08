@@ -77,14 +77,34 @@ function showSingleSection(sectionId, message = '') {
     if (targetSection) {
         targetSection.style.display = 'block';
 
-        // Calcular posición con offset para mejor visualización
-        // Colocar el scroll más arriba para que se vea el título completo
-        const offset = 120; // Offset mayor para mostrar el título completo de la sección
-        const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - offset;
-        window.scrollTo({
-            top: targetPosition,
-            behavior: 'instant'
-        });
+        // Si es la sección de afiliación, ir específicamente al título "¿Por qué afiliarse?"
+        if (sectionId === 'afiliate') {
+            const titleAnchor = document.querySelector('#por-que-afiliarse');
+            if (titleAnchor) {
+                const offset = 80; // Offset para el header fijo
+                const targetPosition = titleAnchor.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'instant'
+                });
+            } else {
+                // Fallback al método anterior si no encuentra el ancla
+                const offset = 120;
+                const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'instant'
+                });
+            }
+        } else {
+            // Para otras secciones, usar el método normal
+            const offset = 80;
+            const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - offset;
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'instant'
+            });
+        }
 
         targetSection.style.animation = 'fadeIn 0.5s ease-in';
         isSingleSectionMode = true;
