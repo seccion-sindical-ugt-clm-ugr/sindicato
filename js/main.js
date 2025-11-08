@@ -24,6 +24,7 @@ const cancelEditBtn = document.querySelector('#cancelEdit');
 // Profile Photo Elements
 const profilePhotoInput = document.querySelector('#profilePhoto');
 const profileImagePreview = document.querySelector('#profileImagePreview');
+const defaultAvatar = document.querySelector('#defaultAvatar');
 const changePhotoBtn = document.querySelector('#changePhotoBtn');
 const removePhotoBtn = document.querySelector('#removePhotoBtn');
 const photoPreview = document.querySelector('#photoPreview');
@@ -624,7 +625,10 @@ function handleProfilePhotoUpload(file) {
 
     const reader = new FileReader();
     reader.onload = (e) => {
+        // Show the uploaded image and hide default avatar
         profileImagePreview.src = e.target.result;
+        profileImagePreview.style.display = 'block';
+        defaultAvatar.style.display = 'none';
         removePhotoBtn.style.display = 'inline-flex';
         changePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
         console.log('📷 Foto de perfil cargada:', file.name);
@@ -634,7 +638,10 @@ function handleProfilePhotoUpload(file) {
 
 // Remove profile photo
 function removeProfilePhoto() {
-    profileImagePreview.src = 'https://via.placeholder.com/150x150/cccccc/666666?text=Foto';
+    // Hide the image and show default avatar
+    profileImagePreview.style.display = 'none';
+    profileImagePreview.src = '';
+    defaultAvatar.style.display = 'flex';
     profilePhotoInput.value = '';
     removePhotoBtn.style.display = 'none';
     changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
@@ -690,9 +697,10 @@ editProfileForm.addEventListener('submit', async (e) => {
     };
 
     // Add profile photo if exists
-    const currentSrc = profileImagePreview.src;
-    if (currentSrc && !currentSrc.includes('placeholder')) {
-        profileData.profilePhoto = currentSrc;
+    if (profileImagePreview.style.display === 'block' && profileImagePreview.src) {
+        profileData.profilePhoto = profileImagePreview.src;
+    } else {
+        profileData.profilePhoto = null;
     }
 
     // Validation
@@ -1196,11 +1204,15 @@ function showEditProfileModal() {
         // Load profile photo if exists
         if (user.profilePhoto) {
             profileImagePreview.src = user.profilePhoto;
+            profileImagePreview.style.display = 'block';
+            defaultAvatar.style.display = 'none';
             removePhotoBtn.style.display = 'inline-flex';
             changePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
         } else {
-            // Reset to default photo
-            profileImagePreview.src = 'https://via.placeholder.com/150x150/cccccc/666666?text=Foto';
+            // Show default avatar
+            profileImagePreview.style.display = 'none';
+            profileImagePreview.src = '';
+            defaultAvatar.style.display = 'flex';
             removePhotoBtn.style.display = 'none';
             changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
         }
