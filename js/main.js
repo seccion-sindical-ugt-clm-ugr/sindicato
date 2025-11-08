@@ -703,7 +703,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 '¡Hola! He visitado el sitio web de UGT-CLM Granada y me gustaría obtener más información sobre afiliación y los servicios que ofrecen.'
             );
 
-            // Número de WhatsApp de UGT-CLM Granada
+          // Número de WhatsApp de UGT-CLM Granada
             const phoneNumber = '34690026370';
 
             // Construir URL de WhatsApp
