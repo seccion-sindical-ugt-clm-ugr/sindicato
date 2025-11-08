@@ -128,20 +128,21 @@ function initHeroButtons() {
             e.preventDefault();
             console.log('🎯 Hero: Afiliación - Navegación directa iniciada');
 
-            showSingleSection('afiliate', 'Has llegado al formulario de afiliación 🎯');
+            showSingleSection('afiliate', 'Has llegado a la sección de afiliación 🎯');
             showBackToTopButton('afiliado');
 
-            // Enfocar formulario inmediatamente
+            // NO enfocar el formulario inmediatamente
+            // Dejar que el usuario lea primero el título y beneficios
             setTimeout(() => {
+                // Solo resaltar suavemente el primer campo sin enfocar
                 const firstInput = document.querySelector('#affiliateForm input[name="name"]');
                 if (firstInput) {
-                    firstInput.focus();
                     firstInput.classList.add('highlight');
                     setTimeout(() => {
                         firstInput.classList.remove('highlight');
-                    }, 2000);
+                    }, 3000);
                 }
-            }, 300);
+            }, 1500);
         });
     }
 
@@ -1830,4 +1831,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Nota: La configuración de Stripe ahora se maneja en stripe-config.js
     // Ver advertencias en la consola sobre requisitos de backend
 });
+// Estilos para resaltado de campos
+const highlightStyle = document.createElement('style');
+highlightStyle.textContent = `
+    .highlight {
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 15px rgba(227, 6, 19, 0.2) !important;
+        transform: scale(1.02);
+        transition: all 0.3s ease;
+    }
+`;
+document.head.appendChild(highlightStyle);
+
 // Última actualización: sábado,  8 de noviembre de 2025, 01:31:50 CET
