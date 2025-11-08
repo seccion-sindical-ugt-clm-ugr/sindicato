@@ -490,13 +490,21 @@
                     </div>
 
                     <div class="form-section">
-                        <h4>Preferencias</h4>
+                        <h4>⚙️ Preferencias de comunicación</h4>
+                        <p style="color: var(--text-light); margin-bottom: 1.5rem; font-size: 0.95rem;">
+                            Configura cómo deseas recibir comunicaciones y compartir tu información
+                        </p>
 
                         <div class="form-group">
                             <label class="checkbox-option">
                                 <input type="checkbox" id="notificationsEnabled" name="notifications">
                                 <span class="checkmark"></span>
-                                <span class="label-text">Recibir notificaciones por email</span>
+                                <div class="label-content">
+                                    <div class="label-text">📧 Recibir notificaciones por email</div>
+                                    <small style="color: var(--text-light); display: block; margin-top: 4px;">
+                                        Mantente informado sobre cursos, eventos y noticias importantes
+                                    </small>
+                                </div>
                             </label>
                         </div>
 
@@ -504,7 +512,12 @@
                             <label class="checkbox-option">
                                 <input type="checkbox" id="publicProfile" name="publicProfile">
                                 <span class="checkmark"></span>
-                                <span class="label-text">Perfil público visible para otros afiliados</span>
+                                <div class="label-content">
+                                    <div class="label-text">👥 Perfil público visible para otros afiliados</div>
+                                    <small style="color: var(--text-light); display: block; margin-top: 4px;">
+                                        Permite que otros afiliados puedan ver tu información básica
+                                    </small>
+                                </div>
                             </label>
                         </div>
                     </div>
@@ -514,6 +527,84 @@
                         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Courses Modal -->
+    <div id="myCoursesModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" id="closeMyCourses">&times;</span>
+            <div class="courses-modal">
+                <h3>📚 Mis Cursos</h3>
+                <p>Tus inscripciones y progreso de formación</p>
+
+                <div class="courses-content">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h4>Aún no tienes cursos inscritos</h4>
+                        <p>Explora nuestro catálogo de cursos y comienza tu formación profesional</p>
+                        <button class="btn btn-primary" onclick="closeModalAndNavigateToCourses()">
+                            <i class="fas fa-search"></i> Explorar Cursos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Documents Modal -->
+    <div id="myDocumentsModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" id="closeMyDocuments">&times;</span>
+            <div class="documents-modal">
+                <h3>📁 Mis Documentos</h3>
+                <p>Accede a tu documentación sindical</p>
+
+                <div class="documents-content">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h4>No hay documentos disponibles</h4>
+                        <p>Los documentos sindicales estarán disponibles próximamente</p>
+                        <div class="coming-soon-info">
+                            <p><i class="fas fa-info-circle"></i> Estamos trabajando en preparar tu documentación</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Events Modal -->
+    <div id="myEventsModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" id="closeMyEvents">&times;</span>
+            <div class="events-modal">
+                <h3>📅 Mis Eventos</h3>
+                <p>Próximas actividades y reuniones sindicales</p>
+
+                <div class="events-content">
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <h4>No hay eventos programados</h4>
+                        <p>Pronto anunciaremos nuestras próximas actividades</p>
+                        <div class="upcoming-info">
+                            <h5>Mantente atento a:</h5>
+                            <ul>
+                                <li><i class="fas fa-users"></i> Asambleas generales</li>
+                                <li><i class="fas fa-graduation-cap"></i> Cursos de formación</li>
+                                <li><i class="fas fa-handshake"></i> Reuniones sindicales</li>
+                                <li><i class="fas fa-microphone"></i> Charlas informativas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
