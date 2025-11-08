@@ -3373,28 +3373,7 @@ body {
     margin-bottom: 1rem;
 }
 
-.checkbox-option {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    cursor: pointer;
-}
-
-.checkbox-option input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    accent-color: var(--primary-color);
-}
-
-.checkmark {
-    position: relative;
-}
-
-.label-text {
-    color: var(--text-dark);
-    user-select: none;
-}
+/* Usar los estilos ya definidos de checkbox-option más arriba en el archivo */
 
 .form-actions {
     display: flex;
