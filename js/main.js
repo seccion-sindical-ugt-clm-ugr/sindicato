@@ -37,13 +37,28 @@ const closeMyCourses = document.querySelector('#closeMyCourses');
 const closeMyDocuments = document.querySelector('#closeMyDocuments');
 const closeMyEvents = document.querySelector('#closeMyEvents');
 
-// Base de datos simulada de usuarios
-const usersDatabase = [
-    { email: 'afiliado@ugt.org', password: 'ugt2024', name: 'Juan Pérez', member: true },
-    { email: 'test@ugt.org', password: 'test123', name: 'María García', member: true },
-    { email: 'admin@ugt.org', password: 'admin123', name: 'Administrador', member: true, admin: true },
-    { email: 'ugtclmgranada@gmail.com', password: 'ugt123456', name: 'UGT-CLM Granada Oficial', member: true, admin: true }
-];
+// Register Modal Elements
+const registerModal = document.querySelector('#registerModal');
+const closeRegister = document.querySelector('#closeRegister');
+const registerForm = document.querySelector('#registerForm');
+const showRegisterLink = document.querySelector('#showRegisterLink');
+const backToLoginFromRegister = document.querySelector('#backToLoginFromRegister');
+
+// Change Password Modal Elements
+const changePasswordModal = document.querySelector('#changePasswordModal');
+const closeChangePassword = document.querySelector('#closeChangePassword');
+const changePasswordForm = document.querySelector('#changePasswordForm');
+const changePasswordLink = document.querySelector('#changePasswordLink');
+const backToProfile = document.querySelector('#backToProfile');
+
+// ============================================
+// SISTEMA DE AUTENTICACIÓN CON API REAL
+// ============================================
+// NOTA: usersDatabase ya no se usa, ahora se usa authAPI (ver js/auth-api.js)
+// Los usuarios ahora se almacenan en MongoDB y se autentican con JWT
+
+// Variable global para el usuario actual
+let currentUser = null;
 
 // Toggle Mobile Menu
 hamburger.addEventListener('click', () => {
@@ -555,6 +570,12 @@ window.addEventListener('click', (e) => {
     if (e.target === recoveryModal) {
         recoveryModal.style.display = 'none';
     }
+    if (e.target === registerModal) {
+        registerModal.style.display = 'none';
+    }
+    if (e.target === changePasswordModal) {
+        changePasswordModal.style.display = 'none';
+    }
 });
 
 // Recovery Modal handlers
@@ -573,6 +594,56 @@ backToLoginBtn.addEventListener('click', (e) => {
     recoveryModal.style.display = 'none';
     loginModal.style.display = 'block';
 });
+
+// ============================================
+// REGISTER MODAL HANDLERS (Solo para admins)
+// ============================================
+if (showRegisterLink) {
+    showRegisterLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginModal.style.display = 'none';
+        registerModal.style.display = 'block';
+    });
+}
+
+if (closeRegister) {
+    closeRegister.addEventListener('click', () => {
+        registerModal.style.display = 'none';
+    });
+}
+
+if (backToLoginFromRegister) {
+    backToLoginFromRegister.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerModal.style.display = 'none';
+        loginModal.style.display = 'block';
+    });
+}
+
+// ============================================
+// CHANGE PASSWORD MODAL HANDLERS
+// ============================================
+if (changePasswordLink) {
+    changePasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        editProfileModal.style.display = 'none';
+        changePasswordModal.style.display = 'block';
+    });
+}
+
+if (closeChangePassword) {
+    closeChangePassword.addEventListener('click', () => {
+        changePasswordModal.style.display = 'none';
+    });
+}
+
+if (backToProfile) {
+    backToProfile.addEventListener('click', (e) => {
+        e.preventDefault();
+        changePasswordModal.style.display = 'none';
+        editProfileModal.style.display = 'block';
+    });
+}
 
 // Edit Profile Modal handlers
 closeEditProfile.addEventListener('click', () => {
@@ -636,16 +707,32 @@ function handleProfilePhotoUpload(file) {
     reader.readAsDataURL(file);
 }
 
-// Remove profile photo
-function removeProfilePhoto() {
-    // Hide the image and show default avatar
-    profileImagePreview.style.display = 'none';
-    profileImagePreview.src = '';
-    defaultAvatar.style.display = 'flex';
-    profilePhotoInput.value = '';
-    removePhotoBtn.style.display = 'none';
-    changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
-    console.log('🗑️ Foto de perfil eliminada');
+// ============================================
+// ELIMINAR FOTO DE PERFIL - CON API REAL
+// ============================================
+async function removeProfilePhoto() {
+    try {
+        // Eliminar foto usando API real
+        const result = await authAPI.deletePhoto();
+
+        if (result.success) {
+            // Hide the image and show default avatar
+            profileImagePreview.style.display = 'none';
+            profileImagePreview.src = '';
+            defaultAvatar.style.display = 'flex';
+            profilePhotoInput.value = '';
+            removePhotoBtn.style.display = 'none';
+            changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
+
+            showMessage('success', 'Foto de perfil eliminada');
+            console.log('✅ Foto de perfil eliminada del backend');
+        } else {
+            showMessage('error', result.error || 'Error al eliminar foto');
+        }
+    } catch (error) {
+        console.error('❌ Error eliminando foto:', error);
+        showMessage('error', 'Error al eliminar foto');
+    }
 }
 
 // Dashboard modals close handlers
@@ -676,7 +763,9 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Edit Profile Form handler
+// ============================================
+// ACTUALIZAR PERFIL - CON API REAL
+// ============================================
 editProfileForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();
@@ -687,36 +776,14 @@ editProfileForm.addEventListener('submit', async (e) => {
 
     // Extract form data
     const profileData = {
-        name: formData.get('name')?.trim(),
-        email: formData.get('email')?.trim(),
-        phone: formData.get('phone')?.trim(),
-        department: formData.get('department')?.trim(),
-        notifications: formData.get('notifications') === 'on',
-        publicProfile: formData.get('publicProfile') === 'on',
-        profilePhoto: null
+        nombre: formData.get('name')?.trim(),
+        telefono: formData.get('phone')?.trim(),
+        departamento: formData.get('department')?.trim()
     };
 
-    // Add profile photo if exists
-    const hasPhoto = profileImagePreview.style.display === 'block' &&
-                    profileImagePreview.src &&
-                    !profileImagePreview.src.includes('data:') === false;
-
-    if (hasPhoto) {
-        profileData.profilePhoto = profileImagePreview.src;
-        console.log('📸 Foto detectada para guardar:', profileImagePreview.src.substring(0, 50) + '...');
-    } else {
-        profileData.profilePhoto = null;
-        console.log('👤 Sin foto para guardar');
-    }
-
     // Validation
-    if (!profileData.name) {
+    if (!profileData.nombre) {
         showMessage('error', 'El nombre es obligatorio');
-        return;
-    }
-
-    if (!profileData.email) {
-        showMessage('error', 'El email es obligatorio');
         return;
     }
 
@@ -725,29 +792,30 @@ editProfileForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
 
     try {
-        // Simulate API call
-        await simulateAPICall();
+        // Actualizar perfil usando API real
+        const result = await authAPI.updateProfile(profileData);
 
-        // Update user in database
-        const userIndex = usersDatabase.findIndex(u => u.email === profileData.email);
-        if (userIndex !== -1) {
-            // Update user data
-            usersDatabase[userIndex] = {
-                ...usersDatabase[userIndex],
-                name: profileData.name,
-                phone: profileData.phone,
-                department: profileData.department,
-                notifications: profileData.notifications,
-                publicProfile: profileData.publicProfile,
-                profilePhoto: profileData.profilePhoto
-            };
-            console.log('💾 Guardando foto en base de datos:', profileData.profilePhoto ? 'Sí' : 'No');
+        if (result.success) {
+            currentUser = result.data.user;
 
-            // Update localStorage
-            localStorage.setItem('userName', profileData.name);
+            // Actualizar foto si existe
+            const hasPhoto = profileImagePreview.style.display === 'block' &&
+                            profileImagePreview.src &&
+                            profileImagePreview.src.startsWith('data:');
+
+            if (hasPhoto) {
+                console.log('📸 Subiendo foto de perfil...');
+                const photoResult = await authAPI.uploadPhoto(profileImagePreview.src);
+
+                if (photoResult.success) {
+                    console.log('✅ Foto actualizada');
+                } else {
+                    console.error('❌ Error al subir foto:', photoResult.error);
+                }
+            }
 
             // Update dashboard display
-            document.getElementById('userName').textContent = profileData.name;
+            document.getElementById('userName').textContent = currentUser.nombre;
             updateLoginState();
 
             showMessage('success', '¡Perfil actualizado correctamente!');
@@ -756,35 +824,50 @@ editProfileForm.addEventListener('submit', async (e) => {
             editProfileModal.style.display = 'none';
             editProfileForm.reset();
 
+            console.log('✅ Perfil actualizado:', currentUser);
+
         } else {
-            showMessage('error', 'No se encontró el usuario en la base de datos');
+            showMessage('error', result.error || 'Error al actualizar el perfil');
         }
 
     } catch (error) {
         showMessage('error', 'Error al actualizar el perfil');
-        console.error('Profile update error:', error);
+        console.error('❌ Profile update error:', error);
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
 });
 
-// Logout handler
-logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
-    showMessage('success', 'Sesión cerrada correctamente');
+// ============================================
+// LOGOUT CON API REAL
+// ============================================
+logoutBtn.addEventListener('click', async () => {
+    try {
+        // Logout usando API real
+        await authAPI.logout();
+        currentUser = null;
 
-    // Hide dashboard and show main site
-    memberDashboard.style.display = 'none';
-    document.querySelectorAll('.section').forEach(section => {
-        if (section.id !== 'memberDashboard') {
-            section.style.display = 'block';
-        }
-    });
+        showMessage('success', 'Sesión cerrada correctamente');
 
-    updateLoginState();
+        // Hide dashboard and show main site
+        memberDashboard.style.display = 'none';
+        document.querySelectorAll('.section').forEach(section => {
+            if (section.id !== 'memberDashboard') {
+                section.style.display = 'block';
+            }
+        });
+
+        updateLoginState();
+
+        console.log('✅ Logout exitoso');
+    } catch (error) {
+        console.error('❌ Error en logout:', error);
+        // Incluso si hay error, limpiamos localmente
+        authAPI.clearTokens();
+        currentUser = null;
+        updateLoginState();
+    }
 });
 
 // Smooth scrolling for navigation links - Mejorado para hero buttons
@@ -888,7 +971,9 @@ function clearErrors() {
     });
 }
 
-// Enhanced login handler
+// ============================================
+// LOGIN CON API REAL
+// ============================================
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();
@@ -926,20 +1011,14 @@ loginForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
 
     try {
-        // Simulate API call with real authentication
-        await simulateAPICall();
+        // Login usando API real
+        const result = await authAPI.login(email, password);
 
-        // Check credentials against database
-        const user = usersDatabase.find(u => u.email === email && u.password === password);
+        if (result.success) {
+            currentUser = result.data.user;
+            showMessage('success', `¡Bienvenido de nuevo, ${currentUser.nombre}!`);
 
-        if (user) {
-            // Store login state
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('userEmail', user.email);
-            localStorage.setItem('userName', user.name);
-            localStorage.setItem('isAdmin', user.admin || false);
-
-            showMessage('success', `¡Bienvenido de nuevo, ${user.name}!`);
+            console.log('✅ Login exitoso:', currentUser);
 
             // Close modal and show dashboard
             setTimeout(() => {
@@ -949,14 +1028,15 @@ loginForm.addEventListener('submit', async (e) => {
             }, 1500);
 
         } else {
-            showMessage('error', 'Email o contraseña incorrectos');
+            // Mostrar error específico del backend
+            showMessage('error', result.error || 'Email o contraseña incorrectos');
             passwordInput.value = '';
             passwordInput.focus();
         }
 
     } catch (error) {
         showMessage('error', 'Error de conexión. Inténtalo de nuevo.');
-        console.error('Login error:', error);
+        console.error('❌ Login error:', error);
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
@@ -1133,9 +1213,12 @@ recoveryForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Show member dashboard
+// ============================================
+// MOSTRAR DASHBOARD CON DATOS REALES
+// ============================================
 function showMemberDashboard() {
-    const userName = localStorage.getItem('userName') || 'Afiliado';
+    // Usar currentUser de la API real
+    const userName = currentUser ? currentUser.nombre : 'Afiliado';
     document.getElementById('userName').textContent = userName;
 
     // Hide all main content sections except dashboard, but keep header visible
@@ -1164,6 +1247,8 @@ function showMemberDashboard() {
 
     // Scroll to top
     window.scrollTo(0, 0);
+
+    console.log('✅ Dashboard mostrado para:', userName);
 }
 
 // Initialize dashboard buttons functionality
@@ -1191,51 +1276,46 @@ function initDashboardButtons() {
     });
 }
 
-// Show edit profile modal
+// ============================================
+// MOSTRAR MODAL DE PERFIL CON DATOS REALES
+// ============================================
 function showEditProfileModal() {
-    // Load current user data
-    const userEmail = localStorage.getItem('userEmail');
-    const userName = localStorage.getItem('userName');
-
-    // Find user in database
-    const user = usersDatabase.find(u => u.email === userEmail);
-
-    if (user) {
-        // Populate form with current data
-        document.getElementById('profileName').value = user.name || '';
-        document.getElementById('profileEmail').value = user.email || '';
-        document.getElementById('profilePhone').value = user.phone || '';
-        document.getElementById('profileDepartment').value = user.department || '';
-        document.getElementById('notificationsEnabled').checked = user.notifications || false;
-        document.getElementById('publicProfile').checked = user.publicProfile || false;
-
-        // Load profile photo if exists
-        console.log('🔍 Verificando foto de perfil para usuario:', user.email);
-        console.log('📸 Foto guardada:', user.profilePhoto ? 'Sí - ' + user.profilePhoto.substring(0, 50) + '...' : 'No');
-
-        if (user.profilePhoto && user.profilePhoto.trim() !== '') {
-            profileImagePreview.src = user.profilePhoto;
-            profileImagePreview.style.display = 'block';
-            defaultAvatar.style.display = 'none';
-            removePhotoBtn.style.display = 'inline-flex';
-            changePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
-            console.log('✅ Foto de perfil cargada correctamente');
-        } else {
-            // Show default avatar
-            profileImagePreview.style.display = 'none';
-            profileImagePreview.src = '';
-            defaultAvatar.style.display = 'flex';
-            removePhotoBtn.style.display = 'none';
-            changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
-            console.log('👤 Mostrando avatar predeterminado');
-        }
-
-        // Show modal
-        editProfileModal.style.display = 'block';
-        console.log('📝 Modal de edición de perfil abierto para:', user.name);
-    } else {
+    // Usar currentUser de la API real
+    if (!currentUser) {
         showMessage('error', 'No se encontraron los datos del usuario');
+        return;
     }
+
+    // Populate form with current data
+    document.getElementById('profileName').value = currentUser.nombre || '';
+    document.getElementById('profileEmail').value = currentUser.email || '';
+    document.getElementById('profilePhone').value = currentUser.telefono || '';
+    document.getElementById('profileDepartment').value = currentUser.departamento || '';
+
+    // Load profile photo if exists
+    console.log('🔍 Verificando foto de perfil para:', currentUser.email);
+    console.log('📸 Foto guardada:', currentUser.profilePhoto ? 'Sí' : 'No');
+
+    if (currentUser.profilePhoto && currentUser.profilePhoto.trim() !== '') {
+        profileImagePreview.src = currentUser.profilePhoto;
+        profileImagePreview.style.display = 'block';
+        defaultAvatar.style.display = 'none';
+        removePhotoBtn.style.display = 'inline-flex';
+        changePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
+        console.log('✅ Foto de perfil cargada correctamente');
+    } else {
+        // Show default avatar
+        profileImagePreview.style.display = 'none';
+        profileImagePreview.src = '';
+        defaultAvatar.style.display = 'flex';
+        removePhotoBtn.style.display = 'none';
+        changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
+        console.log('👤 Mostrando avatar predeterminado');
+    }
+
+    // Show modal
+    editProfileModal.style.display = 'block';
+    console.log('📝 Modal de edición de perfil abierto para:', currentUser.nombre);
 }
 
 // Show my courses modal
@@ -1245,9 +1325,121 @@ function showMyCoursesModal() {
 }
 
 // Show my documents modal
-function showMyDocumentsModal() {
+async function showMyDocumentsModal() {
     myDocumentsModal.style.display = 'block';
     console.log('📁 Modal de "Mis Documentos" abierto');
+
+    // Cargar documentos del usuario
+    await loadUserDocuments();
+}
+
+// Cargar documentos del usuario
+async function loadUserDocuments() {
+    try {
+        const response = await authAPI.getDocuments();
+
+        if (!response.success) {
+            throw new Error(response.error || 'Error al cargar documentos');
+        }
+
+        const documents = response.data.documents || [];
+        const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
+
+        if (documents.length === 0) {
+            // Mostrar estado vacío
+            documentsContent.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h4>No hay documentos disponibles</h4>
+                    <p>Cuando completes actividades o realices pagos, tus documentos aparecerán aquí</p>
+                </div>
+            `;
+        } else {
+            // Mostrar lista de documentos
+            documentsContent.innerHTML = `
+                <div class="documents-list">
+                    ${documents.map(doc => `
+                        <div class="document-card" data-document-id="${doc._id}">
+                            <div class="document-icon">
+                                <i class="fas ${getDocumentIcon(doc.type)}"></i>
+                            </div>
+                            <div class="document-info">
+                                <h4>${doc.title}</h4>
+                                <p>${doc.description}</p>
+                                <div class="document-meta">
+                                    <span><i class="fas fa-calendar"></i> ${formatDate(doc.generatedAt)}</span>
+                                    <span><i class="fas fa-file-pdf"></i> ${formatFileSize(doc.fileSize)}</span>
+                                </div>
+                            </div>
+                            <div class="document-actions">
+                                <button class="btn btn-primary btn-sm" onclick="downloadDocument('${doc._id}', '${doc.title}')">
+                                    <i class="fas fa-download"></i> Descargar
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+    } catch (error) {
+        console.error('❌ Error cargando documentos:', error);
+        const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
+        documentsContent.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h4>Error al cargar documentos</h4>
+                <p>${error.message}</p>
+                <button class="btn btn-primary" onclick="loadUserDocuments()">
+                    <i class="fas fa-sync"></i> Reintentar
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Descargar documento
+async function downloadDocument(documentId, title) {
+    try {
+        console.log(`📥 Descargando documento: ${title}`);
+        await authAPI.downloadDocument(documentId, `${title}.pdf`);
+        showMessage('success', 'Documento descargado correctamente');
+    } catch (error) {
+        console.error('❌ Error descargando documento:', error);
+        showMessage('error', 'Error al descargar documento');
+    }
+}
+
+// Obtener icono según tipo de documento
+function getDocumentIcon(type) {
+    const icons = {
+        'certificado-afiliado': 'fa-certificate',
+        'recibo-pago': 'fa-receipt',
+        'certificado-curso': 'fa-graduation-cap',
+        'ficha-afiliacion': 'fa-id-card'
+    };
+    return icons[type] || 'fa-file-alt';
+}
+
+// Formatear fecha
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+}
+
+// Formatear tamaño de archivo
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
 }
 
 // Show my events modal
@@ -1358,14 +1550,38 @@ function updateLoginState() {
     initLoginBtn();
 }
 
-// Check if user is logged in on page load
-function checkLoginStatus() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (isLoggedIn) {
-        const userName = localStorage.getItem('userName') || 'Afiliado';
-        document.getElementById('userName').textContent = userName;
-        showMemberDashboard();
+// ============================================
+// VERIFICACIÓN DE SESIÓN AL CARGAR - CON API REAL
+// ============================================
+async function checkLoginStatus() {
+    console.log('🔍 Verificando estado de autenticación...');
+
+    // Verificar si hay tokens guardados
+    if (authAPI.isAuthenticated()) {
+        try {
+            // Validar token con el backend
+            const result = await authAPI.me();
+
+            if (result.success) {
+                currentUser = result.data.user;
+                document.getElementById('userName').textContent = currentUser.nombre;
+                showMemberDashboard();
+                console.log('✅ Sesión válida:', currentUser.email);
+            } else {
+                // Token inválido, limpiar
+                authAPI.clearTokens();
+                currentUser = null;
+                console.log('⚠️ Token inválido, limpiando sesión');
+            }
+        } catch (error) {
+            console.error('❌ Error verificando sesión:', error);
+            authAPI.clearTokens();
+            currentUser = null;
+        }
+    } else {
+        console.log('ℹ️ No hay sesión activa');
     }
+
     initLoginBtn();
 }
 
@@ -2252,6 +2468,134 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// ============================================
+// REGISTER FORM HANDLER (Solo admins)
+// ============================================
+if (registerForm) {
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        const formData = new FormData(registerForm);
+        const userData = {
+            nombre: formData.get('nombre').trim(),
+            email: formData.get('email').trim(),
+            password: formData.get('password'),
+            telefono: formData.get('telefono')?.trim(),
+            departamento: formData.get('departamento')?.trim()
+        };
+
+        // Validación
+        if (!userData.nombre || !userData.email || !userData.password) {
+            showMessage('error', 'Todos los campos obligatorios deben estar completos');
+            return;
+        }
+
+        // Show loading
+        const submitBtn = registerForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando cuenta...';
+        submitBtn.disabled = true;
+
+        try {
+            const result = await authAPI.register(userData);
+
+            if (result.success) {
+                currentUser = result.data.user;
+                showMessage('success', `¡Cuenta creada! Bienvenido ${currentUser.nombre}`);
+
+                setTimeout(() => {
+                    registerModal.style.display = 'none';
+                    showMemberDashboard();
+                    registerForm.reset();
+                }, 1500);
+            } else {
+                showMessage('error', result.error || 'Error al crear la cuenta');
+            }
+        } catch (error) {
+            showMessage('error', 'Error de conexión. Inténtalo de nuevo.');
+            console.error('❌ Register error:', error);
+        } finally {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+}
+
+// ============================================
+// CHANGE PASSWORD FORM HANDLER
+// ============================================
+if (changePasswordForm) {
+    changePasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        const formData = new FormData(changePasswordForm);
+        const currentPassword = formData.get('currentPassword');
+        const newPassword = formData.get('newPassword');
+        const confirmPassword = formData.get('confirmPassword');
+
+        // Validación
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            showMessage('error', 'Todos los campos son obligatorios');
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            showMessage('error', 'La nueva contraseña debe tener al menos 6 caracteres');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showMessage('error', 'Las contraseñas no coinciden');
+            return;
+        }
+
+        if (currentPassword === newPassword) {
+            showMessage('error', 'La nueva contraseña debe ser diferente a la actual');
+            return;
+        }
+
+        // Show loading
+        const submitBtn = changePasswordForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cambiando contraseña...';
+        submitBtn.disabled = true;
+
+        try {
+            const result = await authAPI.changePassword(currentPassword, newPassword);
+
+            if (result.success) {
+                showMessage('success', '¡Contraseña cambiada! Inicia sesión con tu nueva contraseña');
+
+                setTimeout(() => {
+                    changePasswordModal.style.display = 'none';
+                    changePasswordForm.reset();
+
+                    // El backend invalida todos los tokens, así que hacemos logout
+                    currentUser = null;
+                    memberDashboard.style.display = 'none';
+                    document.querySelectorAll('.section').forEach(section => {
+                        if (section.id !== 'memberDashboard') {
+                            section.style.display = 'block';
+                        }
+                    });
+                    updateLoginState();
+                    loginModal.style.display = 'block';
+                }, 2000);
+            } else {
+                showMessage('error', result.error || 'Error al cambiar contraseña');
+            }
+        } catch (error) {
+            showMessage('error', 'Error de conexión. Inténtalo de nuevo.');
+            console.error('❌ Change password error:', error);
+        } finally {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+}
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {

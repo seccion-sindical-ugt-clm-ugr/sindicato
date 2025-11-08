@@ -7,6 +7,9 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const User = require('../models/User');
+const Document = require('../models/Document');
+const { generateReciboPago } = require('../services/pdfService');
 
 // ====================================
 // VALIDADORES
@@ -211,11 +214,65 @@ router.post('/webhook', async (req, res) => {
             console.log('   Tipo:', session.metadata.type);
             console.log('   Metadata:', session.metadata);
 
-            // Aquí es donde guardarías los datos en tu base de datos
-            // await saveToDatabase(session);
+            // Procesar pago y generar recibo
+            try {
+                const userEmail = session.customer_email;
+                const user = await User.findByEmail(userEmail);
 
-            // Aquí enviarías un email de confirmación
-            // await sendConfirmationEmail(session);
+                if (user) {
+                    console.log(`✅ Usuario encontrado: ${userEmail}`);
+
+                    // Datos del pago
+                    const paymentData = {
+                        stripeSessionId: session.id,
+                        amount: session.amount_total / 100, // Convertir de centavos a euros
+                        currency: session.currency,
+                        description: session.metadata.type === 'affiliation'
+                            ? 'Afiliación anual UGT-CLM-UGR'
+                            : `Curso de ${session.metadata.courseType || 'Formación'}`,
+                        status: 'completed',
+                        date: new Date()
+                    };
+
+                    // 1. Agregar a historial de pagos del usuario
+                    user.paymentHistory.push(paymentData);
+                    await user.save();
+                    console.log(`💾 Pago registrado en historial del usuario`);
+
+                    // 2. Generar recibo de pago
+                    console.log('📄 Generando recibo de pago...');
+                    const reciboResult = await generateReciboPago(user, paymentData);
+
+                    const reciboDocument = new Document({
+                        userId: user._id,
+                        type: 'recibo-pago',
+                        title: 'Recibo de Pago',
+                        description: `Recibo de ${paymentData.description} - ${paymentData.amount.toFixed(2)} ${paymentData.currency.toUpperCase()}`,
+                        fileData: reciboResult.fileData,
+                        fileSize: reciboResult.fileSize,
+                        metadata: {
+                            amount: paymentData.amount,
+                            stripeSessionId: session.id
+                        }
+                    });
+
+                    await reciboDocument.save();
+                    console.log(`✅ Recibo generado: ${reciboDocument._id}`);
+
+                    // 3. Agregar documento al usuario
+                    user.documents.push(reciboDocument._id);
+                    await user.save();
+
+                    console.log(`✅ Recibo vinculado al usuario ${userEmail}`);
+
+                } else {
+                    console.log(`⚠️ Usuario no encontrado: ${userEmail} - Pago registrado pero sin recibo`);
+                }
+
+            } catch (error) {
+                console.error('❌ Error procesando pago:', error);
+                // No fallar el webhook si hay error en procesamiento
+            }
 
             break;
 

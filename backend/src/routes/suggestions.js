@@ -29,10 +29,12 @@ const suggestionsLimiter = rateLimit({
 // Middleware de sanitización
 router.use(mongoSanitize());
 
-// Importar modelo (se cargará después de configurar MongoDB)
+// Importar modelos (se cargarán después de configurar MongoDB)
 let Suggestion;
+let User;
 try {
     Suggestion = require('../models/Suggestion');
+    User = require('../models/User');
 } catch (error) {
     console.log('⚠️ MongoDB no configurado aún - endpoints de sugerencias disponibles pero no funcionales');
 }
@@ -153,6 +155,27 @@ router.post('/suggestions', suggestionsLimiter,
                 urgency: suggestion.urgency,
                 isAnonymous: suggestion.isAnonymous
             });
+
+            // Vincular sugerencia a usuario registrado si corresponde
+            if (!suggestion.isAnonymous && suggestion.email && User) {
+                try {
+                    const user = await User.findByEmail(suggestion.email);
+                    if (user) {
+                        // Vincular sugerencia al usuario
+                        suggestion.userId = user._id;
+                        await suggestion.save();
+
+                        // Agregar sugerencia al historial del usuario
+                        user.suggestions.push(suggestion._id);
+                        await user.save();
+
+                        console.log(`✅ Sugerencia vinculada al usuario: ${user.email} (${user._id})`);
+                    }
+                } catch (linkError) {
+                    console.error('⚠️ Error vinculando sugerencia a usuario:', linkError.message);
+                    // No fallar el request si hay error en vinculación
+                }
+            }
 
             // Enviar notificaciones por email (en background, no bloquear)
             setImmediate(async () => {
