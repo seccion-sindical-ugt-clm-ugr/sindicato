@@ -15,11 +15,18 @@ const forgotPasswordLink = document.querySelector('#forgotPasswordLink');
 const closeRecoveryBtn = document.querySelector('#closeRecovery');
 const backToLoginBtn = document.querySelector('#backToLogin');
 
+// Edit Profile Modal Elements
+const editProfileModal = document.querySelector('#editProfileModal');
+const closeEditProfile = document.querySelector('#closeEditProfile');
+const editProfileForm = document.querySelector('#editProfileForm');
+const cancelEditBtn = document.querySelector('#cancelEdit');
+
 // Base de datos simulada de usuarios
 const usersDatabase = [
     { email: 'afiliado@ugt.org', password: 'ugt2024', name: 'Juan Pérez', member: true },
     { email: 'test@ugt.org', password: 'test123', name: 'María García', member: true },
-    { email: 'admin@ugt.org', password: 'admin123', name: 'Administrador', member: true, admin: true }
+    { email: 'admin@ugt.org', password: 'admin123', name: 'Administrador', member: true, admin: true },
+    { email: 'ugtclmgranada@gmail.com', password: 'ugt123456', name: 'UGT-CLM Granada Oficial', member: true, admin: true }
 ];
 
 // Toggle Mobile Menu
@@ -521,6 +528,98 @@ backToLoginBtn.addEventListener('click', (e) => {
     loginModal.style.display = 'block';
 });
 
+// Edit Profile Modal handlers
+closeEditProfile.addEventListener('click', () => {
+    editProfileModal.style.display = 'none';
+});
+
+cancelEditBtn.addEventListener('click', () => {
+    editProfileModal.style.display = 'none';
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === editProfileModal) {
+        editProfileModal.style.display = 'none';
+    }
+});
+
+// Edit Profile Form handler
+editProfileForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const formData = new FormData(editProfileForm);
+    const submitBtn = editProfileForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+
+    // Extract form data
+    const profileData = {
+        name: formData.get('name')?.trim(),
+        email: formData.get('email')?.trim(),
+        phone: formData.get('phone')?.trim(),
+        department: formData.get('department')?.trim(),
+        notifications: formData.get('notifications') === 'on',
+        publicProfile: formData.get('publicProfile') === 'on'
+    };
+
+    // Validation
+    if (!profileData.name) {
+        showMessage('error', 'El nombre es obligatorio');
+        return;
+    }
+
+    if (!profileData.email) {
+        showMessage('error', 'El email es obligatorio');
+        return;
+    }
+
+    // Show loading state
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+    submitBtn.disabled = true;
+
+    try {
+        // Simulate API call
+        await simulateAPICall();
+
+        // Update user in database
+        const userIndex = usersDatabase.findIndex(u => u.email === profileData.email);
+        if (userIndex !== -1) {
+            // Update user data
+            usersDatabase[userIndex] = {
+                ...usersDatabase[userIndex],
+                name: profileData.name,
+                phone: profileData.phone,
+                department: profileData.department,
+                notifications: profileData.notifications,
+                publicProfile: profileData.publicProfile
+            };
+
+            // Update localStorage
+            localStorage.setItem('userName', profileData.name);
+
+            // Update dashboard display
+            document.getElementById('userName').textContent = profileData.name;
+            updateLoginState();
+
+            showMessage('success', '¡Perfil actualizado correctamente!');
+
+            // Close modal
+            editProfileModal.style.display = 'none';
+            editProfileForm.reset();
+
+        } else {
+            showMessage('error', 'No se encontró el usuario en la base de datos');
+        }
+
+    } catch (error) {
+        showMessage('error', 'Error al actualizar el perfil');
+        console.error('Profile update error:', error);
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
 // Logout handler
 logoutBtn.addEventListener('click', () => {
     localStorage.removeItem('isLoggedIn');
@@ -900,11 +999,53 @@ function showMemberDashboard() {
     // Show dashboard
     memberDashboard.style.display = 'block';
 
+    // Initialize dashboard buttons
+    initDashboardButtons();
+
     // Update login button
     updateLoginState();
 
     // Scroll to top
     window.scrollTo(0, 0);
+}
+
+// Initialize dashboard buttons functionality
+function initDashboardButtons() {
+    // Profile edit button
+    const profileButtons = document.querySelectorAll('.dashboard-card button');
+    profileButtons.forEach((button, index) => {
+        if (index === 0 && button.textContent.includes('Ver Perfil')) {
+            button.addEventListener('click', () => {
+                showEditProfileModal();
+            });
+        }
+    });
+}
+
+// Show edit profile modal
+function showEditProfileModal() {
+    // Load current user data
+    const userEmail = localStorage.getItem('userEmail');
+    const userName = localStorage.getItem('userName');
+
+    // Find user in database
+    const user = usersDatabase.find(u => u.email === userEmail);
+
+    if (user) {
+        // Populate form with current data
+        document.getElementById('profileName').value = user.name || '';
+        document.getElementById('profileEmail').value = user.email || '';
+        document.getElementById('profilePhone').value = user.phone || '';
+        document.getElementById('profileDepartment').value = user.department || '';
+        document.getElementById('notificationsEnabled').checked = user.notifications || false;
+        document.getElementById('publicProfile').checked = user.publicProfile || false;
+
+        // Show modal
+        editProfileModal.style.display = 'block';
+        console.log('📝 Modal de edición de perfil abierto para:', user.name);
+    } else {
+        showMessage('error', 'No se encontraron los datos del usuario');
+    }
 }
 
 // Payment handler with Stripe integration

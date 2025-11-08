@@ -3302,3 +3302,126 @@ body {
         align-items: center;
     }
 }
+
+/* Edit Profile Modal Styles */
+#editProfileModal .modal-content {
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.edit-profile-form h3 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.edit-profile-form > p {
+    text-align: center;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section h4 {
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.form-section label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.form-section input[type="text"],
+.form-section input[type="email"],
+.form-section input[type="tel"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #E0E0E0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: var(--transition);
+    margin-bottom: 0.5rem;
+}
+
+.form-section input[type="text"]:focus,
+.form-section input[type="email"]:focus,
+.form-section input[type="tel"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(227, 6, 19, 0.1);
+}
+
+.form-section input[readonly] {
+    background-color: var(--bg-light);
+    cursor: not-allowed;
+}
+
+.form-section small {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.checkbox-option input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color);
+}
+
+.checkmark {
+    position: relative;
+}
+
+.label-text {
+    color: var(--text-dark);
+    user-select: none;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #E0E0E0;
+}
+
+.form-actions .btn {
+    min-width: 120px;
+}
+
+/* Mobile responsiveness for edit profile modal */
+@media (max-width: 768px) {
+    #editProfileModal .modal-content {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+}

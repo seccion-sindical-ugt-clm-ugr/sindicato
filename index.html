@@ -451,6 +451,73 @@
         </div>
     </section>
 
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeEditProfile">&times;</span>
+            <div class="edit-profile-form">
+                <h3>👤 Editar Mi Perfil</h3>
+                <p>Actualiza tu información personal</p>
+
+                <form id="editProfileForm">
+                    <div class="form-section">
+                        <h4>Información Personal</h4>
+
+                        <div class="form-group">
+                            <label for="profileName">Nombre Completo</label>
+                            <input type="text" id="profileName" name="name" required>
+                            <span class="error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profileEmail">Email</label>
+                            <input type="email" id="profileEmail" name="email" required readonly>
+                            <small>El email no se puede modificar</small>
+                            <span class="error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profilePhone">Teléfono</label>
+                            <input type="tel" id="profilePhone" name="phone" placeholder="Tu teléfono">
+                            <span class="error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profileDepartment">Departamento/Centro</label>
+                            <input type="text" id="profileDepartment" name="department" placeholder="Tu departamento o centro">
+                            <span class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>Preferencias</h4>
+
+                        <div class="form-group">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="notificationsEnabled" name="notifications">
+                                <span class="checkmark"></span>
+                                <span class="label-text">Recibir notificaciones por email</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="publicProfile" name="publicProfile">
+                                <span class="checkmark"></span>
+                                <span class="label-text">Perfil público visible para otros afiliados</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelEdit">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
