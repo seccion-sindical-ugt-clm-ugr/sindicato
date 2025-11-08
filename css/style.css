@@ -955,6 +955,7 @@ body {
     align-items: center;
     margin-bottom: 3rem;
     padding: 2rem;
+    gap: 2rem;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     border-radius: 15px;
     color: white;
@@ -969,6 +970,28 @@ body {
 .dashboard-header span {
     color: #FFD700;
     font-weight: 600;
+}
+
+.dashboard-header .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 5px 12px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    border-radius: 18px;
+    white-space: nowrap;
+}
+
+.dashboard-header .btn-secondary {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.dashboard-header .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
 .dashboard-grid {
@@ -1094,6 +1117,11 @@ body {
 
     .dashboard-header h2 {
         font-size: 1.5rem;
+    }
+
+    .dashboard-header .btn {
+        width: 100%;
+        justify-content: center;
     }
 
     .dashboard-grid {
