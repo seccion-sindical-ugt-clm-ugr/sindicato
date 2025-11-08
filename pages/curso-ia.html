@@ -436,6 +436,63 @@
     <script src="../js/stripe-config.js"></script>
     <script src="../js/main.js"></script>
     <script>
+        // Asegurar que el logo funcione para volver al inicio
+        document.addEventListener('DOMContentLoaded', function() {
+            const navBrand = document.getElementById('navBrand');
+            if (navBrand) {
+                console.log('🏠 Logo encontrado en página de curso IA - configurando navegación');
+
+                // Estilos para asegurar clicabilidad
+                navBrand.style.cursor = 'pointer';
+                navBrand.style.position = 'relative';
+                navBrand.style.zIndex = '1000';
+
+                // Función para volver al inicio
+                function goToHome() {
+                    console.log('🏠 Logo clicado en página de curso IA - volviendo al inicio principal');
+                    window.location.href = '../index.html';
+                }
+
+                // Event listeners para todos los dispositivos
+                navBrand.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    goToHome();
+                });
+
+                // Soporte táctil para móviles
+                navBrand.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    goToHome();
+                }, { passive: false });
+
+                // Prevenir propagación desde elementos internos
+                const logoImage = navBrand.querySelector('.logo');
+                const brandText = navBrand.querySelector('.brand-text');
+
+                [logoImage, brandText].forEach(element => {
+                    if (element) {
+                        element.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            goToHome();
+                        });
+
+                        element.addEventListener('touchend', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            goToHome();
+                        }, { passive: false });
+                    }
+                });
+
+                console.log('✅ Logo de página de curso IA configurado correctamente');
+            } else {
+                console.error('❌ No se encontró el logo en la página de curso IA');
+            }
+        });
+    </script>
+    <script>
         async function enrollCourse(type) {
             const isMember = type === 'member';
             const price = isMember ? 15 : 160;
