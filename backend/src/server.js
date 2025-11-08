@@ -17,6 +17,7 @@ const healthRoutes = require('./routes/health');
 const suggestionsRoutes = require('./routes/suggestions');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const completeRegistrationRoutes = require('./routes/complete-registration');
 
 // Importar middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -144,6 +145,9 @@ app.use('/api/auth', authRoutes);
 
 // Rutas de usuario
 app.use('/api/user', userRoutes);
+
+// Ruta de completar registro (después del pago)
+app.use('/api', completeRegistrationRoutes);
 
 // Rutas de Stripe
 app.use('/api', stripeRoutes);
