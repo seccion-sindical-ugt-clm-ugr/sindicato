@@ -11,7 +11,6 @@ const recoveryModal = document.querySelector('#recoveryModal');
 const recoveryForm = document.querySelector('#recoveryForm');
 const memberDashboard = document.querySelector('#memberDashboard');
 const logoutBtn = document.querySelector('#logoutBtn');
-const exitDashboardBtn = document.querySelector('#exitDashboardBtn');
 const forgotPasswordLink = document.querySelector('#forgotPasswordLink');
 const closeRecoveryBtn = document.querySelector('#closeRecovery');
 const backToLoginBtn = document.querySelector('#backToLogin');
@@ -679,12 +678,6 @@ editProfileForm.addEventListener('submit', async (e) => {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
-});
-
-// Exit dashboard handler
-exitDashboardBtn.addEventListener('click', () => {
-    exitDashboardMode();
-    showMessage('info', 'Has salido del área de afiliados 🏠');
 });
 
 // Logout handler
