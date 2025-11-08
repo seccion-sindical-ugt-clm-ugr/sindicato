@@ -382,6 +382,53 @@ body {
     display: block;
 }
 
+/* Price Features List - Left Aligned */
+.price-features {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0 0;
+    text-align: left;
+}
+
+.price-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.price-features li:last-child {
+    border-bottom: none;
+}
+
+.price-features li i {
+    color: #4CAF50;
+    font-size: 1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+    width: 16px;
+    text-align: center;
+}
+
+.price-card.featured .price-features li {
+    border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+.price-card.featured .price-features li i {
+    color: #ffffff;
+    background: rgba(76, 175, 80, 0.3);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
 .price-info {
     font-size: 0.9rem;
     opacity: 0.8;
