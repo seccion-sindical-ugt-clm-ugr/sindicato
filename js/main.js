@@ -990,73 +990,201 @@ function showCourseEnrollmentModal() {
             <span class="close" id="closeEnrollmentModal">&times;</span>
             <div class="enrollment-form">
                 <div class="course-header">
-                    <h3>🎓 IA Aplicada al Sector Educativo del CLM</h3>
+                    <h3>🎓 IA Aplicada a la Enseñanza de Lenguas</h3>
                     <div class="course-summary">
                         <div class="summary-item">
                             <i class="fas fa-chalkboard-teacher"></i>
-                            <span>Enfoque ELE y Lenguas Modernas</span>
+                            <span>30 sesiones prácticas de 40 min</span>
                         </div>
                         <div class="summary-item">
-                            <i class="fas fa-clock"></i>
-                            <span>30 horas (6 semanas)</span>
+                            <i class="fas fa-calendar-check"></i>
+                            <span>5 semanas (jueves y viernes)</span>
                         </div>
                         <div class="summary-item">
                             <i class="fas fa-users"></i>
-                            <span>Grupos reducidos CLM</span>
+                            <span>Grupos reducidos (max 15)</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="course-curriculum">
-                    <h4>📚 Programa del Curso</h4>
-                    <div class="curriculum-grid">
-                        <div class="module">
-                            <div class="module-header">
-                                <span class="module-number">Módulo 1</span>
-                                <i class="fas fa-brain"></i>
+                    <h4>📚 Programa Detallado por Sesiones</h4>
+                    <div class="curriculum-weeks">
+
+                        <!-- Semana 1 -->
+                        <div class="week-module">
+                            <div class="week-header">
+                                <span class="week-number">Semana 1</span>
+                                <i class="fas fa-rocket"></i>
+                                <span class="week-hours">6 sesiones</span>
                             </div>
-                            <h5>Introducción a la IA en la Enseñanza</h5>
-                            <ul>
-                                <li>Conceptos básicos de IA y Machine Learning</li>
-                                <li>Herramientas IA para profesores de ELE</li>
-                                <li>Aplicaciones prácticas en CLM Granada</li>
-                            </ul>
+                            <h5>🚀 Jornadas de Introducción a la IA</h5>
+
+                            <div class="day-sessions">
+                                <div class="day">
+                                    <strong>Jueves - Día 1</strong>
+                                    <ul>
+                                        <li><strong>Sesión 1:</strong> Bienvenida e Introducción a la IA (40 min)</li>
+                                        <li><strong>Sesión 2:</strong> Herramientas de IA Accesibles (40 min)</li>
+                                        <li><strong>Sesión 3:</strong> Prompting Básico (40 min)</li>
+                                    </ul>
+                                </div>
+                                <div class="day">
+                                    <strong>Viernes - Día 2</strong>
+                                    <ul>
+                                        <li><strong>Sesión 4:</strong> IA para Profesores de Idiomas I (40 min)</li>
+                                        <li><strong>Sesión 5:</strong> IA para Personal Administrativo I (40 min)</li>
+                                        <li><strong>Sesión 6:</strong> IA para Conserjería y Servicios I (40 min)</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                        <div class="module">
-                            <div class="module-header">
-                                <span class="module-number">Módulo 2</span>
-                                <i class="fas fa-comments"></i>
+
+                        <!-- Semana 2 -->
+                        <div class="week-module">
+                            <div class="week-header">
+                                <span class="week-number">Semana 2</span>
+                                <i class="fas fa-cogs"></i>
+                                <span class="week-hours">6 sesiones</span>
                             </div>
-                            <h5>ChatGPT y Gemini en la Enseñanza</h5>
-                            <ul>
-                                <li>Creación de materiales didácticos</li>
-                                <li>Personalización de ejercicios</li>
-                                <li>Corrección automática de errores</li>
-                            </ul>
+                            <h5>⚙️ Procesamiento y Aplicaciones Especializadas</h5>
+
+                            <div class="day-sessions">
+                                <div class="day">
+                                    <strong>Jueves - Día 3</strong>
+                                    <ul>
+                                        <li><strong>Sesión 7:</strong> Procesamiento de Lenguaje Natural (40 min)</li>
+                                        <li><strong>Sesión 8:</strong> Generación de Imágenes con IA (40 min)</li>
+                                        <li><strong>Sesión 9:</strong> IA para Profesores de Idiomas II (40 min)</li>
+                                    </ul>
+                                </div>
+                                <div class="day">
+                                    <strong>Viernes - Día 4</strong>
+                                    <ul>
+                                        <li><strong>Sesión 10:</strong> IA para Personal Administrativo II (40 min)</li>
+                                        <li><strong>Sesión 11:</strong> Ética y Responsabilidad en el Uso de la IA (40 min)</li>
+                                        <li><strong>Sesión 12:</strong> Proyectos Colaborativos I (40 min)</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                        <div class="module">
-                            <div class="module-header">
-                                <span class="module-number">Módulo 3</span>
-                                <i class="fas fa-tasks"></i>
+
+                        <!-- Semana 3 -->
+                        <div class="week-module">
+                            <div class="week-header">
+                                <span class="week-number">Semana 3</span>
+                                <i class="fas fa-chart-line"></i>
+                                <span class="week-hours">6 sesiones</span>
                             </div>
-                            <h5>Automatización de Evaluación</h5>
-                            <ul>
-                                <li>Evaluación DELE/SIELE asistida</li>
-                                <li>Retroalimentación automática</li>
-                                <li>Análisis de progreso lingüístico</li>
-                            </ul>
+                            <h5>📈 Optimización y Herramientas Avanzadas</h5>
+
+                            <div class="day-sessions">
+                                <div class="day">
+                                    <strong>Jueves - Día 5</strong>
+                                    <ul>
+                                        <li><strong>Sesión 13:</strong> IA para Profesores de Idiomas III (40 min)</li>
+                                        <li><strong>Sesión 14:</strong> IA para Personal Administrativo III (40 min)</li>
+                                        <li><strong>Sesión 15:</strong> IA para Conserjería y Servicios II (40 min)</li>
+                                    </ul>
+                                </div>
+                                <div class="day">
+                                    <strong>Viernes - Día 6</strong>
+                                    <ul>
+                                        <li><strong>Sesión 16:</strong> Herramientas Multimedia con IA (40 min)</li>
+                                        <li><strong>Sesión 17:</strong> Traducción y Localización con IA (40 min)</li>
+                                        <li><strong>Sesión 18:</strong> Proyectos Colaborativos II (40 min)</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                        <div class="module">
-                            <div class="module-header">
-                                <span class="module-number">Módulo 4</span>
-                                <i class="fas fa-users-cog"></i>
+
+                        <!-- Semana 4 -->
+                        <div class="week-module">
+                            <div class="week-header">
+                                <span class="week-number">Semana 4</span>
+                                <i class="fas fa-robot"></i>
+                                <span class="week-hours">6 sesiones</span>
                             </div>
-                            <h5>Adaptación del Aprendizaje</h5>
-                            <ul>
-                                <li>Rutas de aprendizaje personalizadas</li>
-                                <li>Detección de necesidades específicas</li>
-                                <li>Optimización de tiempo docente</li>
-                            </ul>
+                            <h5>🤖 Automatización y Proyectos</h5>
+
+                            <div class="day-sessions">
+                                <div class="day">
+                                    <strong>Jueves - Día 7</strong>
+                                    <ul>
+                                        <li><strong>Sesión 19:</strong> Asistentes Virtuales Personalizados (40 min)</li>
+                                        <li><strong>Sesión 20:</strong> IA para Profesores de Idiomas IV (40 min)</li>
+                                        <li><strong>Sesión 21:</strong> IA para Personal Administrativo IV (40 min)</li>
+                                    </ul>
+                                </div>
+                                <div class="day">
+                                    <strong>Viernes - Día 8</strong>
+                                    <ul>
+                                        <li><strong>Sesión 22:</strong> Detección de Plagio y Uso Ético (40 min)</li>
+                                        <li><strong>Sesión 23:</strong> Personalización del Aprendizaje con IA (40 min)</li>
+                                        <li><strong>Sesión 24:</strong> Proyectos Colaborativos III (40 min)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Semana 5 -->
+                        <div class="week-module">
+                            <div class="week-header">
+                                <span class="week-number">Semana 5</span>
+                                <i class="fas fa-trophy"></i>
+                                <span class="week-hours">6 sesiones</span>
+                            </div>
+                            <h5>🏆 Tendencias y Presentaciones Finales</h5>
+
+                            <div class="day-sessions">
+                                <div class="day">
+                                    <strong>Jueves - Día 9</strong>
+                                    <ul>
+                                        <li><strong>Sesión 25:</strong> Tendencias Futuras en IA Educativa (40 min)</li>
+                                        <li><strong>Sesión 26:</strong> Integración de IA en el Plan Estratégico (40 min)</li>
+                                        <li><strong>Sesión 27:</strong> Preparación de Presentaciones Finales (40 min)</li>
+                                    </ul>
+                                </div>
+                                <div class="day">
+                                    <strong>Viernes - Día 10</strong>
+                                    <ul>
+                                        <li><strong>Sesión 28:</strong> Presentaciones de Proyectos I (40 min)</li>
+                                        <li><strong>Sesión 29:</strong> Presentaciones de Proyectos II (40 min)</li>
+                                        <li><strong>Sesión 30:</strong> Conclusiones y Plan de Acción (40 min)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Materiales y Recursos -->
+                <div class="course-materials">
+                    <h4>🎯 Materiales y Recursos Incluidos</h4>
+                    <div class="materials-grid">
+                        <div class="material-item">
+                            <i class="fas fa-laptop"></i>
+                            <span>Acceso a plataformas de IA (ChatGPT, Gemini, Claude)</span>
+                        </div>
+                        <div class="material-item">
+                            <i class="fas fa-book"></i>
+                            <span>Documentación y guías de referencia rápida</span>
+                        </div>
+                        <div class="material-item">
+                            <i class="fas fa-clipboard"></i>
+                            <span>Plantillas de trabajo para actividades prácticas</span>
+                        </div>
+                        <div class="material-item">
+                            <i class="fas fa-users"></i>
+                            <span>Comunidad de práctica y seguimiento 6 meses</span>
+                        </div>
+                        <div class="material-item">
+                            <i class="fas fa-certificate"></i>
+                            <span>Certificado UGT con validez nacional</span>
+                        </div>
+                        <div class="material-item">
+                            <i class="fas fa-headset"></i>
+                            <span>Mentorías individuales para proyectos específicos</span>
                         </div>
                     </div>
                 </div>

@@ -1990,6 +1990,34 @@ body {
     font-size: 1.3rem;
 }
 
+.module-hours {
+    background: rgba(44, 82, 130, 0.1);
+    color: var(--accent-color);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.module-objectives {
+    background: rgba(227, 6, 19, 0.05);
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 0.8rem;
+    border-left: 3px solid var(--primary-color);
+}
+
+.module-objectives strong {
+    color: var(--primary-color);
+    font-size: 0.85rem;
+}
+
+.module h5 {
+    margin-bottom: 0.5rem;
+}
+
 .module h5 {
     color: var(--text-dark);
     font-size: 1rem;
@@ -2235,6 +2263,197 @@ body {
     font-size: 0.9rem;
     color: var(--text-dark);
     line-height: 1.5;
+}
+
+/* Weekly Curriculum Styles */
+.curriculum-weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.week-module {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.week-module:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-color: var(--primary-color);
+}
+
+.week-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid var(--bg-light);
+}
+
+.week-number {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: white;
+    background: var(--gradient-ugt);
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.week-header i {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+}
+
+.week-hours {
+    background: rgba(44, 82, 130, 0.1);
+    color: var(--accent-color);
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.week-module h5 {
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.day-sessions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.day {
+    background: var(--bg-light);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.day strong {
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.day ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.day li {
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    line-height: 1.4;
+    padding-left: 0.5rem;
+}
+
+.day li strong {
+    color: var(--accent-color);
+    display: inline;
+    font-weight: 600;
+}
+
+/* Course Materials Styles */
+.course-materials {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(227, 6, 19, 0.05), rgba(44, 82, 130, 0.05));
+    border-radius: 12px;
+    border: 1px solid rgba(227, 6, 19, 0.1);
+}
+
+.course-materials h4 {
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.materials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.material-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.material-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    background: rgba(227, 6, 19, 0.05);
+}
+
+.material-item i {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+}
+
+.material-item span {
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    line-height: 1.4;
+}
+
+/* Responsive Design for Weekly Curriculum */
+@media (max-width: 768px) {
+    .day-sessions {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .week-module {
+        padding: 1rem;
+    }
+
+    .materials-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .material-item {
+        padding: 0.8rem;
+    }
+
+    .day {
+        padding: 0.8rem;
+    }
+
+    .day li {
+        font-size: 0.8rem;
+    }
 }
 
 /* Modal responsive for preinscription */
