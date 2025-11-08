@@ -1673,3 +1673,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // Nota: La configuración de Stripe ahora se maneja en stripe-config.js
     // Ver advertencias en la consola sobre requisitos de backend
 });
+// Última actualización: sábado,  8 de noviembre de 2025, 01:31:50 CET
