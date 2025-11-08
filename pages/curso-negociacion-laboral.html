@@ -484,19 +484,41 @@
             });
         });
 
-        // Script para botones de inscripción
-        document.querySelectorAll('#enrollBtn, #enrollBtn2').forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Mensaje para WhatsApp
-                const message = encodeURIComponent(
-                    '¡Hola! Estoy interesado/a en inscribirme al curso "Técnicas de Negociación Laboral". Me gustaría conocer los requisitos y el proceso de inscripción.'
-                );
-                const phoneNumber = '34690026370';
-                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+        // Script para botones de inscripción - Mejorado
+        function setupEnrollButtons() {
+            document.querySelectorAll('#enrollBtn, #enrollBtn2').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
 
-                window.open(whatsappUrl, '_blank');
+                    // Mostrar mensaje de carga
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando...';
+                    btn.disabled = true;
+
+                    // Mensaje para WhatsApp
+                    const message = encodeURIComponent(
+                        '¡Hola! Estoy interesado/a en inscribirme al curso "Técnicas de Negociación Laboral". Me gustaría conocer los requisitos y el proceso de inscripción.'
+                    );
+                    const phoneNumber = '34690026370';
+                    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+
+                    // Abrir WhatsApp
+                    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+
+                    // Restaurar botón después de un pequeño retraso
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }, 1000);
+                });
             });
-        });
+        }
+
+        // Inicializar botones cuando el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', setupEnrollButtons);
+
+        // También intentar inicializar inmediatamente por si el DOM ya está cargado
+        setupEnrollButtons();
     </script>
 </body>
 </html>

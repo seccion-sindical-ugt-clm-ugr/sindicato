@@ -1925,43 +1925,78 @@ body {
 
 /* Course Curriculum Styles */
 .course-curriculum {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    background: var(--bg-light);
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
+    margin-bottom: 3rem;
+    padding: 2.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(227, 6, 19, 0.08);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
 }
 
 .course-curriculum h4 {
     color: var(--text-dark);
-    margin-bottom: 1.5rem;
-    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    font-size: 1.4rem;
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 12px;
+    font-weight: 700;
+    position: relative;
+}
+
+.course-curriculum h4::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: var(--gradient-ugt);
+    border-radius: 2px;
 }
 
 .curriculum-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.curriculum-modules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
     margin-top: 1rem;
 }
 
 .module {
     background: white;
-    border-radius: 10px;
-    padding: 1.2rem;
-    border: 1px solid #e0e0e0;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(227, 6, 19, 0.1);
+    transition: all 0.4s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.module::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-ugt);
+    border-radius: 16px 16px 0 0;
 }
 
 .module:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(227, 6, 19, 0.15);
     border-color: var(--primary-color);
 }
 
@@ -1969,60 +2004,77 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 0.8rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--bg-light);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(227, 6, 19, 0.08);
 }
 
 .module-number {
-    font-size: 0.8rem;
-    font-weight: 700;
+    font-size: 0.75rem;
+    font-weight: 800;
     color: white;
     background: var(--gradient-ugt);
-    padding: 4px 10px;
-    border-radius: 15px;
+    padding: 6px 14px;
+    border-radius: 20px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(227, 6, 19, 0.3);
 }
 
 .module-header i {
     color: var(--primary-color);
-    font-size: 1.3rem;
+    font-size: 1.8rem;
+    background: rgba(227, 6, 19, 0.08);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.module:hover .module-header i {
+    background: var(--gradient-ugt);
+    color: white;
+    transform: scale(1.1);
 }
 
 .module-hours {
-    background: rgba(44, 82, 130, 0.1);
+    background: linear-gradient(135deg, rgba(44, 82, 130, 0.1), rgba(44, 82, 130, 0.15));
     color: var(--accent-color);
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    border: 1px solid rgba(44, 82, 130, 0.2);
 }
 
 .module-objectives {
-    background: rgba(227, 6, 19, 0.05);
-    padding: 8px 12px;
-    border-radius: 6px;
-    margin-bottom: 0.8rem;
-    border-left: 3px solid var(--primary-color);
+    background: linear-gradient(135deg, rgba(227, 6, 19, 0.03), rgba(227, 6, 19, 0.06));
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    margin-bottom: 1.2rem;
+    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 2px 8px rgba(227, 6, 19, 0.08);
 }
 
 .module-objectives strong {
     color: var(--primary-color);
-    font-size: 0.85rem;
-}
-
-.module h5 {
+    font-size: 0.9rem;
+    display: block;
     margin-bottom: 0.5rem;
+    font-weight: 700;
 }
 
 .module h5 {
     color: var(--text-dark);
-    font-size: 1rem;
-    margin-bottom: 0.8rem;
-    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
 }
 
 .module ul {
@@ -2033,24 +2085,408 @@ body {
 
 .module li {
     position: relative;
-    padding-left: 1.2rem;
-    margin-bottom: 0.4rem;
-    font-size: 0.85rem;
+    padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
     color: var(--text-light);
-    line-height: 1.4;
+    line-height: 1.5;
+    background: rgba(44, 82, 130, 0.02);
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.module li:hover {
+    background: rgba(227, 6, 19, 0.05);
+    border-left-color: var(--primary-color);
+    transform: translateX(3px);
 }
 
 .module li::before {
     content: "✓";
     position: absolute;
-    left: 0;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
     color: var(--primary-color);
     font-weight: bold;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    width: 20px;
+    height: 20px;
+    background: rgba(227, 6, 19, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .module li:last-child {
     margin-bottom: 0;
+}
+
+/* Module Card Styles for Course Page */
+.module-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(227, 6, 19, 0.1);
+    transition: all 0.4s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.module-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-ugt);
+    border-radius: 16px 16px 0 0;
+}
+
+.module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(227, 6, 19, 0.15);
+    border-color: var(--primary-color);
+}
+
+.module-card .module-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(227, 6, 19, 0.08);
+}
+
+.module-card .module-number {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: white;
+    background: var(--gradient-ugt);
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(227, 6, 19, 0.3);
+}
+
+.module-card .module-duration {
+    background: linear-gradient(135deg, rgba(44, 82, 130, 0.1), rgba(44, 82, 130, 0.15));
+    color: var(--accent-color);
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(44, 82, 130, 0.2);
+}
+
+.module-card .module-objectives {
+    background: linear-gradient(135deg, rgba(227, 6, 19, 0.03), rgba(227, 6, 19, 0.06));
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    margin-bottom: 1.2rem;
+    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 2px 8px rgba(227, 6, 19, 0.08);
+}
+
+.module-card .module-objectives strong {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.module-card h5 {
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.module-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.module-card li {
+    position: relative;
+    padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    line-height: 1.5;
+    background: rgba(44, 82, 130, 0.02);
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.module-card li:hover {
+    background: rgba(227, 6, 19, 0.05);
+    border-left-color: var(--primary-color);
+    transform: translateX(3px);
+}
+
+.module-card li::before {
+    content: "✓";
+    position: absolute;
+    left: 0.8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 0.9rem;
+    width: 20px;
+    height: 20px;
+    background: rgba(227, 6, 19, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.module-card li:last-child {
+    margin-bottom: 0;
+}
+
+/* Course Information Section - Enhanced Design */
+.course-info-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+.course-overview {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid rgba(227, 6, 19, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.course-overview::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--gradient-ugt);
+}
+
+.course-overview h2 {
+    color: var(--text-dark);
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    font-weight: 700;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.course-overview h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: var(--gradient-ugt);
+    border-radius: 2px;
+}
+
+.learning-objectives {
+    display: grid;
+    gap: 1.2rem;
+}
+
+.objective {
+    display: flex;
+    align-items: start;
+    gap: 1.2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(44, 82, 130, 0.02), rgba(44, 82, 130, 0.05));
+    border-radius: 16px;
+    border: 1px solid rgba(44, 82, 130, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.objective::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--gradient-ugt);
+    border-radius: 2px;
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.objective:hover {
+    transform: translateX(8px);
+    background: linear-gradient(135deg, rgba(227, 6, 19, 0.03), rgba(227, 6, 19, 0.06));
+    border-color: rgba(227, 6, 19, 0.15);
+    box-shadow: 0 8px 25px rgba(227, 6, 19, 0.1);
+}
+
+.objective:hover::before {
+    transform: scaleY(1);
+}
+
+.objective i {
+    color: var(--primary-color);
+    font-size: 2rem;
+    background: rgba(227, 6, 19, 0.08);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(227, 6, 19, 0.15);
+}
+
+.objective:hover i {
+    background: var(--gradient-ugt);
+    color: white;
+    transform: scale(1.1);
+}
+
+.objective h4 {
+    color: var(--text-dark);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.objective p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.course-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.detail-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.detail-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-ugt);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.detail-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(227, 6, 19, 0.12);
+}
+
+.detail-card:hover::before {
+    transform: scaleX(1);
+}
+
+.detail-card h3 {
+    color: var(--text-dark);
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.detail-card h3 i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    background: rgba(227, 6, 19, 0.08);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.detail-card li {
+    position: relative;
+    padding: 0.8rem 0 0.8rem 2rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.detail-card li:last-child {
+    border-bottom: none;
+}
+
+.detail-card li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 0.9rem;
+    width: 18px;
+    height: 18px;
+    background: rgba(227, 6, 19, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail-card li:hover {
+    background: rgba(227, 6, 19, 0.02);
+    padding-left: 2.5rem;
+}
+
+.detail-card li strong {
+    color: var(--text-dark);
+    font-weight: 600;
 }
 
 /* Course Inquiries Section */
@@ -2578,36 +3014,53 @@ body {
 
 /* Individual Course Page Styles */
 .course-hero {
-    background: linear-gradient(135deg, var(--gradient-hero), var(--gradient-ugt));
+    background: var(--gradient-hero);
     color: white;
     padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.course-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(227, 6, 19, 0.9) 0%, rgba(183, 28, 28, 0.95) 100%);
+    z-index: 0;
 }
 
 .course-hero-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    gap: 1.5rem;
     align-items: center;
+    min-height: 450px;
+    position: relative;
+    z-index: 1;
 }
 
 .course-hero-info h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+    font-size: 2.2rem;
+    margin-bottom: 0.8rem;
     line-height: 1.2;
 }
 
 .course-hero-description {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-    line-height: 1.6;
-    opacity: 0.9;
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+    opacity: 0.95;
+    max-width: 450px;
 }
 
 .course-hero-features {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
 }
 
 .course-hero-features .feature {
@@ -2622,38 +3075,183 @@ body {
 
 .course-hero-features .feature i {
     font-size: 1.1rem;
+    color: white;
 }
 
 .course-hero-buttons {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.course-hero-buttons .btn {
+    padding: 14px 28px;
+    font-weight: 600;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+    justify-content: center;
+}
+
+.course-hero-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    color: white;
 }
 
 .course-hero-image img {
     width: 100%;
-    height: auto;
+    height: 350px;
+    object-fit: cover;
     border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.course-hero-image img:hover {
+    transform: scale(1.01);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
 /* Responsive for Course Page */
 @media (max-width: 768px) {
+    .course-hero {
+        padding: 2.5rem 0;
+    }
+
     .course-hero-content {
         grid-template-columns: 1fr;
-        gap: 2rem;
+        gap: 1.5rem;
         text-align: center;
+        min-height: auto;
     }
 
     .course-hero h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .course-hero-description {
+        font-size: 0.95rem;
+        max-width: 100%;
+        margin: 0 auto 1rem;
+        line-height: 1.4;
     }
 
     .course-hero-features {
         justify-content: center;
+        gap: 0.8rem;
+    }
+
+    .course-hero-features .feature {
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
     }
 
     .course-hero-buttons {
         justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .course-hero-buttons .btn {
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .course-hero-image img {
+        height: 220px;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Course Info Grid Responsive */
+    .course-info-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .course-overview {
+        padding: 2rem;
+    }
+
+    .course-overview h2 {
+        font-size: 1.5rem;
+    }
+
+    .learning-objectives {
+        gap: 1rem;
+    }
+
+    .objective {
+        padding: 1.2rem;
+        gap: 1rem;
+    }
+
+    .objective i {
+        font-size: 1.5rem;
+        width: 50px;
+        height: 50px;
+    }
+
+    .objective h4 {
+        font-size: 1rem;
+    }
+
+    .objective p {
+        font-size: 0.9rem;
+    }
+
+    .detail-card {
+        padding: 1.5rem;
+    }
+
+    .detail-card h3 {
+        font-size: 1.1rem;
+    }
+
+    /* Curriculum Modules Responsive */
+    .curriculum-modules {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .module-card {
+        padding: 1.5rem;
+    }
+
+    .module-card .module-header {
+        margin-bottom: 1rem;
+        padding-bottom: 0.8rem;
+    }
+
+    .module-card h5 {
+        font-size: 1rem;
+    }
+
+    .module-card li {
+        padding: 0.6rem 0.6rem 0.6rem 2rem;
+        font-size: 0.85rem;
+    }
+
+    /* Pricing Section Responsive */
+    .pricing-section {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .price-card.featured {
+        transform: none;
+    }
+
+    /* Contact Buttons Responsive */
+    .contact-buttons {
+        flex-direction: column;
+        align-items: center;
     }
 }
