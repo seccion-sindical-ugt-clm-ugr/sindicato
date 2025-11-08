@@ -21,6 +21,14 @@ const closeEditProfile = document.querySelector('#closeEditProfile');
 const editProfileForm = document.querySelector('#editProfileForm');
 const cancelEditBtn = document.querySelector('#cancelEdit');
 
+// My Dashboard Modals Elements
+const myCoursesModal = document.querySelector('#myCoursesModal');
+const myDocumentsModal = document.querySelector('#myDocumentsModal');
+const myEventsModal = document.querySelector('#myEventsModal');
+const closeMyCourses = document.querySelector('#closeMyCourses');
+const closeMyDocuments = document.querySelector('#closeMyDocuments');
+const closeMyEvents = document.querySelector('#closeMyEvents');
+
 // Base de datos simulada de usuarios
 const usersDatabase = [
     { email: 'afiliado@ugt.org', password: 'ugt2024', name: 'Juan Pérez', member: true },
@@ -537,9 +545,31 @@ cancelEditBtn.addEventListener('click', () => {
     editProfileModal.style.display = 'none';
 });
 
+// Dashboard modals close handlers
+closeMyCourses.addEventListener('click', () => {
+    myCoursesModal.style.display = 'none';
+});
+
+closeMyDocuments.addEventListener('click', () => {
+    myDocumentsModal.style.display = 'none';
+});
+
+closeMyEvents.addEventListener('click', () => {
+    myEventsModal.style.display = 'none';
+});
+
 window.addEventListener('click', (e) => {
     if (e.target === editProfileModal) {
         editProfileModal.style.display = 'none';
+    }
+    if (e.target === myCoursesModal) {
+        myCoursesModal.style.display = 'none';
+    }
+    if (e.target === myDocumentsModal) {
+        myDocumentsModal.style.display = 'none';
+    }
+    if (e.target === myEventsModal) {
+        myEventsModal.style.display = 'none';
     }
 });
 
@@ -1011,12 +1041,24 @@ function showMemberDashboard() {
 
 // Initialize dashboard buttons functionality
 function initDashboardButtons() {
-    // Profile edit button
-    const profileButtons = document.querySelectorAll('.dashboard-card button');
-    profileButtons.forEach((button, index) => {
+    // All dashboard buttons
+    const dashboardButtons = document.querySelectorAll('.dashboard-card button');
+    dashboardButtons.forEach((button, index) => {
         if (index === 0 && button.textContent.includes('Ver Perfil')) {
             button.addEventListener('click', () => {
                 showEditProfileModal();
+            });
+        } else if (index === 1 && button.textContent.includes('Ver Cursos')) {
+            button.addEventListener('click', () => {
+                showMyCoursesModal();
+            });
+        } else if (index === 2 && button.textContent.includes('Ver Documentos')) {
+            button.addEventListener('click', () => {
+                showMyDocumentsModal();
+            });
+        } else if (index === 3 && button.textContent.includes('Ver Eventos')) {
+            button.addEventListener('click', () => {
+                showMyEventsModal();
             });
         }
     });
@@ -1046,6 +1088,45 @@ function showEditProfileModal() {
     } else {
         showMessage('error', 'No se encontraron los datos del usuario');
     }
+}
+
+// Show my courses modal
+function showMyCoursesModal() {
+    myCoursesModal.style.display = 'block';
+    console.log('📚 Modal de "Mis Cursos" abierto');
+}
+
+// Show my documents modal
+function showMyDocumentsModal() {
+    myDocumentsModal.style.display = 'block';
+    console.log('📁 Modal de "Mis Documentos" abierto');
+}
+
+// Show my events modal
+function showMyEventsModal() {
+    myEventsModal.style.display = 'block';
+    console.log('📅 Modal de "Mis Eventos" abierto');
+}
+
+// Close modal and navigate to courses section
+function closeModalAndNavigateToCourses() {
+    myCoursesModal.style.display = 'none';
+    // Hide dashboard and show main site
+    memberDashboard.style.display = 'none';
+    document.querySelectorAll('.section').forEach(section => {
+        if (section.id !== 'memberDashboard') {
+            section.style.display = 'block';
+        }
+    });
+    // Navigate to courses section
+    const coursesSection = document.querySelector('#cursos');
+    if (coursesSection) {
+        coursesSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+    showMessage('info', 'Explorando sección de cursos 📚');
 }
 
 // Payment handler with Stripe integration
