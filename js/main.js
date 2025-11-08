@@ -703,8 +703,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 '¡Hola! He visitado el sitio web de UGT-CLM Granada y me gustaría obtener más información sobre afiliación y los servicios que ofrecen.'
             );
 
-            // Número de WhatsApp (debes reemplazarlo con el número real)
-            const phoneNumber = '34XXXXXXXXXX'; // Reemplazar con número real
+            // Número de WhatsApp de UGT-CLM Granada
+            const phoneNumber = '34690026370';
 
             // Construir URL de WhatsApp
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
@@ -739,6 +739,25 @@ function logWhatsAppClick() {
     localStorage.setItem('whatsappClicks', JSON.stringify(clicks));
 
     console.log('📊 Clic en WhatsApp registrado:', click);
+}
+
+// Función para registrar consultas del curso
+function logCourseInquiry() {
+    const inquiry = {
+        timestamp: new Date().toISOString(),
+        action: 'course_inquiry',
+        course: 'IA Aplicada al Sector Educativo del CLM',
+        userAgent: navigator.userAgent,
+        page: window.location.href,
+        referrer: document.referrer
+    };
+
+    // Guardar en localStorage
+    const inquiries = JSON.parse(localStorage.getItem('courseInquiries') || '[]');
+    inquiries.push(inquiry);
+    localStorage.setItem('courseInquiries', JSON.stringify(inquiries));
+
+    console.log('📚 Consulta del curso registrada:', inquiry);
 }
 
 // Password recovery handler
@@ -917,17 +936,321 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. Inicializar botón de login (si existe)
     initLoginBtn();
 
-    // 5. Observar elementos para animaciones de scroll
+    // 5. Inicializar botón de inscripción del curso IA
+    initCourseEnrollment();
+
+    // 6. Observar elementos para animaciones de scroll
     document.querySelectorAll('.about-card, .course-card, .contact-item').forEach(el => {
         el.classList.add('scroll-animate');
         observer.observe(el);
     });
 
-    // 6. Verificar estado de login
+    // 7. Verificar estado de login
     checkLoginStatus();
 
     console.log('✅ Sistema de navegación completamente inicializado');
 });
+
+// Sistema de inscripción para cursos
+function initCourseEnrollment() {
+    const enrollIaBtn = document.getElementById('enrollIaBtn');
+
+    if (enrollIaBtn) {
+        enrollIaBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('📚 Botón de inscripción IA clicado');
+
+            // Mostrar modal de inscripción personalizado
+            showCourseEnrollmentModal();
+        });
+    }
+}
+
+// Modal de inscripción al curso
+function showCourseEnrollmentModal() {
+    // Crear modal dinámicamente
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'courseEnrollmentModal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close" id="closeEnrollmentModal">&times;</span>
+            <div class="enrollment-form">
+                <div class="course-header">
+                    <h3>🎓 IA Aplicada al Sector Educativo del CLM</h3>
+                    <div class="course-summary">
+                        <div class="summary-item">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>Enfoque ELE y Lenguas Modernas</span>
+                        </div>
+                        <div class="summary-item">
+                            <i class="fas fa-clock"></i>
+                            <span>30 horas (6 semanas)</span>
+                        </div>
+                        <div class="summary-item">
+                            <i class="fas fa-users"></i>
+                            <span>Grupos reducidos CLM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-curriculum">
+                    <h4>📚 Programa del Curso</h4>
+                    <div class="curriculum-grid">
+                        <div class="module">
+                            <div class="module-header">
+                                <span class="module-number">Módulo 1</span>
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h5>Introducción a la IA en la Enseñanza</h5>
+                            <ul>
+                                <li>Conceptos básicos de IA y Machine Learning</li>
+                                <li>Herramientas IA para profesores de ELE</li>
+                                <li>Aplicaciones prácticas en CLM Granada</li>
+                            </ul>
+                        </div>
+                        <div class="module">
+                            <div class="module-header">
+                                <span class="module-number">Módulo 2</span>
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h5>ChatGPT y Gemini en la Enseñanza</h5>
+                            <ul>
+                                <li>Creación de materiales didácticos</li>
+                                <li>Personalización de ejercicios</li>
+                                <li>Corrección automática de errores</li>
+                            </ul>
+                        </div>
+                        <div class="module">
+                            <div class="module-header">
+                                <span class="module-number">Módulo 3</span>
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <h5>Automatización de Evaluación</h5>
+                            <ul>
+                                <li>Evaluación DELE/SIELE asistida</li>
+                                <li>Retroalimentación automática</li>
+                                <li>Análisis de progreso lingüístico</li>
+                            </ul>
+                        </div>
+                        <div class="module">
+                            <div class="module-header">
+                                <span class="module-number">Módulo 4</span>
+                                <i class="fas fa-users-cog"></i>
+                            </div>
+                            <h5>Adaptación del Aprendizaje</h5>
+                            <ul>
+                                <li>Rutas de aprendizaje personalizadas</li>
+                                <li>Detección de necesidades específicas</li>
+                                <li>Optimización de tiempo docente</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="courseEnrollmentForm">
+                    <div class="form-section">
+                        <h4>👤 Datos Personales</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="text" name="fullName" placeholder="Nombre completo" required>
+                                <span class="error-message"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" name="email" placeholder="Email" required>
+                                <span class="error-message"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" name="phone" placeholder="Teléfono (opcional)">
+                            <span class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <select name="department" required>
+                                <option value="">Selecciona tu departamento/rol</option>
+                                <option value="profesor-ele">Profesor de Español (ELE)</option>
+                                <option value="profesor-lenguas">Profesor de Lenguas Modernas</option>
+                                <option value="administrativo">Personal Administrativo</option>
+                                <option value="servicios">Personal de Servicios</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                            <span class="error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>📧 Información del Curso</h4>
+                        <div class="course-options">
+                            <label class="checkbox-option">
+                                <input type="checkbox" name="isMember" id="isUGTMember">
+                                <span class="checkmark"></span>
+                                <span class="label-text">Soy afiliado/a a UGT</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="price-display">
+                        <div class="price-info">
+                            <p class="current-price">Precio: <span id="coursePrice">160€</span></p>
+                            <p class="discount-note" style="display: none;">Precio especial afiliados: <strong>15€</strong></p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-graduation-cap"></i> Completar Inscripción
+                    </button>
+                </form>
+
+                <div class="course-inquiries">
+                    <div class="inquiry-divider">
+                        <span>¿Tienes dudas?</span>
+                    </div>
+                    <a href="#" id="whatsappCourseBtn" class="btn-whatsapp-course">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>Consultar por WhatsApp</span>
+                        <small>Respuesta inmediata sobre el curso</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+
+    // Event listeners del modal
+    const closeBtn = document.getElementById('closeEnrollmentModal');
+    const enrollmentForm = document.getElementById('courseEnrollmentForm');
+    const memberCheckbox = document.getElementById('isUGTMember');
+
+    // Cerrar modal
+    closeBtn.addEventListener('click', () => {
+        modal.remove();
+    });
+
+    // Click fuera del modal para cerrar
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+
+    // Checkbox de afiliado
+    if (memberCheckbox) {
+        memberCheckbox.addEventListener('change', (e) => {
+            const priceSpan = document.getElementById('coursePrice');
+            const discountNote = document.querySelector('.discount-note');
+
+            if (e.target.checked) {
+                priceSpan.textContent = '15€';
+                discountNote.style.display = 'block';
+            } else {
+                priceSpan.textContent = '160€';
+                discountNote.style.display = 'none';
+            }
+        });
+    }
+
+    // Envío del formulario
+    if (enrollmentForm) {
+        enrollmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleCourseEnrollment(enrollmentForm);
+        });
+    }
+
+    // WhatsApp course inquiries
+    const whatsappCourseBtn = document.getElementById('whatsappCourseBtn');
+    if (whatsappCourseBtn) {
+        whatsappCourseBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Mensaje predefinido para consultas del curso
+            const message = encodeURIComponent(
+                '¡Hola! Estoy interesado/a en el curso "Inteligencia Artificial Aplicada al Sector Educativo del CLM". Me gustaría recibir más información sobre el temario, horarios y el proceso de inscripción.'
+            );
+
+            // Número de WhatsApp de UGT-CLM Granada
+            const phoneNumber = '34690026370';
+
+            // Construir URL de WhatsApp
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+
+            console.log('📱 Abriendo WhatsApp para consulta del curso...');
+
+            // Abrir WhatsApp en nueva pestaña
+            window.open(whatsappUrl, '_blank');
+
+            // Mensaje de confirmación
+            showMessage('success', '📱 Abriendo WhatsApp... En breve te atenderemos.');
+
+            // Registrar acción para estadísticas
+            logCourseInquiry();
+        });
+    }
+
+    console.log('📋 Modal de inscripción creado');
+}
+
+// Manejar inscripción al curso
+async function handleCourseEnrollment(form) {
+    const formData = new FormData(form);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+
+    // Validación básica
+    const fullName = formData.get('fullName')?.trim();
+    const email = formData.get('email')?.trim();
+    const isMember = formData.get('isMember') === 'on';
+
+    if (!fullName || !email) {
+        showMessage('error', 'Por favor, completa los campos obligatorios');
+        return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showMessage('error', 'Por favor, introduce un email válido');
+        return;
+    }
+
+    // Estado de carga
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+    submitBtn.disabled = true;
+
+    try {
+        // Simular envío (aquí iría la integración con backend real)
+        await simulateAPICall();
+
+        // Datos para el formulario de afiliación
+        const affiliateData = {
+            name: fullName,
+            email: email,
+            phone: formData.get('phone')?.trim() || '',
+            department: formData.get('department') || '',
+            courseType: 'Inteligencia Artificial para Profesores',
+            isMember: isMember,
+            amount: isMember ? 15 : 160,
+            description: `Inscripción al curso especializado para el CLM Granada`
+        };
+
+        console.log('📚 Datos de inscripción:', affiliateData);
+
+        // Cerrar modal
+        document.getElementById('courseEnrollmentModal').remove();
+
+        // Mostrar formulario de afiliación para pago
+        showPaymentForm(affiliateData);
+
+    } catch (error) {
+        showMessage('error', 'Error al procesar la inscripción');
+        console.error('Error en inscripción:', error);
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
 
 // Course enrollment handler
 function enrollInCourse(courseId, isMember = false) {
