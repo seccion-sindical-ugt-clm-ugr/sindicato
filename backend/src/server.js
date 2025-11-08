@@ -15,6 +15,8 @@ const mongoose = require('mongoose');
 const stripeRoutes = require('./routes/stripe');
 const healthRoutes = require('./routes/health');
 const suggestionsRoutes = require('./routes/suggestions');
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
 
 // Importar middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -137,6 +139,12 @@ app.use(logger);
 // Health check
 app.use('/health', healthRoutes);
 
+// Rutas de autenticación
+app.use('/api/auth', authRoutes);
+
+// Rutas de usuario
+app.use('/api/user', userRoutes);
+
 // Rutas de Stripe
 app.use('/api', stripeRoutes);
 
@@ -166,9 +174,24 @@ app.get('/', (req, res) => {
         endpoints: {
             health: '/health',
             healthDetailed: '/health/detailed',
+            // Autenticación
+            register: 'POST /api/auth/register',
+            login: 'POST /api/auth/login',
+            refresh: 'POST /api/auth/refresh',
+            logout: 'POST /api/auth/logout',
+            me: 'GET /api/auth/me',
+            // Usuario
+            profile: 'GET /api/user/profile',
+            updateProfile: 'PUT /api/user/profile',
+            uploadPhoto: 'POST /api/user/photo',
+            deletePhoto: 'DELETE /api/user/photo',
+            changePassword: 'PUT /api/user/password',
+            membership: 'GET /api/user/membership',
+            // Pagos
             createAffiliationSession: 'POST /api/create-affiliation-session',
             createCourseSession: 'POST /api/create-course-session',
             webhook: 'POST /webhook',
+            // Sugerencias
             suggestions: 'POST /api/suggestions',
             suggestionsAdmin: 'GET /api/suggestions/admin (requiere auth)',
             suggestionsStats: 'GET /api/suggestions/stats'
@@ -198,7 +221,7 @@ app.use(errorHandler);
 // ====================================
 
 // Validar variables de entorno requeridas
-const requiredEnvVars = ['STRIPE_SECRET_KEY'];
+const requiredEnvVars = ['STRIPE_SECRET_KEY', 'JWT_SECRET'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
@@ -219,6 +242,7 @@ app.listen(PORT, () => {
     console.log(`   📝 Entorno: ${process.env.NODE_ENV || 'development'}`);
     console.log(`   💳 Stripe: ${process.env.STRIPE_SECRET_KEY ? '✓ Configurado' : '✗ No configurado'}`);
     console.log(`   💾 MongoDB: ${process.env.MONGODB_URI ? '✓ Configurado' : '✗ No configurado'}`);
+    console.log(`   🔐 JWT: ${process.env.JWT_SECRET ? '✓ Configurado' : '✗ No configurado'}`);
     console.log('   ===================================\n');
 });
 
