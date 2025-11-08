@@ -1180,7 +1180,7 @@ function showCourseEnrollmentModal() {
                         </div>
                         <div class="material-item">
                             <i class="fas fa-certificate"></i>
-                            <span>Certificado UGT con validez nacional</span>
+                            <span>Certificado UGT-CLM Granada</span>
                         </div>
                         <div class="material-item">
                             <i class="fas fa-headset"></i>
