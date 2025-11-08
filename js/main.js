@@ -79,15 +79,22 @@ function showSingleSection(sectionId, message = '') {
 
         // Si es la sección de afiliación, ir específicamente al título "¿Por qué afiliarse?"
         if (sectionId === 'afiliate') {
+            console.log('🎯 SECCIÓN AFILIACIÓN DETECTADA - Buscando ancla específica');
             const titleAnchor = document.querySelector('#por-que-afiliarse');
+            console.log('📍 Ancla encontrada:', titleAnchor);
+
             if (titleAnchor) {
                 const offset = 80; // Offset para el header fijo
                 const targetPosition = titleAnchor.getBoundingClientRect().top + window.pageYOffset - offset;
+                console.log(`📐 Calculando scroll: anchor.getBoundingClientRect().top=${titleAnchor.getBoundingClientRect().top}, offset=${offset}, targetPosition=${targetPosition}`);
+
                 window.scrollTo({
                     top: targetPosition,
                     behavior: 'instant'
                 });
+                console.log('✅ Scroll ejecutado hacia el ancla #por-que-afiliarse');
             } else {
+                console.log('❌ NO se encontró el ancla #por-que-afiliarse - usando fallback');
                 // Fallback al método anterior si no encuentra el ancla
                 const offset = 120;
                 const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - offset;
@@ -95,6 +102,7 @@ function showSingleSection(sectionId, message = '') {
                     top: targetPosition,
                     behavior: 'instant'
                 });
+                console.log('✅ Scroll ejecutado con método fallback');
             }
         } else {
             // Para otras secciones, usar el método normal
@@ -521,6 +529,13 @@ function initSmoothScroll() {
                 return;
             }
 
+            // Ignorar específicamente el botón principal de afiliación del hero
+            // porque ya está manejado por initHeroButtons()
+            if (this.id === 'heroAffiliateBtn') {
+                console.log(`⏭️ Ignorando botón hero afiliado: ${href} - manejado por initHeroButtons`);
+                return;
+            }
+
             e.preventDefault();
             console.log(`🛑 preventDefault ejecutado para: ${href}`);
 
@@ -536,16 +551,8 @@ function initSmoothScroll() {
                     block: 'start'
                 });
 
-                // Si es el formulario de afiliación, enfocar el primer campo después del scroll
-                if (href === '#afiliate') {
-                    setTimeout(() => {
-                        const firstInput = document.querySelector('#affiliateForm input[name="name"]');
-                        if (firstInput) {
-                            firstInput.focus();
-                            console.log('✅ Formulario de afiliación enfocado');
-                        }
-                    }, 800); // Esperar a que termine el scroll
-                }
+                // NO enfocar el formulario de afiliación automáticamente
+                // El usuario debe poder leer primero el título y beneficios
             } else {
                 console.warn(`⚠️ No se encontró el elemento: ${href}`);
             }
