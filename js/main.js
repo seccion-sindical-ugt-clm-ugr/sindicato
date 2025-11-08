@@ -77,14 +77,42 @@ function showSingleSection(sectionId, message = '') {
     if (targetSection) {
         targetSection.style.display = 'block';
 
-        // Calcular posición con offset para mejor visualización
-        // Colocar el scroll más arriba para que se vea el título completo
-        const offset = 120; // Offset mayor para mostrar el título completo de la sección
-        const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - offset;
-        window.scrollTo({
-            top: targetPosition,
-            behavior: 'instant'
-        });
+        // Si es la sección de afiliación, ir específicamente al título "¿Por qué afiliarse?"
+        if (sectionId === 'afiliate') {
+            console.log('🎯 SECCIÓN AFILIACIÓN DETECTADA - Buscando ancla específica');
+            const titleAnchor = document.querySelector('#por-que-afiliarse');
+            console.log('📍 Ancla encontrada:', titleAnchor);
+
+            if (titleAnchor) {
+                const offset = 40; // Offset reducido para que el título esté más arriba
+                const targetPosition = titleAnchor.getBoundingClientRect().top + window.pageYOffset - offset;
+                console.log(`📐 Calculando scroll: anchor.getBoundingClientRect().top=${titleAnchor.getBoundingClientRect().top}, offset=${offset}, targetPosition=${targetPosition}`);
+
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'instant'
+                });
+                console.log('✅ Scroll ejecutado hacia el ancla #por-que-afiliarse con offset reducido');
+            } else {
+                console.log('❌ NO se encontró el ancla #por-que-afiliarse - usando fallback');
+                // Fallback al método anterior si no encuentra el ancla
+                const offset = 120;
+                const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'instant'
+                });
+                console.log('✅ Scroll ejecutado con método fallback');
+            }
+        } else {
+            // Para otras secciones, usar el método normal
+            const offset = 80;
+            const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - offset;
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'instant'
+            });
+        }
 
         targetSection.style.animation = 'fadeIn 0.5s ease-in';
         isSingleSectionMode = true;
@@ -106,22 +134,41 @@ function initHeroButtons() {
     if (heroAffiliateBtn) {
         heroAffiliateBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('🎯 Hero: Afiliación - Navegación directa iniciada');
+            console.log('🎯 Hero: Afiliación - Navegación normal iniciada');
 
-            showSingleSection('afiliate', 'Has llegado al formulario de afiliación 🎯');
-            showBackToTopButton('afiliado');
+            // En lugar de showSingleSection, hacer scroll normal
+            const targetAnchor = document.querySelector('#por-que-afiliarse');
+            if (targetAnchor) {
+                const offset = 40; // Offset optimizado
+                const targetPosition = targetAnchor.getBoundingClientRect().top + window.pageYOffset - offset;
 
-            // Enfocar formulario inmediatamente
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+
+                console.log('✅ Scroll normal ejecutado hacia #por-que-afiliarse');
+            } else {
+                // Fallback a la sección general
+                const targetSection = document.querySelector('#afiliate');
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }
+
+            // Resaltar suavemente el primer campo sin enfocar
             setTimeout(() => {
                 const firstInput = document.querySelector('#affiliateForm input[name="name"]');
                 if (firstInput) {
-                    firstInput.focus();
                     firstInput.classList.add('highlight');
                     setTimeout(() => {
                         firstInput.classList.remove('highlight');
-                    }, 2000);
+                    }, 3000);
                 }
-            }, 300);
+            }, 1500);
         });
     }
 
@@ -500,6 +547,13 @@ function initSmoothScroll() {
                 return;
             }
 
+            // Ignorar específicamente el botón principal de afiliación del hero
+            // porque ya está manejado por initHeroButtons()
+            if (this.id === 'heroAffiliateBtn') {
+                console.log(`⏭️ Ignorando botón hero afiliado: ${href} - manejado por initHeroButtons`);
+                return;
+            }
+
             e.preventDefault();
             console.log(`🛑 preventDefault ejecutado para: ${href}`);
 
@@ -515,16 +569,8 @@ function initSmoothScroll() {
                     block: 'start'
                 });
 
-                // Si es el formulario de afiliación, enfocar el primer campo después del scroll
-                if (href === '#afiliate') {
-                    setTimeout(() => {
-                        const firstInput = document.querySelector('#affiliateForm input[name="name"]');
-                        if (firstInput) {
-                            firstInput.focus();
-                            console.log('✅ Formulario de afiliación enfocado');
-                        }
-                    }, 800); // Esperar a que termine el scroll
-                }
+                // NO enfocar el formulario de afiliación automáticamente
+                // El usuario debe poder leer primero el título y beneficios
             } else {
                 console.warn(`⚠️ No se encontró el elemento: ${href}`);
             }
@@ -1810,4 +1856,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Nota: La configuración de Stripe ahora se maneja en stripe-config.js
     // Ver advertencias en la consola sobre requisitos de backend
 });
+// Estilos para resaltado de campos
+const highlightStyle = document.createElement('style');
+highlightStyle.textContent = `
+    .highlight {
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 15px rgba(227, 6, 19, 0.2) !important;
+        transform: scale(1.02);
+        transition: all 0.3s ease;
+    }
+`;
+document.head.appendChild(highlightStyle);
+
 // Última actualización: sábado,  8 de noviembre de 2025, 01:31:50 CET
