@@ -955,6 +955,7 @@ body {
     align-items: center;
     margin-bottom: 3rem;
     padding: 2rem;
+    gap: 2rem;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     border-radius: 15px;
     color: white;
@@ -974,11 +975,12 @@ body {
 .dashboard-header .btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 6px 14px;
+    gap: 0.4rem;
+    padding: 5px 12px;
     font-weight: 500;
-    font-size: 0.9rem;
-    border-radius: 20px;
+    font-size: 0.85rem;
+    border-radius: 18px;
+    white-space: nowrap;
 }
 
 .dashboard-header .btn-secondary {
