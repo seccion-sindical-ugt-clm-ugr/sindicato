@@ -76,7 +76,16 @@ function showSingleSection(sectionId, message = '') {
     // Mostrar sección objetivo
     if (targetSection) {
         targetSection.style.display = 'block';
-        targetSection.scrollIntoView({ behavior: 'instant', block: 'start' });
+
+        // Calcular posición con offset para mejor visualización
+        // Colocar el scroll más arriba para que se vea el título completo
+        const offset = 120; // Offset mayor para mostrar el título completo de la sección
+        const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({
+            top: targetPosition,
+            behavior: 'instant'
+        });
+
         targetSection.style.animation = 'fadeIn 0.5s ease-in';
         isSingleSectionMode = true;
 
