@@ -3373,7 +3373,103 @@ body {
     margin-bottom: 1rem;
 }
 
-/* Usar los estilos ya definidos de checkbox-option más arriba en el archivo */
+/* Estilos mejorados para checkboxes del perfil */
+.checkbox-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    padding: 16px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+}
+
+.checkbox-option:hover {
+    background: #ffffff;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(227, 6, 19, 0.1);
+}
+
+.checkbox-option input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 24px;
+    height: 24px;
+    background: #ffffff;
+    border: 3px solid #e0e0e0;
+    border-radius: 6px;
+    position: relative;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.checkbox-option input[type="checkbox"]:checked + .checkmark {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(227, 6, 19, 0.3);
+}
+
+.checkbox-option input[type="checkbox"]:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.label-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.label-text {
+    color: var(--text-dark);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+    user-select: none;
+}
+
+/* Efecto de activación mejorado */
+.checkbox-option:active {
+    transform: scale(0.98);
+}
+
+/* Estilo especial para checkboxes desactivados */
+.checkbox-option input[type="checkbox"]:not(:checked) + .checkmark {
+    background: #f8f9fa;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .checkbox-option {
+        padding: 14px;
+        gap: 14px;
+        margin-bottom: 1.2rem;
+    }
+
+    .checkmark {
+        width: 22px;
+        height: 22px;
+    }
+
+    .label-text {
+        font-size: 0.95rem;
+    }
+}
 
 .form-actions {
     display: flex;
