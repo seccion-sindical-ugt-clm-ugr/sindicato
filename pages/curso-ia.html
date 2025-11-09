@@ -1409,7 +1409,7 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
                 btn.style.pointerEvents = 'none';
 
-                const response = await fetch(`${API_URL}/api/curso-ia/programa-pdf`);
+                const response = await fetch(`${BACKEND_URL}/api/curso-ia/programa-pdf`);
 
                 if (!response.ok) {
                     throw new Error('Error al generar el PDF');
