@@ -24,6 +24,16 @@
             font-size: 1.5rem;
             font-weight: 300;
             margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.95);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .course-hero .hero-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
         }
 
         .course-content {
@@ -181,12 +191,25 @@
         }
 
         .perfil-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
             color: white;
             padding: 2rem;
             border-radius: 15px;
             text-align: center;
             transition: transform 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .perfil-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .perfil-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            opacity: 0.95;
         }
 
         .perfil-card:hover {
@@ -362,7 +385,7 @@
                 </div>
                 <div class="meta-item">
                     <i class="fas fa-calendar-alt"></i>
-                    <span>Jueves y Viernes</span>
+                    <span>Viernes (mañana y tarde)</span>
                 </div>
                 <div class="meta-item">
                     <i class="fas fa-laptop-code"></i>
@@ -376,6 +399,60 @@
                     <i class="fas fa-users"></i>
                     <span>Plazas limitadas</span>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Buttons -->
+    <section class="section" style="padding: 2rem 0;">
+        <div class="course-content">
+            <div class="enrollment-section">
+                <h2>Inscríbete en las Jornadas de IA</h2>
+                <p>Elige la modalidad que mejor se adapte a tu situación</p>
+
+                <div class="price-cards">
+                    <div class="price-card">
+                        <h3>No Afiliados</h3>
+                        <div class="price-display">
+                            <span class="currency">€</span>
+                            <span class="amount">160</span>
+                            <span class="period">precio completo</span>
+                        </div>
+                        <ul class="price-features">
+                            <li><i class="fas fa-check"></i> Acceso a las 30 sesiones</li>
+                            <li><i class="fas fa-check"></i> Material didáctico completo</li>
+                            <li><i class="fas fa-check"></i> Certificado UGT-CLM-UGR</li>
+                            <li><i class="fas fa-check"></i> Seguimiento post-jornadas</li>
+                        </ul>
+                        <button class="btn btn-secondary btn-full" onclick="enrollCourse('external')" style="background: #2196F3; border: none;">
+                            Inscribirme por 160€
+                        </button>
+                    </div>
+
+                    <div class="price-card featured">
+                        <h3>Afiliados UGT</h3>
+                        <div class="price-display">
+                            <span class="currency">€</span>
+                            <span class="amount">15</span>
+                            <span class="period">precio afiliado</span>
+                        </div>
+                        <ul class="price-features">
+                            <li><i class="fas fa-check"></i> Todo lo anterior</li>
+                            <li><i class="fas fa-check"></i> <strong>Descuento especial 90%</strong></li>
+                            <li><i class="fas fa-check"></i> Prioridad en proyectos</li>
+                            <li><i class="fas fa-check"></i> Red de contactos UGT</li>
+                        </ul>
+                        <button class="btn btn-primary btn-full" onclick="enrollCourse('member')">
+                            Inscribirme por 15€
+                        </button>
+                    </div>
+                </div>
+
+                <p style="margin-top: 2rem; opacity: 0.9; text-align: center;">
+                    <i class="fas fa-info-circle"></i>
+                    ¿No eres afiliado? <a href="../index.html#afiliate" style="color: white; text-decoration: underline;">Afíliate ahora por solo 15€/año</a>
+                    y accede a todos los cursos con descuento
+                </p>
             </div>
         </div>
     </section>
@@ -401,7 +478,7 @@
                     <h4 style="color: #1976D2; margin-bottom: 1rem;"><i class="fas fa-lightbulb"></i> Enfoque Práctico</h4>
                     <p style="margin: 0; font-size: 1.05rem;">
                         Con una duración total de <strong>20 horas</strong> distribuidas en sesiones de <strong>40 minutos</strong>
-                        durante días <strong>jueves y viernes</strong>, estas jornadas ofrecen un enfoque eminentemente práctico,
+                        durante <strong>viernes en sesiones de mañana y tarde</strong>, estas jornadas ofrecen un enfoque eminentemente práctico,
                         permitiendo a los participantes interactuar con herramientas de IA desde la primera sesión y aplicarlas
                         en tareas relevantes para su trabajo diario.
                     </p>
@@ -409,8 +486,8 @@
 
                 <h3 style="margin-top: 2.5rem;">Distribución Temporal</h3>
                 <ul style="font-size: 1.05rem; line-height: 1.8;">
-                    <li><strong>Duración:</strong> 5 semanas (10 días en total)</li>
-                    <li><strong>Horario:</strong> 6 sesiones por día (3 horas por franja)</li>
+                    <li><strong>Duración:</strong> 5 semanas (5 viernes)</li>
+                    <li><strong>Horario:</strong> 6 sesiones por viernes - mañana (3 sesiones) y tarde (3 sesiones)</li>
                     <li><strong>Sesiones:</strong> 30 sesiones de 40 minutos</li>
                     <li><strong>Descansos:</strong> 10 minutos entre sesiones</li>
                     <li><strong>Total:</strong> 20 horas de formación práctica</li>
@@ -669,35 +746,35 @@
                     <div class="week-card">
                         <span class="week-number">Semana 1</span>
                         <h4>Fundamentos de IA</h4>
-                        <p><i class="fas fa-calendar"></i> Jueves y Viernes</p>
+                        <p><i class="fas fa-calendar"></i> Viernes</p>
                         <p><i class="fas fa-clock"></i> 6 sesiones</p>
                     </div>
 
                     <div class="week-card">
                         <span class="week-number">Semana 2</span>
                         <h4>IA Educativa (Parte 1)</h4>
-                        <p><i class="fas fa-calendar"></i> Jueves y Viernes</p>
+                        <p><i class="fas fa-calendar"></i> Viernes</p>
                         <p><i class="fas fa-clock"></i> 6 sesiones</p>
                     </div>
 
                     <div class="week-card">
                         <span class="week-number">Semana 3</span>
                         <h4>IA Educativa (Parte 2)</h4>
-                        <p><i class="fas fa-calendar"></i> Jueves y Viernes</p>
+                        <p><i class="fas fa-calendar"></i> Viernes</p>
                         <p><i class="fas fa-clock"></i> 6 sesiones</p>
                     </div>
 
                     <div class="week-card">
                         <span class="week-number">Semana 4</span>
                         <h4>IA Administrativa + Servicios</h4>
-                        <p><i class="fas fa-calendar"></i> Jueves y Viernes</p>
+                        <p><i class="fas fa-calendar"></i> Viernes</p>
                         <p><i class="fas fa-clock"></i> 6 sesiones</p>
                     </div>
 
                     <div class="week-card">
                         <span class="week-number">Semana 5</span>
                         <h4>Proyectos Colaborativos</h4>
-                        <p><i class="fas fa-calendar"></i> Jueves y Viernes</p>
+                        <p><i class="fas fa-calendar"></i> Viernes</p>
                         <p><i class="fas fa-clock"></i> 6 sesiones</p>
                     </div>
                 </div>
@@ -814,7 +891,7 @@
                             <li><i class="fas fa-check"></i> Soporte técnico</li>
                             <li><i class="fas fa-check"></i> Seguimiento post-jornadas</li>
                         </ul>
-                        <button class="btn btn-secondary btn-full" onclick="enrollCourse('external')">
+                        <button class="btn btn-secondary btn-full" onclick="enrollCourse('external')" style="background: #2196F3; color: white; border: none;">
                             Inscribirme por 160€
                         </button>
                     </div>
