@@ -374,44 +374,49 @@
                     <button type="submit" class="btn btn-primary btn-full">Iniciar Sesión</button>
                 </form>
                 <div class="login-footer">
-                    <p>¿No tienes cuenta? <a href="#" id="showRegisterLink">Registrarse</a></p>
+                    <p>¿No eres afiliado? <a href="#afiliate" id="goToAffiliateLink" onclick="document.getElementById('loginModal').style.display='none'">Afíliate aquí (15€/año)</a></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Register Modal -->
+    <!-- Register Info Modal (Redirects to Affiliate) -->
     <div id="registerModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeRegister">&times;</span>
             <div class="login-form">
-                <h3>Crear Cuenta</h3>
-                <p style="margin-bottom: 20px; color: #666;">Únete a UGT-CLM Granada</p>
-                <form id="registerForm">
-                    <div class="form-group">
-                        <input type="text" name="nombre" placeholder="Nombre completo" required>
-                        <span class="error-message"></span>
+                <div style="text-align: center; padding: 20px 0;">
+                    <div style="font-size: 4rem; color: var(--primary-color); margin-bottom: 20px;">
+                        <i class="fas fa-user-plus"></i>
                     </div>
-                    <div class="form-group">
-                        <input type="email" name="email" placeholder="Email" required>
-                        <span class="error-message"></span>
+                    <h3>¿Quieres unirte a UGT-CLM Granada?</h3>
+                    <p style="margin: 20px 0; color: #666; line-height: 1.6;">
+                        Para tener acceso completo a tu área personal, necesitas <strong>afiliarte primero</strong>.<br>
+                        El proceso es simple y rápido.
+                    </p>
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                        <h4 style="margin-bottom: 15px; color: var(--primary-color);">
+                            <i class="fas fa-gift"></i> Beneficios de afiliarte:
+                        </h4>
+                        <ul style="text-align: left; list-style: none; padding: 0;">
+                            <li style="margin: 10px 0;"><i class="fas fa-check" style="color: #4CAF50; margin-right: 10px;"></i> Defensa de tus derechos laborales</li>
+                            <li style="margin: 10px 0;"><i class="fas fa-check" style="color: #4CAF50; margin-right: 10px;"></i> Asesoramiento jurídico gratuito</li>
+                            <li style="margin: 10px 0;"><i class="fas fa-check" style="color: #4CAF50; margin-right: 10px;"></i> Descuentos en cursos (hasta 90%)</li>
+                            <li style="margin: 10px 0;"><i class="fas fa-check" style="color: #4CAF50; margin-right: 10px;"></i> Certificados y documentación automática</li>
+                            <li style="margin: 10px 0;"><i class="fas fa-check" style="color: #4CAF50; margin-right: 10px;"></i> Área personal con seguimiento de actividad</li>
+                        </ul>
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #ddd;">
+                            <span style="font-size: 0.9rem; color: #999;">Cuota anual</span><br>
+                            <span style="font-size: 2.5rem; font-weight: bold; color: var(--primary-color);">15€</span>
+                            <span style="font-size: 1rem; color: #666;">/año</span>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <input type="password" name="password" placeholder="Contraseña (mínimo 6 caracteres)" required minlength="6">
-                        <span class="error-message"></span>
+                    <a href="#afiliate" class="btn btn-primary btn-full" onclick="document.getElementById('registerModal').style.display='none'" style="margin-bottom: 15px; text-decoration: none; display: inline-block; width: 100%;">
+                        <i class="fas fa-rocket"></i> Afiliarme Ahora por 15€/año
+                    </a>
+                    <div class="login-footer">
+                        <p>¿Ya estás afiliado? <a href="#" id="backToLoginFromRegister">Iniciar sesión</a></p>
                     </div>
-                    <div class="form-group">
-                        <input type="tel" name="telefono" placeholder="Teléfono (opcional)" pattern="[0-9]{9,15}">
-                        <span class="error-message"></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" name="departamento" placeholder="Departamento (opcional)">
-                        <span class="error-message"></span>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-full">Crear Cuenta</button>
-                </form>
-                <div class="login-footer">
-                    <p>¿Ya tienes cuenta? <a href="#" id="backToLoginFromRegister">Iniciar sesión</a></p>
                 </div>
             </div>
         </div>
