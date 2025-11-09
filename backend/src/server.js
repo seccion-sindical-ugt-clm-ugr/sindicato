@@ -48,6 +48,7 @@ if (process.env.MONGODB_URI) {
         serverSelectionTimeoutMS: 30000, // 30 segundos para encontrar servidor
         socketTimeoutMS: 45000, // 45 segundos para operaciones
         connectTimeoutMS: 30000, // 30 segundos para conexión inicial
+        bufferTimeoutMS: 30000, // 30 segundos para buffering de operaciones
     })
     .then(() => {
         console.log('✅ MongoDB conectado correctamente');
