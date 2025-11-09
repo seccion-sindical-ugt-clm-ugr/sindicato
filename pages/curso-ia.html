@@ -1461,157 +1461,490 @@
             // Configuración de página
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
-            const margin = 20;
+            const margin = 15;
             let yPosition = margin;
 
+            // Colores institucionales
+            const primaryColor = [102, 126, 234];    // Azul UGT
+            const secondaryColor = [118, 75, 162];  // Púrpura
+            const accentColor = [236, 64, 122];     // Rosa acento
+            const lightGray = [245, 245, 245];
+
             // Función para agregar texto con salto de línea automático
-            function addText(text, fontSize = 12, fontStyle = 'normal') {
+            function addText(text, fontSize = 12, fontStyle = 'normal', color = [0, 0, 0]) {
                 doc.setFontSize(fontSize);
                 doc.setFont('helvetica', fontStyle);
+                doc.setTextColor(...color);
                 const lines = doc.splitTextToSize(text, pageWidth - (margin * 2));
                 lines.forEach(line => {
-                    if (yPosition > pageHeight - margin) {
+                    if (yPosition > pageHeight - margin - 10) {
                         doc.addPage();
                         yPosition = margin;
+                        addHeader(); // Agregar encabezado en nueva página
                     }
                     doc.text(line, margin, yPosition);
-                    yPosition += 7;
+                    yPosition += fontSize === 12 ? 6 : fontSize === 14 ? 7 : 8;
                 });
                 return yPosition;
             }
 
-            // Función para agregar encabezado a cada página
+            // Función para agregar encabezado con logo y colores
             function addHeader() {
+                // Barra de color superior
+                doc.setFillColor(...primaryColor);
+                doc.rect(0, 0, pageWidth, 15, 'F');
+
+                // Texto del encabezado
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text('UGT-CLM-UGR Granada', margin, 10);
+
                 doc.setFontSize(8);
-                doc.setTextColor(100, 100, 100);
-                doc.text('Jornadas de Inteligencia Artificial - UGT-CLM-UGR Granada', margin, 10);
-                doc.text('Página ' + doc.internal.getNumberOfPages(), pageWidth - margin - 20, 10);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Jornadas de Inteligencia Artificial', margin + 70, 10);
+
+                // Número de página
+                doc.text('Página ' + doc.internal.getNumberOfPages(), pageWidth - margin - 15, 10);
+
+                // Reset para contenido
                 doc.setTextColor(0, 0, 0);
                 yPosition = 25;
             }
 
-            // Primera página - Título
+            // Función para agregar sección con fondo de color
+            function addSectionBox(startY, height, color = lightGray) {
+                doc.setFillColor(...color);
+                doc.rect(margin - 5, startY - 3, pageWidth - (margin * 2) + 10, height, 'F');
+            }
+
+            // Función para agregar línea separadora
+            function addSeparator(yPos) {
+                doc.setDrawColor(...primaryColor);
+                doc.setLineWidth(0.5);
+                doc.line(margin, yPos, pageWidth - margin, yPos);
+            }
+
+            // PÁGINA 1 - Portada mejorada
             addHeader();
-            doc.setFontSize(24);
+
+            // Hero section con fondo gradiente simulado
+            addSectionBox(yPosition - 5, 80, [240, 240, 250]);
+
+            // Título principal grande
+            doc.setFontSize(32);
             doc.setFont('helvetica', 'bold');
-            doc.text('Jornadas de Inteligencia Artificial', margin, yPosition);
-            yPosition += 15;
+            doc.setTextColor(...primaryColor);
+            doc.text('Jornadas de', margin, yPosition + 10);
+            doc.text('Inteligencia Artificial', margin, yPosition + 25);
 
+            // Subtítulo
             doc.setFontSize(18);
+            doc.setTextColor(...secondaryColor);
             doc.setFont('helvetica', 'normal');
-            doc.text('Para el Centro de Lenguas Modernas', margin, yPosition);
-            yPosition += 15;
+            doc.text('Para el Centro de Lenguas Modernas', margin, yPosition + 40);
 
+            // Línea decorativa
+            doc.setDrawColor(...accentColor);
+            doc.setLineWidth(2);
+            doc.line(margin, yPosition + 48, margin + 60, yPosition + 48);
+
+            yPosition += 65;
+
+            // Descripción en columna con mejor formato
+            doc.setTextColor(0, 0, 0);
             doc.setFontSize(12);
-            addText('Formación práctica en IA adaptada a las necesidades del CLM de la Universidad de Granada');
+            const description = 'Formación práctica en IA adaptada específicamente a las necesidades del personal del Centro de Lenguas Modernas de la Universidad de Granada. Un enfoque eminentemente práctico con 20 horas distribuidas en sesiones interactivas.';
+            addText(description, 12, 'normal');
 
-            // Segunda página - Información general
-            doc.addPage();
-            addHeader();
-            addText('Información del Programa', 18, 'bold');
-            yPosition += 5;
-
-            addText('Duración: 20 horas (30 sesiones de 40 minutos)');
-            addText('Modalidad: Virtual a través de Zoom');
-            addText('Frecuencia: Viernes (mañana y tarde)');
-            addText('Precio: 15€ afiliados UGT / 160€ no afiliados');
-            addText('Certificado: Certificado UGT-CLM Granada');
+            // Quick info box
             yPosition += 10;
+            addSectionBox(yPosition - 3, 35, [250, 250, 255]);
+            addText('INFORMACIÓN RÁPIDA', 14, 'bold', primaryColor);
+            yPosition += 3;
 
-            // Tercera página - Perfiles dirigidos
+            const quickInfo = [
+                '📅 Duración: 20 horas (30 sesiones de 40 min)',
+                '💻 Modalidad: Virtual a través de Zoom',
+                '📆 Frecuencia: Viernes (mañana y tarde)',
+                '🎓 Certificado: UGT-CLM Granada',
+                '👥 Dirigido a: Todo el personal del CLM'
+            ];
+
+            quickInfo.forEach(info => {
+                addText(info, 11, 'normal');
+            });
+
+            yPosition += 8;
+            addSeparator(yPosition);
+
+            // PÁGINA 2 - Detalles completos del programa
             doc.addPage();
             addHeader();
-            addText('Perfiles Profesionales Dirigidos', 18, 'bold');
+
+            addText('DETALLES DEL PROGRAMA', 20, 'bold', primaryColor);
             yPosition += 5;
+
+            // Two-column layout simulation
+            const leftCol = margin;
+            const rightCol = pageWidth / 2 + 10;
+
+            // Columna izquierda - Información general
+            addSectionBox(yPosition - 3, 70, [245, 250, 255]);
+            addText('INFORMACIÓN GENERAL', 14, 'bold', primaryColor);
+            yPosition += 3;
+
+            const generalInfo = [
+                'Duración total: 20 horas',
+                'Número de sesiones: 30',
+                'Duración por sesión: 40 minutos',
+                'Frecuencia: 5 viernes consecutivos',
+                'Horario: Mañana y tarde (6 sesiones/día)',
+                'Modalidad: Online vía Zoom',
+                'Plataforma: Zoom + herramientas digitales',
+                'Material: Recursos digitales incluidos',
+                'Certificado: Oficial UGT-CLM Granada',
+                'Seguimiento: 6 meses post-jornadas'
+            ];
+
+            generalInfo.forEach(info => {
+                addText('• ' + info, 10, 'normal');
+            });
+
+            // Columna derecha - Precios
+            const currentY = yPosition;
+            yPosition = 40; // Reset para columna derecha
+
+            addSectionBox(rightCol - 5, 45, [255, 245, 250]);
+            doc.setTextColor(...accentColor);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('INVERSIÓN', rightCol, 45);
+
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+
+            // Afiliados UGT
+            doc.setFillColor(...primaryColor);
+            doc.rect(rightCol - 3, 52, 80, 25, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('15€', rightCol + 25, 60);
+            doc.setFontSize(10);
+            doc.text('Afiliados UGT', rightCol + 15, 67);
+            doc.text('(90% descuento)', rightCol + 12, 73);
+
+            // No afiliados
+            doc.setTextColor(0, 0, 0);
+            doc.setDrawColor(...accentColor);
+            doc.setLineWidth(1);
+            doc.rect(rightCol - 3, 82, 80, 20);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('160€', rightCol + 28, 90);
+            doc.setFontSize(9);
+            doc.text('No afiliados', rightCol + 18, 97);
+
+            // Continuar con perfiles en misma página
+            yPosition = Math.max(currentY, 110) + 10;
+            addSeparator(yPosition);
+            yPosition += 8;
+
+            addText('PERFILES PROFESIONALES DIRIGIDOS', 16, 'bold', secondaryColor);
+            yPosition += 3;
 
             const perfiles = [
-                'Profesores de español como lengua extranjera',
-                'Profesores de otras lenguas modernas',
-                'Personal de administración',
-                'Personal de conserjería',
-                'Personal de servicios técnicos'
+                { icon: '👨‍🏫', text: 'Profesores de español como lengua extranjera' },
+                { icon: '🌍', text: 'Profesores de otras lenguas modernas' },
+                { icon: '💼', text: 'Personal de administración y gestión' },
+                { icon: '🔑', text: 'Personal de conserjería y recepción' },
+                { icon: '🛠️', text: 'Personal de servicios técnicos y mantenimiento' }
             ];
 
             perfiles.forEach(perfil => {
-                addText('• ' + perfil);
+                addText(`${perfil.icon} ${perfil.text}`, 11, 'normal');
             });
 
-            // Cuarta página - Bloques temáticos
-            doc.addPage();
-            addHeader();
-            addText('Bloques Temáticos', 18, 'bold');
-            yPosition += 5;
-
-            addText('BLOQUE 1: Fundamentos de la IA', 14, 'bold');
-            addText('• Introducción a la IA: conceptos básicos y evolución');
-            addText('• Tipos de IA y principales tecnologías');
-            addText('• Herramientas de IA accesibles');
-            addText('• Ética y responsabilidad en el uso de la IA');
-            addText('• Primeros pasos con herramientas básicas');
             yPosition += 8;
+            addSeparator(yPosition);
 
-            addText('BLOQUE 2: IA en el Ámbito Educativo', 14, 'bold');
-            addText('• IA para la creación de contenidos educativos');
-            addText('• Herramientas para la enseñanza de idiomas');
-            addText('• Evaluación y feedback automático');
-            addText('• Personalización del aprendizaje');
-            addText('• Traducción y adaptación de materiales');
-            yPosition += 8;
+            // PÁGINA 3 - Bloques temáticos (continúa en misma página si hay espacio)
+            if (yPosition > 200) {
+                doc.addPage();
+                addHeader();
+            }
 
-            addText('BLOQUE 3: IA en la Gestión Administrativa', 14, 'bold');
-            addText('• Automatización de procesos administrativos');
-            addText('• IA para la atención multilingüe');
-            addText('• Gestión documental inteligente');
-            addText('• Análisis de datos para la toma de decisiones');
-            yPosition += 8;
-
-            addText('BLOQUE 4: IA en Servicios y Conserjería', 14, 'bold');
-            addText('• Sistemas de información inteligentes');
-            addText('• Gestión de espacios y recursos');
-            addText('• Asistencia multilingüe automatizada');
-            yPosition += 8;
-
-            addText('BLOQUE 5: Proyectos Colaborativos', 14, 'bold');
-            addText('• Diseño de soluciones basadas en IA');
-            addText('• Implementación de casos prácticos');
-            addText('• Evaluación de impacto y sostenibilidad');
-            addText('• Plan de acción futuro');
-
-            // Quinta página - Metodología
-            doc.addPage();
-            addHeader();
-            addText('Metodología', 18, 'bold');
-            yPosition += 5;
-
-            addText('Nuestro enfoque práctico incluye:');
-            yPosition += 5;
-
-            const metodologia = [
-                'Aprendizaje activo desde la primera sesión',
-                'Enfoque práctico con mínimo contenido teórico',
-                'Personalización según perfil profesional',
-                'Fomento del trabajo colaborativo',
-                'Progresión de lo simple a lo complejo',
-                'Aplicación inmediata en el entorno laboral'
+            // Continuar con bloques temáticos en la página 3
+            const bloques = [
+                {
+                    title: 'BLOQUE 1: Fundamentos de la IA',
+                    duration: '4 horas · 6 sesiones',
+                    color: [102, 126, 234],
+                    topics: [
+                        'Introducción a la IA: conceptos básicos y evolución',
+                        'Tipos de IA: débil vs fuerte, estrecha vs general',
+                        'Principales tecnologías: Machine Learning, NLP, visión artificial',
+                        'Herramientas de IA accesibles: panorama actual',
+                        'Ética y responsabilidad en el uso de la IA',
+                        'Enfoque práctico: Primeros pasos con ChatGPT y herramientas básicas'
+                    ]
+                },
+                {
+                    title: 'BLOQUE 2: IA en el Ámbito Educativo',
+                    duration: '6 horas · 9 sesiones',
+                    color: [118, 75, 162],
+                    topics: [
+                        'IA para la creación de contenidos educativos',
+                        'Herramientas de IA para la enseñanza de idiomas',
+                        'Evaluación y feedback automático',
+                        'Personalización del aprendizaje mediante IA',
+                        'Traducción y adaptación de materiales',
+                        'Creación de recursos multimedia con IA',
+                        'Detección de plagio y uso ético',
+                        'Asistentes virtuales para estudiantes',
+                        'Talleres específicos para profesores de español y otras lenguas'
+                    ]
+                }
             ];
 
-            metodologia.forEach(item => {
-                addText('• ' + item);
+            bloques.forEach((bloque, index) => {
+                // Agregar nueva página si no hay espacio
+                if (yPosition > 220) {
+                    doc.addPage();
+                    addHeader();
+                }
+
+                // Box con color para cada bloque
+                addSectionBox(yPosition - 3, 35 + (bloque.topics.length * 5), [240, 240, 250]);
+
+                // Título del bloque con color
+                doc.setTextColor(...bloque.color);
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.text(bloque.title, margin, yPosition);
+
+                // Duración
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text(bloque.duration, margin, yPosition + 6);
+
+                yPosition += 12;
+
+                // Tópicos
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(9);
+                bloque.topics.forEach(topic => {
+                    addText('• ' + topic, 9, 'normal');
+                });
+
+                yPosition += 8;
             });
 
-            // Última página - Información de contacto
+            // PÁGINA 4 - Continuación de bloques temáticos
             doc.addPage();
             addHeader();
-            addText('Información de Contacto', 18, 'bold');
+
+            const bloques2 = [
+                {
+                    title: 'BLOQUE 3: IA en la Gestión Administrativa',
+                    duration: '4 horas · 6 sesiones',
+                    color: [236, 64, 122],
+                    topics: [
+                        'Automatización de procesos administrativos',
+                        'IA para la atención multilingüe',
+                        'Gestión documental inteligente',
+                        'Análisis de datos para la toma de decisiones',
+                        'Optimización de recursos mediante IA',
+                        'Talleres específicos para personal administrativo'
+                    ]
+                },
+                {
+                    title: 'BLOQUE 4: IA en Servicios y Conserjería',
+                    duration: '2 horas · 3 sesiones',
+                    color: [76, 175, 80],
+                    topics: [
+                        'Sistemas de información inteligentes',
+                        'Gestión de espacios y recursos',
+                        'Asistencia multilingüe automatizada',
+                        'Talleres específicos para personal de conserjería y servicios'
+                    ]
+                },
+                {
+                    title: 'BLOQUE 5: Proyectos Colaborativos',
+                    duration: '4 horas · 6 sesiones',
+                    color: [255, 152, 0],
+                    topics: [
+                        'Diseño de soluciones basadas en IA para el centro',
+                        'Implementación de casos prácticos',
+                        'Presentación de proyectos y retroalimentación',
+                        'Evaluación de impacto y sostenibilidad',
+                        'Plan de acción futuro',
+                        'Trabajo en equipos mixtos para resolver problemas reales'
+                    ]
+                }
+            ];
+
+            bloques2.forEach((bloque, index) => {
+                if (yPosition > 180) {
+                    doc.addPage();
+                    addHeader();
+                }
+
+                addSectionBox(yPosition - 3, 25 + (bloque.topics.length * 5), [245, 245, 255]);
+
+                doc.setTextColor(...bloque.color);
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'bold');
+                doc.text(bloque.title, margin, yPosition);
+
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text(bloque.duration, margin, yPosition + 6);
+
+                yPosition += 12;
+
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(9);
+                bloque.topics.forEach(topic => {
+                    addText('• ' + topic, 9, 'normal');
+                });
+
+                yPosition += 8;
+            });
+
+            // PÁGINA 5 - Metodología y evaluación
+            doc.addPage();
+            addHeader();
+
+            addText('METODOLOGÍA DE APRENDIZAJE', 18, 'bold', primaryColor);
             yPosition += 5;
 
-            addText('UGT-CLM-UGR Granada');
-            addText('Sección Sindical - Centro de Lenguas Modernas');
+            addSectionBox(yPosition - 3, 40, [240, 250, 245]);
+            addText('Principios Metodológicos', 14, 'bold', secondaryColor);
+            yPosition += 3;
+
+            const metodologiaItems = [
+                { icon: '🎯', text: 'Aprendizaje Activo - Utilizarás herramientas de IA desde la primera sesión' },
+                { icon: '💻', text: 'Enfoque Práctico - Mínimo contenido teórico, máxima aplicación práctica' },
+                { icon: '🎨', text: 'Personalización - Actividades adaptadas a cada perfil profesional' },
+                { icon: '🤝', text: 'Colaboración - Fomento del trabajo en equipo e intercambio de experiencias' },
+                { icon: '📈', text: 'Progresión - De lo simple a lo complejo, construyendo sobre lo aprendido' },
+                { icon: '🚀', text: 'Aplicación Inmediata - Todo lo aprendido se aplica en el entorno laboral' }
+            ];
+
+            metodologiaItems.forEach(item => {
+                addText(`${item.icon} ${item.text}`, 10, 'normal');
+            });
+
+            yPosition += 10;
+            addSeparator(yPosition);
+            yPosition += 8;
+
+            addText('ESTRUCTURA DE SESIONES (40 minutos)', 16, 'bold', primaryColor);
+            yPosition += 5;
+
+            const sesiones = [
+                { time: '5 min', title: 'Introducción', desc: 'Presentación del tema y objetivos' },
+                { time: '10 min', title: 'Demostración', desc: 'Ejemplo práctico con herramientas reales' },
+                { time: '15 min', title: 'Práctica Guiada', desc: 'Aplicación con apoyo del formador' },
+                { time: '10 min', title: 'Reflexión y Dudas', desc: 'Discusión y resolución de problemas' }
+            ];
+
+            sesiones.forEach((sesion, index) => {
+                addSectionBox(yPosition - 2, 12, [250, 250, 255]);
+                doc.setTextColor(...primaryColor);
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`${index + 1}. ${sesion.title} (${sesion.time})`, margin, yPosition + 4);
+
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                doc.text(sesion.desc, margin + 5, yPosition + 10);
+
+                yPosition += 15;
+            });
+
+            // PÁGINA 6 - Información de contacto y pie
+            doc.addPage();
+            addHeader();
+
+            // Calendario visual
+            addText('CALENDARIO DE LAS JORNADAS', 18, 'bold', primaryColor);
+            yPosition += 8;
+
+            const semanas = [
+                { week: 'Semana 1', topic: 'Fundamentos de IA', date: 'Viernes' },
+                { week: 'Semana 2', topic: 'IA Educativa (Parte 1)', date: 'Viernes' },
+                { week: 'Semana 3', topic: 'IA Educativa (Parte 2)', date: 'Viernes' },
+                { week: 'Semana 4', topic: 'IA Administrativa + Servicios', date: 'Viernes' },
+                { week: 'Semana 5', topic: 'Proyectos Colaborativos', date: 'Viernes' }
+            ];
+
+            semanas.forEach((semana, index) => {
+                const yPos = yPosition + (index * 12);
+
+                // Box para cada semana
+                addSectionBox(yPos - 3, 10, [245, 250, 255]);
+
+                doc.setTextColor(...primaryColor);
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.text(semana.week, margin + 2, yPos + 2);
+
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                doc.text(semana.topic, margin + 25, yPos + 2);
+                doc.text(semana.date, margin + 100, yPos + 2);
+            });
+
+            yPosition += 70;
+            addSeparator(yPosition);
             yPosition += 10;
 
+            // Información de contacto con diseño
+            addSectionBox(yPosition - 3, 35, [240, 240, 250]);
+            addText('INFORMACIÓN DE CONTACTO', 16, 'bold', primaryColor);
+            yPosition += 5;
+
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('UGT-CLM-UGR Granada', margin, yPosition);
+            yPosition += 6;
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            addText('Sección Sindical - Centro de Lenguas Modernas - Universidad de Granada');
+            yPosition += 6;
             addText('Para cualquier consulta sobre las jornadas:');
-            addText('Email: ugt.clm.ugr@gmail.com');
-            addText('Web: www.ugtclmgranada.org');
+            yPosition += 5;
+
+            const contactInfo = ['📧 Email: ugt.clm.ugr@gmail.com', '🌐 Web: www.ugtclmgranada.org', '📱 Teléfono: 958 24 09 77'];
+            contactInfo.forEach(info => {
+                addText(info, 10, 'normal');
+            });
+
+            // Footer en todas las páginas
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+
+                // Footer bar
+                doc.setFillColor(...primaryColor);
+                doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+
+                // Footer text
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                doc.text('© 2025 UGT-CLM-UGR Granada - Todos los derechos reservados', margin, pageHeight - 8);
+                doc.text('Jornadas de Inteligencia Artificial para el Centro de Lenguas Modernas', margin + 80, pageHeight - 8);
+                doc.text(`Página ${i} de ${pageCount}`, pageWidth - margin - 20, pageHeight - 8);
+            }
 
             return doc.output('blob');
         }
