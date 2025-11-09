@@ -954,6 +954,101 @@
         </div>
     </footer>
 
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="login-form">
+                <h3>Acceso Afiliados</h3>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="Email" required>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" placeholder="Contraseña" required>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="form-options">
+                        <label class="checkbox">
+                            <input type="checkbox">
+                            <span class="checkmark"></span>
+                            Recordarme
+                        </label>
+                        <a href="#" class="forgot-password" id="forgotPasswordLink">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Iniciar Sesión</button>
+                </form>
+                <div class="login-footer">
+                    <p>¿No eres afiliado? <a href="../index.html#afiliate" id="goToAffiliateLink" onclick="document.getElementById('loginModal').style.display='none'">Afíliate aquí (15€/año)</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Info Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeRegister">&times;</span>
+            <div class="login-form">
+                <div style="text-align: center; padding: 20px 0;">
+                    <div style="font-size: 4rem; color: var(--primary-color); margin-bottom: 20px;">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>¿Quieres unirte a UGT-CLM Granada?</h3>
+                    <p style="margin: 20px 0; color: #666; line-height: 1.6;">
+                        Para tener acceso completo a tu área personal, necesitas <strong>afiliarte primero</strong>.<br>
+                        El proceso es simple y rápido.
+                    </p>
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                        <h4 style="margin-bottom: 15px; color: var(--primary-color);">
+                            <i class="fas fa-gift"></i> Beneficios de afiliarte:
+                        </h4>
+                        <ul style="text-align: left; list-style: none; padding: 0;">
+                            <li style="margin: 10px 0;"><i class="fas fa-check" style="color: #4CAF50; margin-right: 10px;"></i> Defensa de tus derechos laborales</li>
+                            <li style="margin: 10px 0;"><i class="fas fa-check" style="color: #4CAF50; margin-right: 10px;"></i> Asesoramiento jurídico gratuito</li>
+                            <li style="margin: 10px 0;"><i class="fas fa-check" style="color: #4CAF50; margin-right: 10px;"></i> Descuentos en cursos (hasta 90%)</li>
+                            <li style="margin: 10px 0;"><i class="fas fa-check" style="color: #4CAF50; margin-right: 10px;"></i> Certificados y documentación automática</li>
+                            <li style="margin: 10px 0;"><i class="fas fa-check" style="color: #4CAF50; margin-right: 10px;"></i> Área personal con seguimiento de actividad</li>
+                        </ul>
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #ddd;">
+                            <span style="font-size: 0.9rem; color: #999;">Cuota anual</span><br>
+                            <span style="font-size: 2.5rem; font-weight: bold; color: var(--primary-color);">15€</span>
+                            <span style="font-size: 1rem; color: #666;">/año</span>
+                        </div>
+                    </div>
+                    <a href="../index.html#afiliate" class="btn btn-primary btn-full" onclick="document.getElementById('registerModal').style.display='none'" style="margin-bottom: 15px; text-decoration: none; display: inline-block; width: 100%;">
+                        <i class="fas fa-rocket"></i> Afiliarme Ahora por 15€/año
+                    </a>
+                    <div class="login-footer">
+                        <p>¿Ya estás afiliado? <a href="#" id="backToLoginFromRegister">Iniciar sesión</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Recovery Modal -->
+    <div id="recoveryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeRecovery">&times;</span>
+            <div class="recovery-form">
+                <h3>Recuperar Contraseña</h3>
+                <p>Introduce tu email y te enviaremos instrucciones para recuperar tu contraseña</p>
+                <form id="recoveryForm">
+                    <div class="form-group">
+                        <input type="email" name="recoveryEmail" placeholder="Tu email" required>
+                        <span class="error-message"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Enviar Instrucciones</button>
+                </form>
+                <div class="recovery-footer">
+                    <p><a href="#" id="backToLogin">Volver al login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://js.stripe.com/v3/"></script>
     <script src="../js/backend-config.js"></script>
     <script src="../js/stripe-config.js"></script>
@@ -1064,48 +1159,10 @@
 
         // Mostrar modal de login
         function showLoginModal() {
-            const loginModal = document.createElement('div');
-            loginModal.className = 'modal';
-            loginModal.innerHTML = `
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <div class="enrollment-form">
-                        <h3><i class="fas fa-user-lock"></i> Acceso Requerido</h3>
-                        <p style="text-align: center; margin: 1rem 0;">
-                            Para acceder al precio de afiliado (15€) debes iniciar sesión con tu cuenta de afiliado.
-                        </p>
-                        <div class="info-box" style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                            <i class="fas fa-info-circle" style="color: #2196F3;"></i>
-                            <strong>¿No eres afiliado aún?</strong><br>
-                            <a href="../index.html#afiliate" style="color: #2196F3;">Afíliate ahora por solo 15€/año</a>
-                            y accede a este curso con un 90% de descuento.
-                        </div>
-                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                            <button onclick="window.location.href='../index.html#login'" class="btn btn-primary" style="flex: 1;">
-                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                            </button>
-                            <button onclick="enrollCourse('external')" class="btn btn-secondary" style="flex: 1;">
-                                <i class="fas fa-shopping-cart"></i> Pagar 160€
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(loginModal);
-            loginModal.style.display = 'block';
-
-            const closeBtn = loginModal.querySelector('.close');
-            closeBtn.addEventListener('click', () => {
-                document.body.removeChild(loginModal);
-            });
-
-            // Cerrar al hacer clic fuera del modal
-            loginModal.addEventListener('click', (e) => {
-                if (e.target === loginModal) {
-                    document.body.removeChild(loginModal);
-                }
-            });
+            const loginModal = document.getElementById('loginModal');
+            if (loginModal) {
+                loginModal.style.display = 'block';
+            }
         }
 
         function showEnrollmentForm(courseData) {
