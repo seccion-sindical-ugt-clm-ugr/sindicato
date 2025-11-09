@@ -931,11 +931,102 @@
             const price = isMember ? 15 : 160;
             const description = isMember ? 'Curso IA CLM - Afiliado UGT' : 'Curso IA CLM - Externo';
 
+            // Si intenta inscribirse como afiliado, verificar autenticación
+            if (isMember) {
+                const isAuthenticated = checkAuthentication();
+                if (!isAuthenticated) {
+                    showLoginModal();
+                    return;
+                }
+
+                // Verificar que sea afiliado
+                const isAffiliate = await verifyAffiliate();
+                if (!isAffiliate) {
+                    showMessage('error', 'Debes ser afiliado para acceder al precio de 15€. Por favor, completa tu afiliación primero.');
+                    return;
+                }
+            }
+
             showEnrollmentForm({
                 courseType: 'ia',
                 isMember: isMember,
                 price: price,
                 description: description
+            });
+        }
+
+        // Verificar si el usuario está autenticado
+        function checkAuthentication() {
+            const token = localStorage.getItem('accessToken');
+            return !!token;
+        }
+
+        // Verificar si el usuario es afiliado
+        async function verifyAffiliate() {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+                // Verificar role
+                if (user.role !== 'afiliado') {
+                    return false;
+                }
+
+                // Verificar que la membresía esté activa
+                if (user.membershipStatus !== 'activo') {
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error verificando afiliado:', error);
+                return false;
+            }
+        }
+
+        // Mostrar modal de login
+        function showLoginModal() {
+            const loginModal = document.createElement('div');
+            loginModal.className = 'modal';
+            loginModal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <div class="enrollment-form">
+                        <h3><i class="fas fa-user-lock"></i> Acceso Requerido</h3>
+                        <p style="text-align: center; margin: 1rem 0;">
+                            Para acceder al precio de afiliado (15€) debes iniciar sesión con tu cuenta de afiliado.
+                        </p>
+                        <div class="info-box" style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                            <i class="fas fa-info-circle" style="color: #2196F3;"></i>
+                            <strong>¿No eres afiliado aún?</strong><br>
+                            <a href="../index.html#afiliate" style="color: #2196F3;">Afíliate ahora por solo 15€/año</a>
+                            y accede a este curso con un 90% de descuento.
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button onclick="window.location.href='../index.html#login'" class="btn btn-primary" style="flex: 1;">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                            </button>
+                            <button onclick="enrollCourse('external')" class="btn btn-secondary" style="flex: 1;">
+                                <i class="fas fa-shopping-cart"></i> Pagar 160€
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(loginModal);
+            loginModal.style.display = 'block';
+
+            const closeBtn = loginModal.querySelector('.close');
+            closeBtn.addEventListener('click', () => {
+                document.body.removeChild(loginModal);
+            });
+
+            // Cerrar al hacer clic fuera del modal
+            loginModal.addEventListener('click', (e) => {
+                if (e.target === loginModal) {
+                    document.body.removeChild(loginModal);
+                }
             });
         }
 
@@ -965,7 +1056,7 @@
                                 <input type="email" name="email" placeholder="Email" required>
                             </div>
                             <div class="form-group">
-                                <input type="tel" name="phone" placeholder="Teléfono" required>
+                                <input type="tel" name="phone" placeholder="Teléfono (opcional)">
                             </div>
                             <div class="form-group">
                                 <select name="department" required>

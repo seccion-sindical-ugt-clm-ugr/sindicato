@@ -86,7 +86,33 @@ router.post('/complete-registration',
 
             // 4. Obtener metadata del pago
             const metadata = session.metadata || {};
+            const paymentType = metadata.type || 'affiliation'; // 'affiliation' o 'course'
+            const isMember = metadata.isMember === 'true';
             const departamento = metadata.department || session.custom_fields?.find(f => f.key === 'department')?.text?.value || '';
+
+            // Determinar role y fechas según el tipo de pago
+            let role, membershipStatus, membershipStartDate, membershipExpiryDate;
+
+            if (paymentType === 'affiliation') {
+                // Afiliación: crear usuario afiliado con membresía de 1 año
+                role = 'afiliado';
+                membershipStatus = 'activo';
+                membershipStartDate = new Date();
+                membershipExpiryDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+            } else if (paymentType === 'course' && isMember) {
+                // Curso para afiliado: crear usuario afiliado
+                role = 'afiliado';
+                membershipStatus = 'activo';
+                membershipStartDate = new Date();
+                membershipExpiryDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+            } else {
+                // Curso para externo: no debería llegar aquí, pero por si acaso
+                console.log('⚠️ Intento de crear usuario para curso externo - redirigiendo');
+                return res.status(400).json({
+                    success: false,
+                    error: 'Los cursos para externos no requieren registro de usuario'
+                });
+            }
 
             // 5. Crear el usuario
             const nombreCompleto = `${nombre} ${apellidos}`;
@@ -97,10 +123,10 @@ router.post('/complete-registration',
                 password,
                 telefono: phone,
                 departamento,
-                role: 'afiliado',
-                membershipStatus: 'activo', // Ya pagó
-                membershipStartDate: new Date(),
-                membershipExpiryDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // +1 año
+                role,
+                membershipStatus,
+                membershipStartDate,
+                membershipExpiryDate,
                 ipAddress: req.ip || req.connection.remoteAddress,
                 userAgent: req.headers['user-agent']
             });

@@ -254,7 +254,7 @@ function formatPrice(cents) {
 
 // Validar datos del usuario
 function validateUserData(userData) {
-    const required = ['name', 'email', 'phone', 'department'];
+    const required = ['name', 'email', 'department'];
     const missing = required.filter(field => !userData[field] || userData[field].trim() === '');
 
     if (missing.length > 0) {
