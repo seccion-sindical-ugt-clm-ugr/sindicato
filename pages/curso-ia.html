@@ -1113,15 +1113,26 @@
                 submitBtn.disabled = true;
 
                 try {
+                    // Log detallado para depuración
+                    console.log('🔍 DEBUG - Datos del curso:', courseData);
+                    console.log('🔍 DEBUG - Datos del usuario:', userData);
+                    console.log('🔍 DEBUG - courseType:', courseData.courseType);
+                    console.log('🔍 DEBUG - isMember:', courseData.isMember);
+
                     validateUserData(userData);
+
+                    console.log('🔍 DEBUG - Llamando a createCourseCheckout...');
                     const session = await createCourseCheckout(
                         courseData.courseType,
                         userData,
                         courseData.isMember
                     );
+
+                    console.log('🔍 DEBUG - Sesión creada:', session);
                     await redirectToStripeCheckout(session.id);
                 } catch (error) {
-                    console.error('Enrollment error:', error);
+                    console.error('❌ Enrollment error:', error);
+                    console.error('❌ Error completo:', JSON.stringify(error, null, 2));
                     showMessage('error', 'Error al procesar la inscripción: ' + error.message);
                 } finally {
                     submitBtn.innerHTML = originalText;
