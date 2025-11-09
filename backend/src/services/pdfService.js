@@ -91,26 +91,25 @@ async function generateCertificadoAfiliado(userData) {
             doc.fontSize(13)
                 .fillColor(ugtRed)
                 .text(status, { align: 'center' })
-                .moveDown(1.5);
+                .moveDown(0.8);
 
             // Pie de documento
             doc.fontSize(10)
                 .fillColor(darkGray)
                 .text('Este certificado es válido como acreditación de afiliación a UGT-CLM-UGR Granada.', { align: 'justify' })
-                .moveDown(2);
+                .moveDown(1);
 
             // Fecha de emisión
             const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
             doc.fontSize(10)
                 .text(`Granada, ${today}`, { align: 'right' })
-                .moveDown(1.5);
+                .moveDown(0.8);
 
             // Firma
             doc.fontSize(10)
                 .text('_________________________', { align: 'center' })
                 .moveDown(0.2)
-                .text('Sección Sindical UGT-CLM-UGR Granada', { align: 'center' })
-                .moveDown(2);
+                .text('Sección Sindical UGT-CLM-UGR Granada', { align: 'center' });
 
             // Footer
             doc.fontSize(8)
@@ -398,20 +397,19 @@ async function generateFichaAfiliacion(userData) {
                 .text(`Estado: ${userData.membershipStatus}`)
                 .moveDown(0.2)
                 .text(`Rol: ${userData.role}`)
-                .moveDown(1.5);
+                .moveDown(0.8);
 
             // Notas
             doc.fontSize(9)
                 .fillColor('#666666')
                 .text('Esta ficha es un documento interno de UGT-CLM-UGR Granada.', { align: 'justify' })
                 .text('Contiene información confidencial y de uso exclusivo para la gestión sindical.', { align: 'justify' })
-                .moveDown(1.5);
+                .moveDown(0.8);
 
             // Fecha de generación
             const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
             doc.fontSize(9)
-                .text(`Generado el: ${today}`, { align: 'right' })
-                .moveDown(1);
+                .text(`Generado el: ${today}`, { align: 'right' });
 
             // Footer
             doc.fontSize(8)
