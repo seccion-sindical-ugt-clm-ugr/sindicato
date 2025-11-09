@@ -103,9 +103,13 @@ router.post('/create-affiliation-session', affiliationValidators, async (req, re
 
 router.post('/create-course-session', courseValidators, async (req, res) => {
     try {
+        console.log('🔍 DEBUG - Endpoint /create-course-session llamado');
+        console.log('🔍 DEBUG - Request body:', JSON.stringify(req.body, null, 2));
+
         // Validar datos
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            console.error('❌ DEBUG - Errores de validación:', errors.array());
             return res.status(400).json({
                 error: 'Datos inválidos',
                 details: errors.array()
@@ -113,6 +117,8 @@ router.post('/create-course-session', courseValidators, async (req, res) => {
         }
 
         const { name, email, phone, department, courseType, isMember } = req.body;
+
+        console.log('🔍 DEBUG - Datos extraídos:', { name, email, phone, department, courseType, isMember });
 
         // Determinar precio según tipo de usuario
         const price = isMember ? 1500 : 16000; // 15€ o 160€ en centavos
