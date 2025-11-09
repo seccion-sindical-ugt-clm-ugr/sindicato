@@ -302,6 +302,16 @@
                         <li>Certificación final</li>
                     </ul>
                 </div>
+
+                <!-- Botón para descargar programa -->
+                <div style="text-align: center; margin-top: 3rem;">
+                    <button class="btn btn-outline btn-lg" onclick="downloadProgram()">
+                        <i class="fas fa-download"></i> Descargar Programa Completo
+                    </button>
+                    <p style="margin-top: 1rem; opacity: 0.8; font-size: 0.9rem;">
+                        PDF con todos los módulos, temario y metodología
+                    </p>
+                </div>
             </div>
         </div>
     </section>
@@ -604,6 +614,308 @@
                     submitBtn.disabled = false;
                 }
             });
+        }
+
+        // Función para descargar el programa del curso
+        async function downloadProgram() {
+            try {
+                showMessage('info', 'Generando programa del curso...');
+
+                // Crear PDF del programa del curso
+                const pdfData = await generateCourseProgramPDF();
+
+                // Descargar el PDF
+                const blob = new Blob([pdfData], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'programa-curso-inteligencia-artificial-ugt.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showMessage('success', '¡Programa del curso descargado exitosamente!');
+
+            } catch (error) {
+                console.error('Error descargando programa:', error);
+                showMessage('error', 'Error al generar el programa. Por favor, intenta más tarde.');
+            }
+        }
+
+        // Función para generar el PDF del programa del curso
+        async function generateCourseProgramPDF() {
+            return new Promise((resolve, reject) => {
+                try {
+                    // Cargar PDFKit dinámicamente si no está disponible
+                    if (typeof PDFDocument === 'undefined') {
+                        const script = document.createElement('script');
+                        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdfkit/0.14.1/pdfkit.min.js';
+                        script.onload = () => createProgramPDF(resolve, reject);
+                        script.onerror = () => reject(new Error('No se pudo cargar PDFKit'));
+                        document.head.appendChild(script);
+                    } else {
+                        createProgramPDF(resolve, reject);
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }
+
+        // Función para crear el PDF del programa
+        function createProgramPDF(resolve, reject) {
+            try {
+                const { jsPDF } = window.jspdf || {};
+                if (!jsPDF) {
+                    // Si jsPDF no está disponible, usar una solución alternativa
+                    createSimplePDF(resolve, reject);
+                    return;
+                }
+
+                const doc = new jsPDF();
+
+                // Colores y estilos
+                const primaryColor = [102, 126, 234]; // Azul del diseño
+                const darkGray = [51, 51, 51];
+
+                // Página 1: Portada
+                doc.setFontSize(28);
+                doc.setTextColor(...primaryColor);
+                doc.text('PROGRAMA DE CURSO', 105, 40, { align: 'center' });
+
+                doc.setFontSize(20);
+                doc.setTextColor(...darkGray);
+                doc.text('INTELIGENCIA ARTIFICIAL', 105, 55, { align: 'center' });
+                doc.text('PARA PROFESIONALES', 105, 65, { align: 'center' });
+
+                doc.setFontSize(14);
+                doc.text('UGT-CLM-UGR Granada', 105, 80, { align: 'center' });
+
+                // Línea decorativa
+                doc.setDrawColor(...primaryColor);
+                doc.setLineWidth(1);
+                doc.line(30, 90, 180, 90);
+
+                // Información del curso
+                doc.setFontSize(12);
+                doc.setTextColor(...darkGray);
+                doc.text('Duración: 20 horas totales', 20, 110);
+                doc.text('Modalidad: Online', 20, 120);
+                doc.text('Certificado: UGT-CLM Granada', 20, 130);
+                doc.text('Seguimiento: 6 meses', 20, 140);
+
+                // Página 2: Módulos
+                doc.addPage();
+                doc.setFontSize(18);
+                doc.setTextColor(...primaryColor);
+                doc.text('CONTENIDO DEL CURSO', 105, 20, { align: 'center' });
+
+                const modules = [
+                    {
+                        title: 'MÓDULO 1: Introducción a la Inteligencia Artificial',
+                        topics: [
+                            '¿Qué es la Inteligencia Artificial?',
+                            'Historia y evolución de la IA',
+                            'Tipos de IA: Débil vs Fuerte',
+                            'Machine Learning y Deep Learning explicados',
+                            'Impacto de la IA en el mundo laboral actual'
+                        ]
+                    },
+                    {
+                        title: 'MÓDULO 2: Herramientas de IA Generativa',
+                        topics: [
+                            'Introducción a ChatGPT y otros modelos de lenguaje',
+                            'Prompt engineering: Cómo obtener mejores resultados',
+                            'Generación de imágenes con DALL-E, Midjourney y Stable Diffusion',
+                            'Herramientas de IA para la creación de contenido',
+                            'Ejemplos prácticos y casos de uso'
+                        ]
+                    },
+                    {
+                        title: 'MÓDULO 3: IA para la Productividad Profesional',
+                        topics: [
+                            'Automatización de tareas repetitivas',
+                            'Análisis de datos con IA',
+                            'Herramientas de IA para la comunicación',
+                            'Gestión de proyectos asistida por IA',
+                            'Integración de IA en flujos de trabajo'
+                        ]
+                    },
+                    {
+                        title: 'MÓDULO 4: IA en el Entorno Laboral',
+                        topics: [
+                            'IA para la toma de decisiones',
+                            'Herramientas de reclutamiento y selección con IA',
+                            'IA en la formación y desarrollo profesional',
+                            'Aspectos éticos y legales de la IA en el trabajo',
+                            'Preparación para el futuro laboral con IA'
+                        ]
+                    },
+                    {
+                        title: 'MÓDULO 5: Proyecto Práctico',
+                        topics: [
+                            'Desarrollo de un proyecto personalizado',
+                            'Aplicación de conocimientos adquiridos',
+                            'Presentación y evaluación del proyecto',
+                            'Certificación final'
+                        ]
+                    }
+                ];
+
+                let yPosition = 40;
+                modules.forEach((module, index) => {
+                    if (yPosition > 220) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+
+                    doc.setFontSize(12);
+                    doc.setTextColor(...primaryColor);
+                    doc.text(module.title, 20, yPosition);
+                    yPosition += 8;
+
+                    doc.setFontSize(10);
+                    doc.setTextColor(...darkGray);
+                    module.topics.forEach(topic => {
+                        if (yPosition > 270) {
+                            doc.addPage();
+                            yPosition = 20;
+                        }
+                        doc.text(`• ${topic}`, 25, yPosition);
+                        yPosition += 6;
+                    });
+                    yPosition += 8;
+                });
+
+                // Página final: Información adicional
+                doc.addPage();
+                doc.setFontSize(18);
+                doc.setTextColor(...primaryColor);
+                doc.text('INFORMACIÓN ADICIONAL', 105, 20, { align: 'center' });
+
+                doc.setFontSize(12);
+                doc.setTextColor(...darkGray);
+
+                let yInfo = 40;
+                const infoTexts = [
+                    'DIRIGIDO A:',
+                    '• Profesionales que quieren incorporar IA en su trabajo diario',
+                    '• Trabajadores que buscan mejorar su productividad con herramientas de IA',
+                    '• Personas interesadas en comprender el impacto de la IA en el mundo laboral',
+                    '• Cualquier persona que quiera estar preparada para el futuro del trabajo',
+                    '',
+                    'BENEFICIOS:',
+                    '• Aprenderás a utilizar herramientas de IA de forma práctica',
+                    '• Mejorarás tu productividad con tecnología actual',
+                    '• Obtendrás un certificado reconocido por UGT-CLM Granada',
+                    '• Accederás a material didáctico y recursos exclusivos',
+                    '',
+                    'INVERSIÓN:',
+                    '• Afiliados UGT: 15€ por módulo',
+                    '• No afiliados: 160€ por módulo',
+                    '',
+                    'MÁS INFORMACIÓN:',
+                    '• Contacta con la Sección Sindical UGT-CLM-UGR Granada',
+                    '• Email: ugt.clm.ugr@gmail.com',
+                    '• Teléfono: 958 XXX XXX'
+                ];
+
+                infoTexts.forEach(text => {
+                    if (yInfo > 270) {
+                        doc.addPage();
+                        yInfo = 20;
+                    }
+                    doc.text(text, 20, yInfo);
+                    yInfo += 8;
+                });
+
+                // Pie de página
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(100, 100, 100);
+                    doc.text(`Página ${i} de ${pageCount}`, 105, 290, { align: 'center' });
+                    doc.text('© 2024 UGT-CLM-UGR Granada - Todos los derechos reservados', 105, 285, { align: 'center' });
+                }
+
+                resolve(doc.output('blob'));
+
+            } catch (error) {
+                reject(error);
+            }
+        }
+
+        // Función alternativa simple si jsPDF no está disponible
+        function createSimplePDF(resolve, reject) {
+            try {
+                // Crear un PDF simple usando una cadena base64 de un programa básico
+                const basicPDF = 'JVBERi0xLjQKJeLjz9MKNCAwIG9iag0KPDwvVHlwZSAvQ2F0YWxvZw0KL1BhZ2VzIDIgMCBSCj4+CmVuZG9iag0KMiAwIG9iag0KPDwvVHlwZSAvUGFnZXMvS2lkcyBbMyAwIFJdL01lZGlhQm94IFswIDAgNjEyIDc5Ml0vQ291bnQgMS9SZXNvdXJjZXM8PC9Gb250PDwvRjEgNCAwIFI+Pj4+PgplbmRvYmoKNCAwIG9iag0KPDwvVHlwZSAvRm9udA0KL1N1YnR5cGUgL1R5cGUxCi9CYXNlRm9udCAvSGVsdmV0aWNhCj4+CmVuZG9iag0KNSAwIG9iag0KPDwvTGVuZ3RoIDQ0Pj4+CnN0cmVhbQ0KQlQKL0YxIDEgVGYKMTIgVGYKMTA3LjIgNzI2LjI4IFRkCihQUk9HUkFNQSBERSBDVVJTTyAtIElOVEVMSUdFTkNJQSBBUklGSUNJQUwpRQpUQw0KRU5ET2JqCmVuZHN0cmVhbQ0KZW5kb2JqCjYgMCBvYmoKNjM2CmVuZG9iagoxIDAgb2JqCjw8L1R5cGUgL0NhdGFsb2cKL1BhZ2VzIDIgMCBSCi9PdXRsaW5lcyAzIDAgUgo+PgplbmRvYmoKeHJlZg0KMSA3CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAwOSAwMDAwMCBuIAowMDAwMDAwMDU4IDAwMDAwIG4gCjAwMDAwMDAxMDggMDAwMDAgbiAKMDAwMDAwMDE1OCAwMDAwMCBuIAowMDAwMDAwMjM0IDAwMDAwIG4gCjAwMDAwMDAyOTMgMDAwMDAgbiAKdHJhaWxlcgo8PC9TaXplIDcvUm9vdCAxIDAgUi9JbmZvIDEgMCBSPj4Kc3RhcnR4cmVmCjE1ODcKJSVFT0Y=';
+
+                // Convertir base64 a blob
+                const byteCharacters = atob(basicPDF);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+                resolve(blob);
+
+            } catch (error) {
+                reject(error);
+            }
+        }
+
+        // Función para mostrar mensajes
+        function showMessage(type, message) {
+            // Crear un toast personalizado
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 15px 25px;
+                border-radius: 8px;
+                z-index: 10000;
+                font-weight: 500;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideDown 0.3s ease-out;
+            `;
+
+            if (type === 'success') {
+                toast.style.background = '#4CAF50';
+                toast.style.color = 'white';
+            } else if (type === 'error') {
+                toast.style.background = '#f44336';
+                toast.style.color = 'white';
+            } else if (type === 'info') {
+                toast.style.background = '#2196F3';
+                toast.style.color = 'white';
+            }
+
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            // Animación
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideDown {
+                    from { transform: translate(-50%, -100%); opacity: 0; }
+                    to { transform: translate(-50%, 0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Auto-eliminar después de 4 segundos
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 4000);
         }
 
         // Add CSS for price display
