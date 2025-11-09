@@ -111,11 +111,6 @@ async function generateCertificadoAfiliado(userData) {
                 .moveDown(0.1)
                 .text('Sección Sindical UGT-CLM-UGR Granada', { align: 'center' });
 
-            // Footer
-            doc.fontSize(8)
-                .fillColor('#666666')
-                .text('Universidad de Granada | Email: ugtclmgranada@gmail.com', 40, doc.page.height - 40, { align: 'center' });
-
             doc.end();
         } catch (error) {
             reject(error);
@@ -194,18 +189,12 @@ async function generateReciboPago(userData, paymentData) {
             doc.fontSize(9)
                 .fillColor(darkGray)
                 .text('Este recibo es un comprobante de pago válido.', { align: 'justify' })
-                .text('Para cualquier consulta, contacta con nosotros en ugtclmgranada@gmail.com', { align: 'justify' })
                 .moveDown(2);
 
             // Fecha de emisión
             const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
             doc.fontSize(9)
                 .text(`Emitido el: ${today}`, { align: 'right' });
-
-            // Footer
-            doc.fontSize(8)
-                .fillColor('#666666')
-                .text('Universidad de Granada | ugtclmgranada@gmail.com', 50, doc.page.height - 50, { align: 'center' });
 
             doc.end();
         } catch (error) {
@@ -410,11 +399,6 @@ async function generateFichaAfiliacion(userData) {
             const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
             doc.fontSize(8)
                 .text(`Generado el: ${today}`, { align: 'right' });
-
-            // Footer
-            doc.fontSize(8)
-                .fillColor('#666666')
-                .text('UGT-CLM-UGR Granada | Universidad de Granada', 40, doc.page.height - 40, { align: 'center' });
 
             doc.end();
         } catch (error) {
