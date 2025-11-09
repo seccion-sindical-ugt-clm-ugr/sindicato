@@ -682,8 +682,12 @@ body {
     border-radius: 15px;
     width: 90%;
     max-width: 400px;
+    max-height: 85vh;
+    overflow-y: auto;
     position: relative;
     animation: slideIn 0.3s;
+    display: flex;
+    flex-direction: column;
 }
 
 .close {
@@ -1773,6 +1777,9 @@ body {
 .enrollment-form {
     max-width: 500px;
     margin: 0 auto;
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
 }
 
 .course-header {

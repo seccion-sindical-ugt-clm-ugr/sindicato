@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Inscripción Confirmada! - UGT-CLM-UGR Granada</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .success-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            padding: 2rem;
+        }
+
+        .success-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: #4CAF50;
+            background: #e8f5e9;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+            text-align: center;
+        }
+
+        .success-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 1.5rem;
+            border-radius: 5px;
+            margin: 1.5rem 0;
+        }
+
+        .info-box i {
+            color: #2196F3;
+            margin-right: 0.5rem;
+        }
+
+        .info-box strong {
+            font-size: 1.1rem;
+        }
+
+        .details-section {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+
+        .details-section h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .btn-home {
+            width: 100%;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .next-steps {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 1.5rem;
+            border-radius: 5px;
+            margin: 2rem 0;
+        }
+
+        .next-steps h4 {
+            color: #e65100;
+            margin-bottom: 1rem;
+        }
+
+        .next-steps ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .next-steps li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .next-steps li i {
+            color: #ff9800;
+            margin-right: 0.8rem;
+            margin-top: 0.2rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+
+            <h1 class="success-title">¡Inscripción Confirmada!</h1>
+            <p class="success-subtitle">Tu pago se ha procesado correctamente</p>
+
+            <div class="info-box">
+                <i class="fas fa-envelope"></i>
+                <strong>Revisa tu email</strong><br>
+                <p style="margin: 0.5rem 0 0 2rem;">
+                    Hemos enviado un correo a <span id="userEmail">tu dirección de email</span> con todos los detalles
+                    de acceso al curso, el enlace de Zoom para las sesiones y el material didáctico.
+                </p>
+            </div>
+
+            <div class="details-section">
+                <h3>📋 Detalles de tu Inscripción</h3>
+                <div class="detail-item">
+                    <span class="detail-label">Curso:</span>
+                    <span class="detail-value" id="courseName">Cargando...</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Modalidad:</span>
+                    <span class="detail-value">Pago Completo - Externo</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Importe Pagado:</span>
+                    <span class="detail-value" id="amountPaid">160,00 €</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Fecha de Pago:</span>
+                    <span class="detail-value" id="paymentDate">Cargando...</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">ID de Transacción:</span>
+                    <span class="detail-value" id="transactionId" style="font-size: 0.9rem;">Cargando...</span>
+                </div>
+            </div>
+
+            <div class="next-steps">
+                <h4><i class="fas fa-rocket"></i> Próximos Pasos</h4>
+                <ul>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span>Revisa tu email (incluyendo la carpeta de spam) para encontrar el mensaje de confirmación</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span>Guarda el enlace de Zoom que te hemos enviado para las sesiones en directo</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span>Accede al material del curso a través del enlace proporcionado en el email</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span>Recuerda: Las sesiones son los jueves y viernes durante 5 semanas</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="info-box" style="background: #e8f5e9; border-color: #4CAF50;">
+                <i class="fas fa-gift" style="color: #4CAF50;"></i>
+                <strong>¿Sabías que...?</strong><br>
+                <p style="margin: 0.5rem 0 0 2rem;">
+                    Los afiliados a UGT-CLM-UGR acceden a este curso por solo 15€ (90% de descuento).
+                    <a href="index.html#afiliate" style="color: #2196F3;">Más información sobre la afiliación</a>
+                </p>
+            </div>
+
+            <a href="index.html" class="btn-home">
+                <i class="fas fa-home"></i> Volver al Inicio
+            </a>
+
+            <p style="text-align: center; margin-top: 2rem; color: #666;">
+                <i class="fas fa-question-circle"></i> ¿Necesitas ayuda?
+                <a href="mailto:ugtclmgranada@gmail.com" style="color: #2196F3;">ugtclmgranada@gmail.com</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="js/backend-config.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        const courseType = urlParams.get('course');
+
+        // Cargar detalles de la sesión
+        async function loadSessionDetails() {
+            try {
+                const API_URL = typeof BACKEND_CONFIG !== 'undefined'
+                    ? BACKEND_CONFIG.apiUrl
+                    : 'https://sindicato-mu.vercel.app';
+
+                const response = await fetch(`${API_URL}/api/session/${sessionId}`);
+                const sessionData = await response.json();
+
+                if (sessionData) {
+                    // Actualizar email
+                    if (sessionData.customer_email) {
+                        document.getElementById('userEmail').textContent = sessionData.customer_email;
+                    }
+
+                    // Actualizar nombre del curso
+                    const courseNames = {
+                        'ia': 'IA en Acción: Transformando el Centro de Lenguas Modernas'
+                    };
+                    document.getElementById('courseName').textContent = courseNames[courseType] || 'Curso de IA';
+
+                    // Actualizar importe
+                    if (sessionData.amount_total) {
+                        document.getElementById('amountPaid').textContent =
+                            new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' })
+                                .format(sessionData.amount_total / 100);
+                    }
+
+                    // Actualizar fecha
+                    document.getElementById('paymentDate').textContent =
+                        new Date().toLocaleDateString('es-ES', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+
+                    // Actualizar ID de transacción
+                    document.getElementById('transactionId').textContent =
+                        sessionData.id.substring(0, 20) + '...';
+                }
+            } catch (error) {
+                console.error('Error cargando detalles:', error);
+                // Los valores por defecto ya están en el HTML
+            }
+        }
+
+        // Cargar detalles al cargar la página
+        if (sessionId) {
+            loadSessionDetails();
+        }
+    </script>
+</body>
+</html>

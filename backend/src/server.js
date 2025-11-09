@@ -20,6 +20,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const completeRegistrationRoutes = require('./routes/complete-registration');
 const documentsRoutes = require('./routes/documents');
+const cursoIAPdfRoutes = require('./routes/curso-ia-pdf');
 
 // Importar middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -192,6 +193,9 @@ app.use('/api', suggestionsRoutes);
 
 // Rutas de Documentos
 app.use('/api', documentsRoutes);
+
+// Ruta PDF del curso de IA
+app.use('/api/curso-ia', cursoIAPdfRoutes);
 
 // Ruta raíz
 app.get('/', (req, res) => {

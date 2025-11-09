@@ -61,18 +61,20 @@ const backToProfile = document.querySelector('#backToProfile');
 let currentUser = null;
 
 // Toggle Mobile Menu
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
-});
-
-// Close mobile menu when clicking on a link
-document.querySelectorAll('.nav-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
+if (hamburger && navMenu) {
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
     });
-});
+
+    // Close mobile menu when clicking on a link
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        });
+    });
+}
 
 // SISTEMA DE NAVEGACIÓN INTELIGENTE
 let isSingleSectionMode = false;
@@ -541,6 +543,11 @@ function smoothScrollTo(targetElement, offset = 0) {
 
 // Login Modal - Will be updated in updateLoginState function
 function initLoginBtn() {
+    if (!loginBtn || !loginModal) {
+        console.warn('Login button or modal not found');
+        return;
+    }
+
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
     if (isLoggedIn) {
@@ -559,41 +566,49 @@ function initLoginBtn() {
     }
 }
 
-closeModal.addEventListener('click', () => {
-    loginModal.style.display = 'none';
-});
+if (closeModal && loginModal) {
+    closeModal.addEventListener('click', () => {
+        loginModal.style.display = 'none';
+    });
+}
 
 window.addEventListener('click', (e) => {
-    if (e.target === loginModal) {
+    if (loginModal && e.target === loginModal) {
         loginModal.style.display = 'none';
     }
-    if (e.target === recoveryModal) {
+    if (recoveryModal && e.target === recoveryModal) {
         recoveryModal.style.display = 'none';
     }
-    if (e.target === registerModal) {
+    if (registerModal && e.target === registerModal) {
         registerModal.style.display = 'none';
     }
-    if (e.target === changePasswordModal) {
+    if (changePasswordModal && e.target === changePasswordModal) {
         changePasswordModal.style.display = 'none';
     }
 });
 
 // Recovery Modal handlers
-forgotPasswordLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    loginModal.style.display = 'none';
-    recoveryModal.style.display = 'block';
-});
+if (forgotPasswordLink && loginModal && recoveryModal) {
+    forgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginModal.style.display = 'none';
+        recoveryModal.style.display = 'block';
+    });
+}
 
-closeRecoveryBtn.addEventListener('click', () => {
-    recoveryModal.style.display = 'none';
-});
+if (closeRecoveryBtn && recoveryModal) {
+    closeRecoveryBtn.addEventListener('click', () => {
+        recoveryModal.style.display = 'none';
+    });
+}
 
-backToLoginBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    recoveryModal.style.display = 'none';
-    loginModal.style.display = 'block';
-});
+if (backToLoginBtn && recoveryModal && loginModal) {
+    backToLoginBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        recoveryModal.style.display = 'none';
+        loginModal.style.display = 'block';
+    });
+}
 
 // ============================================
 // REGISTER MODAL HANDLERS (Solo para admins)
@@ -842,6 +857,7 @@ editProfileForm.addEventListener('submit', async (e) => {
 // ============================================
 // LOGOUT CON API REAL
 // ============================================
+if (logoutBtn) {
 logoutBtn.addEventListener('click', async () => {
     try {
         // Logout usando API real
@@ -869,6 +885,7 @@ logoutBtn.addEventListener('click', async () => {
         updateLoginState();
     }
 });
+}
 
 // Smooth scrolling for navigation links - Mejorado para hero buttons
 function initSmoothScroll() {
@@ -974,6 +991,7 @@ function clearErrors() {
 // ============================================
 // LOGIN CON API REAL
 // ============================================
+if (loginForm) {
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();
@@ -1042,7 +1060,9 @@ loginForm.addEventListener('submit', async (e) => {
         submitBtn.disabled = false;
     }
 });
+}
 
+if (affiliateForm) {
 affiliateForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -1086,6 +1106,7 @@ affiliateForm.addEventListener('submit', async (e) => {
         submitBtn.disabled = false;
     }
 });
+}
 
 // SISTEMA DE CONTACTO WHATSAPP Y EMAIL
 document.addEventListener('DOMContentLoaded', () => {
