@@ -50,7 +50,16 @@ router.put('/profile',
         body('telefono')
             .optional()
             .trim()
-            .matches(/^[0-9]{9,15}$/).withMessage('Teléfono inválido'),
+            .custom((value) => {
+                if (!value) return true; // Es opcional
+                // Permitir formatos flexibles: +34 123 456 789, 123-456-789, etc.
+                // Extraer solo dígitos
+                const digitsOnly = value.replace(/[\s\-().]/g, '').replace(/^\+/, '');
+                if (!/^[0-9]{9,15}$/.test(digitsOnly)) {
+                    throw new Error('Teléfono inválido (debe tener entre 9 y 15 dígitos)');
+                }
+                return true;
+            }),
         body('departamento')
             .optional()
             .trim()
