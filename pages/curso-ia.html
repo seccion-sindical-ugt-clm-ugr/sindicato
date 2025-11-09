@@ -345,6 +345,139 @@
             .bloque {
                 padding: 1.5rem;
             }
+
+            /* Estilos para indicadores de dificultad y progreso */
+            .bloque-header {
+                flex-wrap: wrap;
+                gap: 1rem;
+                align-items: center;
+            }
+
+            .difficulty-indicator,
+            .progress-indicator {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.85rem;
+                padding: 0.3rem 0.6rem;
+                background: rgba(255,255,255,0.1);
+                border-radius: 15px;
+                backdrop-filter: blur(5px);
+            }
+
+            .difficulty-label,
+            .progress-label {
+                font-weight: 500;
+                color: #666;
+                min-width: 40px;
+            }
+
+            .difficulty-bar,
+            .progress-bar {
+                width: 60px;
+                height: 6px;
+                background: #e0e0e0;
+                border-radius: 3px;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .difficulty-fill,
+            .progress-fill {
+                height: 100%;
+                border-radius: 3px;
+                transition: width 0.8s ease;
+                position: relative;
+            }
+
+            .difficulty-fill::after,
+            .progress-fill::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                animation: shimmer 2s infinite;
+            }
+
+            .difficulty-text,
+            .progress-text {
+                font-weight: 600;
+                min-width: 60px;
+                text-align: center;
+            }
+
+            /* Colores según dificultad */
+            .bloque[data-difficulty="beginner"] .difficulty-text {
+                color: #4caf50;
+            }
+
+            .bloque[data-difficulty="intermediate"] .difficulty-text {
+                color: #ff9800;
+            }
+
+            .bloque[data-difficulty="advanced"] .difficulty-text {
+                color: #f44336;
+            }
+
+            /* Animaciones para los indicadores */
+            .bloque:hover .difficulty-indicator,
+            .bloque:hover .progress-indicator {
+                transform: scale(1.05);
+                transition: transform 0.3s ease;
+            }
+
+            .bloque:hover .difficulty-fill,
+            .bloque:hover .progress-fill {
+                animation: progressPulse 1s ease-in-out infinite;
+            }
+
+            @keyframes progressPulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+            }
+
+            /* Efectos de progreso animado */
+            .progress-fill {
+                position: relative;
+            }
+
+            .progress-fill::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+                animation: progressSweep 2s ease-in-out infinite;
+            }
+
+            @keyframes progressSweep {
+                0% { left: -100%; }
+                50% { left: 100%; }
+                100% { left: 100%; }
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .bloque-header {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .difficulty-indicator,
+                .progress-indicator {
+                    justify-content: space-between;
+                }
+
+                .difficulty-bar,
+                .progress-bar {
+                    width: 80px;
+                }
+            }
         }
     </style>
 </head>
@@ -382,6 +515,36 @@
             <p class="subtitle">Jornadas de Introducción a la IA</p>
             <h1>IA en Acción: Transformando el Centro de Lenguas Modernas</h1>
             <p class="hero-subtitle">Formación práctica en Inteligencia Artificial diseñada específicamente para el personal del Centro de Lenguas Modernas de la Universidad de Granada</p>
+
+            <!-- Contador de Plazas Disponibles -->
+            <div class="spots-counter" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3); border-radius: 15px; padding: 1.5rem; margin: 2rem 0; text-align: center;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <div style="color: #ff6b6b; font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">
+                            <span id="availableSpots">8</span><span style="font-size: 1.5rem;">/15</span>
+                        </div>
+                        <div style="color: white; font-size: 1.1rem; font-weight: 500;">PLAZAS DISPONIBLES</div>
+                        <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 0.5rem;">
+                            <i class="fas fa-fire"></i> Últimas plazas disponibles
+                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <div style="background: rgba(255,255,255,0.2); border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden;">
+                                <div id="spotsProgress" style="width: 53%; height: 100%; background: linear-gradient(90deg, #ff6b6b, #ff8e8e); border-radius: 4px; transition: width 0.5s ease;"></div>
+                            </div>
+                            <div style="color: white; font-size: 0.85rem; margin-top: 0.5rem;">
+                                <span id="spotsPercentage">53%</span> de las plazas ya reservadas
+                            </div>
+                        </div>
+                        <div style="color: rgba(255,255,255,0.9); font-size: 0.85rem; line-height: 1.4;">
+                            <i class="fas fa-clock"></i> Inicio: Viernes <span id="nextFriday">Próximo</span><br>
+                            <i class="fas fa-users"></i> <span id="enrolledCount">7</span> personas ya inscritas
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="course-meta-header">
                 <div class="meta-item">
                     <i class="fas fa-clock"></i>
@@ -411,8 +574,283 @@
         </div>
     </section>
 
+    <!-- Navegación Sticky -->
+    <nav id="stickyNav" class="sticky-navigation" style="
+        position: sticky;
+        top: 0;
+        background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+        color: white;
+        padding: 1rem 0;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+    ">
+        <div class="course-content">
+            <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; overflow-x: auto;">
+                <!-- Enlaces de navegación -->
+                <div class="nav-links" style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: nowrap;">
+                    <a href="#journey" class="nav-link" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 20px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.9rem;">
+                        <i class="fas fa-route"></i> Tu Ruta
+                    </a>
+                    <a href="#program" class="nav-link" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 20px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.9rem;">
+                        <i class="fas fa-book-open"></i> Programa
+                    </a>
+                    <a href="#profiles" class="nav-link" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 20px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.9rem;">
+                        <i class="fas fa-users"></i> Perfiles
+                    </a>
+                    <a href="#credentials" class="nav-link" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 20px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.9rem;">
+                        <i class="fas fa-award"></i> Certificaciones
+                    </a>
+                    <a href="#enrollment" class="nav-link" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 20px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.9rem;">
+                        <i class="fas fa-rocket"></i> Inscripción
+                    </a>
+                </div>
+
+                <!-- Indicador rápido de plazas -->
+                <div class="quick-spots" style="background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 15px; display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+                    <i class="fas fa-fire" style="color: #ff6b6b;"></i>
+                    <span style="font-size: 0.85rem; font-weight: 600;">
+                        <span id="quickSpots">12</span>/<span id="quickTotal">15</span> plazas
+                    </span>
+                </div>
+
+                <!-- Botón de inscripción rápida -->
+                <a href="#enrollment" class="quick-enroll" style="
+                    background: #4caf50;
+                    color: white;
+                    padding: 0.7rem 1.5rem;
+                    border-radius: 25px;
+                    text-decoration: none;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    white-space: nowrap;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+                ">
+                    <i class="fas fa-bolt"></i> Inscribirme Ya
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Infografía Animada del Proceso de Aprendizaje -->
+    <section id="journey" class="section" style="background: #f8f9fa; padding: 4rem 0;">
+        <div class="course-content">
+            <div class="section-header">
+                <h2 style="color: #1a237e; margin-bottom: 1rem;">Tu Camino de Aprendizaje en IA</h2>
+                <p style="font-size: 1.2rem; color: #666;">Un viaje transformador en 5 etapas</p>
+            </div>
+
+            <div class="learning-journey" style="position: relative; max-width: 1000px; margin: 0 auto;">
+                <!-- Línea de tiempo -->
+                <div class="timeline-line" style="position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, #667eea 0%, #764ba2 50%, #ff6b6b 100%); transform: translateX(-50%); border-radius: 2px;"></div>
+
+                <!-- Etapas del aprendizaje -->
+                <div class="journey-stage" data-stage="1" style="display: flex; align-items: center; margin-bottom: 3rem; opacity: 0; transform: translateY(30px); transition: all 0.6s ease;">
+                    <div class="stage-content" style="flex: 1; text-align: right; padding-right: 3rem;">
+                        <div class="stage-number" style="background: #667eea; color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 1rem;">1</div>
+                        <h3 style="color: #1a237e; margin-bottom: 0.5rem;">Descubrimiento</h3>
+                        <p style="color: #666; line-height: 1.6;">Exploras los conceptos fundamentales de la IA y su aplicación en tu entorno laboral.</p>
+                        <div class="stage-icon" style="font-size: 2rem; color: #667eea; margin-top: 1rem;">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                    </div>
+                    <div class="stage-point" style="width: 20px; height: 20px; background: #667eea; border: 4px solid white; border-radius: 50%; position: relative; z-index: 2; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);"></div>
+                    <div class="stage-empty" style="flex: 1;"></div>
+                </div>
+
+                <div class="journey-stage" data-stage="2" style="display: flex; align-items: center; margin-bottom: 3rem; opacity: 0; transform: translateY(30px); transition: all 0.6s ease;">
+                    <div class="stage-empty" style="flex: 1;"></div>
+                    <div class="stage-point" style="width: 20px; height: 20px; background: #764ba2; border: 4px solid white; border-radius: 50%; position: relative; z-index: 2; box-shadow: 0 0 0 4px rgba(118, 75, 162, 0.2);"></div>
+                    <div class="stage-content" style="flex: 1; text-align: left; padding-left: 3rem;">
+                        <div class="stage-number" style="background: #764ba2; color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 1rem;">2</div>
+                        <h3 style="color: #1a237e; margin-bottom: 0.5rem;">Experimentación</h3>
+                        <p style="color: #666; line-height: 1.6;">Manejas herramientas reales de IA en casos prácticos adaptados al CLM.</p>
+                        <div class="stage-icon" style="font-size: 2rem; color: #764ba2; margin-top: 1rem;">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="journey-stage" data-stage="3" style="display: flex; align-items: center; margin-bottom: 3rem; opacity: 0; transform: translateY(30px); transition: all 0.6s ease;">
+                    <div class="stage-content" style="flex: 1; text-align: right; padding-right: 3rem;">
+                        <div class="stage-number" style="background: #9c27b0; color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 1rem;">3</div>
+                        <h3 style="color: #1a237e; margin-bottom: 0.5rem;">Aplicación</h3>
+                        <p style="color: #666; line-height: 1.6;">Implementas soluciones de IA en tus tareas diarias del centro.</p>
+                        <div class="stage-icon" style="font-size: 2rem; color: #9c27b0; margin-top: 1rem;">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                    </div>
+                    <div class="stage-point" style="width: 20px; height: 20px; background: #9c27b0; border: 4px solid white; border-radius: 50%; position: relative; z-index: 2; box-shadow: 0 0 0 4px rgba(156, 39, 176, 0.2);"></div>
+                    <div class="stage-empty" style="flex: 1;"></div>
+                </div>
+
+                <div class="journey-stage" data-stage="4" style="display: flex; align-items: center; margin-bottom: 3rem; opacity: 0; transform: translateY(30px); transition: all 0.6s ease;">
+                    <div class="stage-empty" style="flex: 1;"></div>
+                    <div class="stage-point" style="width: 20px; height: 20px; background: #ff9800; border: 4px solid white; border-radius: 50%; position: relative; z-index: 2; box-shadow: 0 0 0 4px rgba(255, 152, 0, 0.2);"></div>
+                    <div class="stage-content" style="flex: 1; text-align: left; padding-left: 3rem;">
+                        <div class="stage-number" style="background: #ff9800; color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 1rem;">4</div>
+                        <h3 style="color: #1a237e; margin-bottom: 0.5rem;">Colaboración</h3>
+                        <p style="color: #666; line-height: 1.6;">Trabajas en equipo en proyectos innovadores para el CLM.</p>
+                        <div class="stage-icon" style="font-size: 2rem; color: #ff9800; margin-top: 1rem;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="journey-stage" data-stage="5" style="display: flex; align-items: center; margin-bottom: 3rem; opacity: 0; transform: translateY(30px); transition: all 0.6s ease;">
+                    <div class="stage-content" style="flex: 1; text-align: right; padding-right: 3rem;">
+                        <div class="stage-number" style="background: #4caf50; color: white; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 1rem;">5</div>
+                        <h3 style="color: #1a237e; margin-bottom: 0.5rem;">Transformación</h3>
+                        <p style="color: #666; line-height: 1.6;">Te conviertes en un agente de cambio con IA en el CLM.</p>
+                        <div class="stage-icon" style="font-size: 2rem; color: #4caf50; margin-top: 1rem;">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                    </div>
+                    <div class="stage-point" style="width: 20px; height: 20px; background: #4caf50; border: 4px solid white; border-radius: 50%; position: relative; z-index: 2; box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.2);"></div>
+                    <div class="stage-empty" style="flex: 1;"></div>
+                </div>
+
+                <!-- Resultado Final -->
+                <div class="journey-result" style="text-align: center; margin-top: 4rem; padding: 2rem; background: linear-gradient(135deg, #1a237e 0%, #667eea 100%); border-radius: 20px; color: white; opacity: 0; transform: translateY(30px); transition: all 0.8s ease;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎓</div>
+                    <h3 style="font-size: 1.8rem; margin-bottom: 1rem;">¡Listo para Transformar el CLM con IA!</h3>
+                    <p style="font-size: 1.1rem; opacity: 1; max-width: 600px; margin: 0 auto; line-height: 1.6; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                        Habrás adquirido las competencias necesarias para aplicar inteligencia artificial en tu trabajo diario,
+                        optimizar procesos y liderar la innovación en el Centro de Lenguas Modernas.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Badges de Credenciales y Acreditaciones -->
+    <section id="credentials" class="section" style="background: white; padding: 4rem 0;">
+        <div class="course-content">
+            <div class="section-header">
+                <h2 style="color: #1a237e; margin-bottom: 1rem;">Credenciales y Acreditaciones</h2>
+                <p style="font-size: 1.2rem; color: #666;">Reconocimiento oficial y garantía de calidad</p>
+            </div>
+
+            <div class="credentials-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1000px; margin: 0 auto;">
+
+                <!-- Badge UGT-CLM -->
+                <div class="credential-badge" style="background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%); color: white; padding: 2rem; border-radius: 15px; text-align: center; position: relative; overflow: hidden; opacity: 0; transform: translateY(30px); transition: all 0.6s ease;">
+                    <div class="badge-shine" style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent); transform: rotate(45deg); animation: shine 3s infinite;"></div>
+
+                    <div class="badge-icon" style="font-size: 3rem; margin-bottom: 1rem; position: relative; z-index: 2;">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.3rem; position: relative; z-index: 2;">Certificado UGT-CLM</h3>
+                    <p style="opacity: 1; line-height: 1.6; margin-bottom: 1.5rem; position: relative; z-index: 2; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">Acreditación oficial de la Sección Sindical UGT-CLM de la Universidad de Granada</p>
+
+                    <div class="badge-features" style="list-style: none; padding: 0; position: relative; z-index: 2;">
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #4caf50; margin-right: 0.5rem;"></i>Reconocimiento institucional</div>
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #4caf50; margin-right: 0.5rem;"></i>Validez nacional</div>
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #4caf50; margin-right: 0.5rem;"></i>Código verificación único</div>
+                    </div>
+                </div>
+
+                <!-- Badge UGR -->
+                <div class="credential-badge" style="background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%); color: white; padding: 2rem; border-radius: 15px; text-align: center; position: relative; overflow: hidden; opacity: 0; transform: translateY(30px); transition: all 0.6s ease;">
+                    <div class="badge-shine" style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent); transform: rotate(45deg); animation: shine 3s infinite;"></div>
+
+                    <div class="badge-icon" style="font-size: 3rem; margin-bottom: 1rem; position: relative; z-index: 2;">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.3rem; position: relative; z-index: 2;">Respaldo UGR</h3>
+                    <p style="opacity: 1; line-height: 1.6; margin-bottom: 1.5rem; position: relative; z-index: 2; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">Desarrollado en colaboración con el Centro de Lenguas Modernas de la UGR</p>
+
+                    <div class="badge-features" style="list-style: none; padding: 0; position: relative; z-index: 2;">
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #81c784; margin-right: 0.5rem;"></i>Excelencia académica</div>
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #81c784; margin-right: 0.5rem;"></i>Contenido validado</div>
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #81c784; margin-right: 0.5rem;"></i>Caso de éxito UGR</div>
+                    </div>
+                </div>
+
+                <!-- Badge Europeo -->
+                <div class="credential-badge" style="background: linear-gradient(135deg, #0277bd 0%, #039be5 100%); color: white; padding: 2rem; border-radius: 15px; text-align: center; position: relative; overflow: hidden; opacity: 0; transform: translateY(30px); transition: all 0.6s ease;">
+                    <div class="badge-shine" style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent); transform: rotate(45deg); animation: shine 3s infinite;"></div>
+
+                    <div class="badge-icon" style="font-size: 3rem; margin-bottom: 1rem; position: relative; z-index: 2;">
+                        <i class="fas fa-globe-europe"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.3rem; position: relative; z-index: 2;">Estándar Europeo</h3>
+                    <p style="opacity: 1; line-height: 1.6; margin-bottom: 1.5rem; position: relative; z-index: 2; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">Cumplimiento con directivas europeas de formación digital</p>
+
+                    <div class="badge-features" style="list-style: none; padding: 0; position: relative; z-index: 2;">
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #4fc3f7; margin-right: 0.5rem;"></i>Marco Europeo Cualificaciones</div>
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #4fc3f7; margin-right: 0.5rem;"></i>ECTS reconocidos</div>
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #4fc3f7; margin-right: 0.5rem;"></i>Validación internacional</div>
+                    </div>
+                </div>
+
+                <!-- Badge Innovación -->
+                <div class="credential-badge" style="background: linear-gradient(135deg, #f57c00 0%, #ff9800 100%); color: white; padding: 2rem; border-radius: 15px; text-align: center; position: relative; overflow: hidden; opacity: 0; transform: translateY(30px); transition: all 0.6s ease;">
+                    <div class="badge-shine" style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent); transform: rotate(45deg); animation: shine 3s infinite;"></div>
+
+                    <div class="badge-icon" style="font-size: 3rem; margin-bottom: 1rem; position: relative; z-index: 2;">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.3rem; position: relative; z-index: 2;">Sello Innovación</h3>
+                    <p style="opacity: 1; line-height: 1.6; margin-bottom: 1.5rem; position: relative; z-index: 2; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">Reconocido como programa pionero en IA aplicada a lenguas modernas</p>
+
+                    <div class="badge-features" style="list-style: none; padding: 0; position: relative; z-index: 2;">
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #ffcc80; margin-right: 0.5rem;"></i>Metodología innovadora</div>
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #ffcc80; margin-right: 0.5rem;"></i>Caso de éxito referente</div>
+                        <div style="padding: 0.3rem 0;"><i class="fas fa-check-circle" style="color: #ffcc80; margin-right: 0.5rem;"></i>Publicación académica</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Sellos de calidad -->
+            <div class="quality-seals" style="margin-top: 3rem; text-align: center; opacity: 0; transform: translateY(30px); transition: all 0.8s ease;">
+                <h3 style="color: #1a237e; margin-bottom: 2rem;">Sellos de Calidad y Reconocimiento</h3>
+
+                <div style="display: flex; justify-content: center; align-items: center; gap: 3rem; flex-wrap: wrap; margin-top: 2rem;">
+                    <div class="seal-item" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="width: 60px; height: 60px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #1a237e;">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <span style="font-size: 0.9rem; color: #666;">Garantía UGT</span>
+                    </div>
+
+                    <div class="seal-item" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="width: 60px; height: 60px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #2e7d32;">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <span style="font-size: 0.9rem; color: #666;">Certificado UGR</span>
+                    </div>
+
+                    <div class="seal-item" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="width: 60px; height: 60px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #0277bd;">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span style="font-size: 0.9rem; color: #666;">Excelencia</span>
+                    </div>
+
+                    <div class="seal-item" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="width: 60px; height: 60px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #f57c00;">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <span style="font-size: 0.9rem; color: #666;">Calidad</span>
+                    </div>
+
+                    <div class="seal-item" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <div style="width: 60px; height: 60px; background: #f5f5f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #9c27b0;">
+                            <i class="fas fa-infinity"></i>
+                        </div>
+                        <span style="font-size: 0.9rem; color: #666;">Aprendizaje Continuo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
   <!-- CTA Buttons -->
-    <section class="section" style="padding: 2rem 0;">
+    <section id="enrollment" class="section" style="padding: 2rem 0;">
         <div class="course-content">
             <div class="enrollment-section">
                 <h2>Inscríbete en las Jornadas de IA</h2>
@@ -517,7 +955,7 @@
     </section>
 
     <!-- Perfiles Profesionales -->
-    <section class="section section-alt">
+    <section id="profiles" class="section section-alt">
         <div class="course-content">
             <div class="section-header">
                 <h2>¿A quién va dirigido?</h2>
@@ -569,7 +1007,7 @@
     </section>
 
     <!-- Programa: Bloques Temáticos -->
-    <section class="section">
+    <section id="program" class="section">
         <div class="course-content">
             <div class="section-header">
                 <h2>Bloques Temáticos</h2>
@@ -578,10 +1016,24 @@
 
             <div class="program-section">
                 <!-- Bloque 1 -->
-                <div class="bloque">
+                <div class="bloque" data-difficulty="beginner" data-progress="20">
                     <div class="bloque-header">
                         <span class="bloque-number">Bloque 1</span>
                         <span class="bloque-duration">4 horas · 6 sesiones</span>
+                        <div class="difficulty-indicator">
+                            <span class="difficulty-label">Nivel:</span>
+                            <div class="difficulty-bar">
+                                <div class="difficulty-fill" style="width: 20%; background: #4caf50;"></div>
+                            </div>
+                            <span class="difficulty-text">Principiante</span>
+                        </div>
+                        <div class="progress-indicator">
+                            <span class="progress-label">Progreso:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 20%;"></div>
+                            </div>
+                            <span class="progress-text">20%</span>
+                        </div>
                     </div>
                     <h3>Fundamentos de la IA</h3>
                     <ul class="bloque-topics">
@@ -595,10 +1047,24 @@
                 </div>
 
                 <!-- Bloque 2 -->
-                <div class="bloque">
+                <div class="bloque" data-difficulty="intermediate" data-progress="40">
                     <div class="bloque-header">
                         <span class="bloque-number">Bloque 2</span>
                         <span class="bloque-duration">6 horas · 9 sesiones</span>
+                        <div class="difficulty-indicator">
+                            <span class="difficulty-label">Nivel:</span>
+                            <div class="difficulty-bar">
+                                <div class="difficulty-fill" style="width: 50%; background: #ff9800;"></div>
+                            </div>
+                            <span class="difficulty-text">Intermedio</span>
+                        </div>
+                        <div class="progress-indicator">
+                            <span class="progress-label">Progreso:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 40%;"></div>
+                            </div>
+                            <span class="progress-text">40%</span>
+                        </div>
                     </div>
                     <h3>IA en el Ámbito Educativo</h3>
                     <ul class="bloque-topics">
@@ -615,10 +1081,24 @@
                 </div>
 
                 <!-- Bloque 3 -->
-                <div class="bloque">
+                <div class="bloque" data-difficulty="intermediate" data-progress="60">
                     <div class="bloque-header">
                         <span class="bloque-number">Bloque 3</span>
                         <span class="bloque-duration">4 horas · 6 sesiones</span>
+                        <div class="difficulty-indicator">
+                            <span class="difficulty-label">Nivel:</span>
+                            <div class="difficulty-bar">
+                                <div class="difficulty-fill" style="width: 60%; background: #ff9800;"></div>
+                            </div>
+                            <span class="difficulty-text">Intermedio</span>
+                        </div>
+                        <div class="progress-indicator">
+                            <span class="progress-label">Progreso:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 60%;"></div>
+                            </div>
+                            <span class="progress-text">60%</span>
+                        </div>
                     </div>
                     <h3>IA en la Gestión Administrativa</h3>
                     <ul class="bloque-topics">
@@ -632,10 +1112,24 @@
                 </div>
 
                 <!-- Bloque 4 -->
-                <div class="bloque">
+                <div class="bloque" data-difficulty="beginner" data-progress="80">
                     <div class="bloque-header">
                         <span class="bloque-number">Bloque 4</span>
                         <span class="bloque-duration">2 horas · 3 sesiones</span>
+                        <div class="difficulty-indicator">
+                            <span class="difficulty-label">Nivel:</span>
+                            <div class="difficulty-bar">
+                                <div class="difficulty-fill" style="width: 30%; background: #4caf50;"></div>
+                            </div>
+                            <span class="difficulty-text">Básico</span>
+                        </div>
+                        <div class="progress-indicator">
+                            <span class="progress-label">Progreso:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 80%;"></div>
+                            </div>
+                            <span class="progress-text">80%</span>
+                        </div>
                     </div>
                     <h3>IA en Servicios y Conserjería</h3>
                     <ul class="bloque-topics">
@@ -647,10 +1141,24 @@
                 </div>
 
                 <!-- Bloque 5 -->
-                <div class="bloque">
+                <div class="bloque" data-difficulty="advanced" data-progress="100">
                     <div class="bloque-header">
                         <span class="bloque-number">Bloque 5</span>
                         <span class="bloque-duration">4 horas · 6 sesiones</span>
+                        <div class="difficulty-indicator">
+                            <span class="difficulty-label">Nivel:</span>
+                            <div class="difficulty-bar">
+                                <div class="difficulty-fill" style="width: 80%; background: #f44336;"></div>
+                            </div>
+                            <span class="difficulty-text">Avanzado</span>
+                        </div>
+                        <div class="progress-indicator">
+                            <span class="progress-label">Progreso:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%;"></div>
+                            </div>
+                            <span class="progress-text">100%</span>
+                        </div>
                     </div>
                     <h3>Proyectos Colaborativos Interdepartamentales</h3>
                     <ul class="bloque-topics">
@@ -2145,6 +2653,1240 @@
                 }, 300);
             }, 4000);
         }
+
+        // =======================================
+        // CONTADOR DE PLAZAS DINÁMICO
+        // =======================================
+
+        // Configuración del contador
+        const spotsConfig = {
+            totalSpots: 15,
+            currentEnrolled: 3, // 3 reservas actuales
+            updateInterval: 30000, // 30 segundos
+            urgencyThreshold: 5 // Menos de 5 plazas = urgencia
+        };
+
+        // Función para actualizar el contador
+        function updateSpotsCounter() {
+            const availableSpots = spotsConfig.totalSpots - spotsConfig.currentEnrolled;
+            const percentage = Math.round((spotsConfig.currentEnrolled / spotsConfig.totalSpots) * 100);
+
+            // Actualizar elementos del DOM
+            const availableSpotsEl = document.getElementById('availableSpots');
+            const spotsProgressEl = document.getElementById('spotsProgress');
+            const spotsPercentageEl = document.getElementById('spotsPercentage');
+            const enrolledCountEl = document.getElementById('enrolledCount');
+            const nextFridayEl = document.getElementById('nextFriday');
+
+            if (availableSpotsEl) {
+                availableSpotsEl.textContent = availableSpots;
+
+                // Efecto de urgencia si quedan pocas plazas
+                if (availableSpots <= spotsConfig.urgencyThreshold) {
+                    availableSpotsEl.style.color = '#ff4444';
+                    availableSpotsEl.style.animation = 'pulse 1s infinite';
+
+                    // Mostrar mensaje de urgencia
+                    if (!document.querySelector('.urgency-message')) {
+                        const urgencyMsg = document.createElement('div');
+                        urgencyMsg.className = 'urgency-message';
+                        urgencyMsg.style.cssText = `
+                            background: #ff4444;
+                            color: white;
+                            padding: 0.5rem 1rem;
+                            border-radius: 20px;
+                            font-size: 0.85rem;
+                            margin-top: 0.5rem;
+                            animation: fadeInUp 0.5s ease;
+                        `;
+                        urgencyMsg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ¡ÚLTIMAS PLAZAS!';
+                        availableSpotsEl.parentElement.appendChild(urgencyMsg);
+                    }
+                }
+            }
+
+            if (spotsProgressEl) {
+                spotsProgressEl.style.width = percentage + '%';
+                // Cambiar color si está casi lleno
+                if (percentage >= 80) {
+                    spotsProgressEl.style.background = 'linear-gradient(90deg, #ff4444, #ff6666)';
+                }
+            }
+
+            if (spotsPercentageEl) {
+                spotsPercentageEl.textContent = percentage + '%';
+            }
+
+            if (enrolledCountEl) {
+                enrolledCountEl.textContent = spotsConfig.currentEnrolled;
+            }
+
+            // Actualizar contador rápido en navegación sticky
+            const quickSpotsEl = document.getElementById('quickSpots');
+            const quickTotalEl = document.getElementById('quickTotal');
+            if (quickSpotsEl) {
+                quickSpotsEl.textContent = availableSpots;
+            }
+            if (quickTotalEl) {
+                quickTotalEl.textContent = spotsConfig.totalSpots;
+            }
+
+            if (nextFridayEl) {
+                // Calcular próximo viernes
+                const today = new Date();
+                const daysUntilFriday = (5 - today.getDay() + 7) % 7 || 7;
+                const nextFriday = new Date(today.getTime() + daysUntilFriday * 24 * 60 * 60 * 1000);
+                const options = { day: 'numeric', month: 'short' };
+                nextFridayEl.textContent = nextFriday.toLocaleDateString('es-ES', options);
+            }
+        }
+
+        // Función para simular inscripciones en tiempo real
+        function simulateRandomEnrollment() {
+            // Simulación aleatoria de nueva inscripción (15% de probabilidad cada 30s)
+            if (Math.random() < 0.15 && spotsConfig.currentEnrolled < spotsConfig.totalSpots - 1) {
+                spotsConfig.currentEnrolled++;
+                updateSpotsCounter();
+
+                // Mostrar notificación de nueva inscripción
+                showNotification('🔥 ¡Alguien se acaba de inscribir! Quedan ' + (spotsConfig.totalSpots - spotsConfig.currentEnrolled) + ' plazas', 'info');
+            }
+        }
+
+        // Inicializar el contador
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSpotsCounter();
+
+            // Actualizar cada 30 segundos
+            setInterval(simulateRandomEnrollment, spotsConfig.updateInterval);
+
+            // Efecto parpadeo inicial para llamar la atención
+            setTimeout(() => {
+                const counter = document.querySelector('.spots-counter');
+                if (counter) {
+                    counter.style.animation = 'pulse 2s ease-in-out';
+                }
+            }, 2000);
+        });
+
+        // Añadir estilos CSS para animaciones
+        const spotsStyles = `
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .spots-counter {
+                animation: fadeInUp 0.8s ease;
+            }
+
+            .spots-counter:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+                transition: all 0.3s ease;
+            }
+
+            @media (max-width: 768px) {
+                .spots-counter > div {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .spots-counter {
+                    padding: 1rem;
+                }
+            }
+        `;
+
+        const spotsStyleSheet = document.createElement('style');
+        spotsStyleSheet.textContent = spotsStyles;
+        document.head.appendChild(spotsStyleSheet);
+
+        // =======================================
+        // INFOGRAFÍA ANIMADA DEL PROCESO
+        // =======================================
+
+        // Función para animar las etapas del aprendizaje
+        function animateLearningJourney() {
+            const stages = document.querySelectorAll('.journey-stage');
+            const result = document.querySelector('.journey-result');
+
+            // Crear Intersection Observer para activar animaciones
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, index * 200);
+
+                        // Animar puntos de la línea de tiempo
+                        const stagePoint = entry.target.querySelector('.stage-point');
+                        if (stagePoint) {
+                            setTimeout(() => {
+                                stagePoint.style.animation = 'pulse 2s infinite';
+                            }, index * 200 + 500);
+                        }
+                    }
+                });
+            }, {
+                threshold: 0.3,
+                rootMargin: '0px 0px -100px 0px'
+            });
+
+            // Observar cada etapa
+            stages.forEach((stage, index) => {
+                observer.observe(stage);
+
+                // Añadir efectos hover interactivos
+                stage.addEventListener('mouseenter', function() {
+                    const stagePoint = this.querySelector('.stage-point');
+                    const stageIcon = this.querySelector('.stage-icon');
+
+                    if (stagePoint) {
+                        stagePoint.style.transform = 'scale(1.3)';
+                        stagePoint.style.transition = 'transform 0.3s ease';
+                    }
+                    if (stageIcon) {
+                        stageIcon.style.transform = 'scale(1.2) rotate(5deg)';
+                        stageIcon.style.transition = 'transform 0.3s ease';
+                    }
+                });
+
+                stage.addEventListener('mouseleave', function() {
+                    const stagePoint = this.querySelector('.stage-point');
+                    const stageIcon = this.querySelector('.stage-icon');
+
+                    if (stagePoint) {
+                        stagePoint.style.transform = 'scale(1)';
+                    }
+                    if (stageIcon) {
+                        stageIcon.style.transform = 'scale(1) rotate(0deg)';
+                    }
+                });
+            });
+
+            // Observar el resultado final
+            if (result) {
+                const resultObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setTimeout(() => {
+                                entry.target.style.opacity = '1';
+                                entry.target.style.transform = 'translateY(0) scale(1.05)';
+                                setTimeout(() => {
+                                    entry.target.style.transform = 'translateY(0) scale(1)';
+                                }, 300);
+                            }, 500);
+                        }
+                    });
+                }, {
+                    threshold: 0.3
+                });
+                resultObserver.observe(result);
+            }
+        }
+
+        // Función para añadir efectos de progreso dinámicos
+        function addProgressEffects() {
+            const stages = document.querySelectorAll('.journey-stage');
+
+            stages.forEach((stage, index) => {
+                const stageContent = stage.querySelector('.stage-content');
+                const stageNumber = stage.querySelector('.stage-number');
+
+                // Crear efecto de partículas cuando aparece
+                if (stageContent) {
+                    stageContent.addEventListener('animationend', function() {
+                        createParticles(stageNumber);
+                    });
+                }
+            });
+        }
+
+        // Función para crear partículas animadas
+        function createParticles(element) {
+            if (!element) return;
+
+            const rect = element.getBoundingClientRect();
+            const colors = ['#667eea', '#764ba2', '#9c27b0', '#ff9800', '#4caf50'];
+
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: fixed;
+                    width: 6px;
+                    height: 6px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    border-radius: 50%;
+                    left: ${rect.left + rect.width / 2}px;
+                    top: ${rect.top + rect.height / 2}px;
+                    pointer-events: none;
+                    z-index: 9999;
+                    animation: particleFade 1s ease-out forwards;
+                `;
+
+                // Animación de partícula
+                const angle = (i / 5) * Math.PI * 2;
+                const distance = 50 + Math.random() * 50;
+                const endX = Math.cos(angle) * distance;
+                const endY = Math.sin(angle) * distance;
+
+                particle.style.setProperty('--endX', endX + 'px');
+                particle.style.setProperty('--endY', endY + 'px');
+
+                document.body.appendChild(particle);
+
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 1000);
+            }
+        }
+
+        // Inicializar animaciones cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Esperar un poco antes de iniciar animaciones
+            setTimeout(() => {
+                animateLearningJourney();
+                addProgressEffects();
+            }, 500);
+        });
+
+        // Añadir estilos CSS para las animaciones
+        const journeyStyles = `
+            @keyframes particleFade {
+                0% {
+                    opacity: 1;
+                    transform: translate(0, 0) scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translate(var(--endX), var(--endY)) scale(0);
+                }
+            }
+
+            .journey-stage:hover .stage-point {
+                transform: scale(1.3) !important;
+                transition: transform 0.3s ease;
+            }
+
+            .journey-stage:hover .stage-icon {
+                transform: scale(1.2) rotate(5deg) !important;
+                transition: transform 0.3s ease;
+            }
+
+            .journey-stage {
+                position: relative;
+            }
+
+            .journey-stage::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                transition: all 0.6s ease;
+                pointer-events: none;
+            }
+
+            .journey-stage:hover::before {
+                width: 200px;
+                height: 200px;
+            }
+
+            .timeline-line {
+                background: linear-gradient(180deg,
+                    transparent 0%,
+                    #667eea 20%,
+                    #764ba2 50%,
+                    #9c27b0 70%,
+                    #ff9800 85%,
+                    #4caf50 100%,
+                    transparent 100%) !important;
+                animation: lineGlow 3s ease-in-out infinite;
+            }
+
+            @keyframes lineGlow {
+                0%, 100% { opacity: 0.7; }
+                50% { opacity: 1; }
+            }
+
+            .stage-number {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .stage-number::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+                transform: rotate(45deg);
+                animation: shimmer 2s infinite;
+            }
+
+            @keyframes shimmer {
+                0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+                100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            }
+
+            @media (max-width: 768px) {
+                .learning-journey {
+                    padding: 0 1rem;
+                }
+
+                .journey-stage {
+                    flex-direction: column !important;
+                    text-align: center !important;
+                    margin-bottom: 2rem;
+                }
+
+                .stage-content {
+                    padding: 1rem !important;
+                    text-align: center !important;
+                }
+
+                .timeline-line {
+                    left: 20px;
+                    width: 3px;
+                }
+
+                .stage-point {
+                    position: absolute;
+                    left: 11px;
+                }
+
+                .stage-empty {
+                    display: none;
+                }
+            }
+        `;
+
+        const journeyStyleSheet = document.createElement('style');
+        journeyStyleSheet.textContent = journeyStyles;
+        document.head.appendChild(journeyStyleSheet);
+
+        // =======================================
+        // ANIMACIÓN DE BADGES DE CREDENCIALES
+        // =======================================
+
+        // Función para animar los badges de credenciales
+        function animateCredentialBadges() {
+            const badges = document.querySelectorAll('.credential-badge');
+            const qualitySeals = document.querySelector('.quality-seals');
+
+            // Crear Intersection Observer para badges
+            const badgeObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0) scale(1.02)';
+                            setTimeout(() => {
+                                entry.target.style.transform = 'translateY(0) scale(1)';
+                            }, 200);
+                        }, index * 150);
+
+                        // Añadir efecto flotante después de la animación inicial
+                        setTimeout(() => {
+                            entry.target.style.animation = 'float 3s ease-in-out infinite';
+                        }, index * 150 + 800);
+                    }
+                });
+            }, {
+                threshold: 0.2,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            // Observar cada badge
+            badges.forEach((badge, index) => {
+                badgeObserver.observe(badge);
+
+                // Añadir efectos hover interactivos
+                badge.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.05) rotate(1deg)';
+                    this.style.boxShadow = '0 15px 40px rgba(0,0,0,0.2)';
+
+                    // Animar icono
+                    const icon = this.querySelector('.badge-icon');
+                    if (icon) {
+                        icon.style.transform = 'scale(1.2) rotate(10deg)';
+                        icon.style.transition = 'transform 0.3s ease';
+                    }
+                });
+
+                badge.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                    this.style.boxShadow = 'none';
+
+                    // Restaurar icono
+                    const icon = this.querySelector('.badge-icon');
+                    if (icon) {
+                        icon.style.transform = 'scale(1) rotate(0deg)';
+                    }
+                });
+
+                // Añadir efecto de clic
+                badge.addEventListener('click', function() {
+                    this.style.animation = 'pulse 0.5s ease';
+                    setTimeout(() => {
+                        this.style.animation = 'float 3s ease-in-out infinite';
+                    }, 500);
+                });
+            });
+
+            // Observar sellos de calidad
+            if (qualitySeals) {
+                const sealObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setTimeout(() => {
+                                entry.target.style.opacity = '1';
+                                entry.target.style.transform = 'translateY(0)';
+
+                                // Animar sellos individuales
+                                const sealItems = entry.target.querySelectorAll('.seal-item');
+                                sealItems.forEach((seal, index) => {
+                                    setTimeout(() => {
+                                        seal.style.opacity = '0';
+                                        seal.style.transform = 'translateY(20px)';
+                                        setTimeout(() => {
+                                            seal.style.opacity = '1';
+                                            seal.style.transform = 'translateY(0)';
+                                            seal.style.transition = 'all 0.5s ease';
+                                        }, 50);
+                                    }, index * 100);
+                                });
+                            }, 300);
+                        }
+                    });
+                }, {
+                    threshold: 0.3
+                });
+                sealObserver.observe(qualitySeals);
+            }
+        }
+
+        // Función para añadir efectos de brillo dinámico
+        function addShineEffects() {
+            const badges = document.querySelectorAll('.credential-badge');
+
+            badges.forEach(badge => {
+                // Crear partículas de brillo aleatorias
+                setInterval(() => {
+                    if (Math.random() < 0.3) { // 30% de probabilidad
+                        createShineParticle(badge);
+                    }
+                }, 3000);
+            });
+        }
+
+        // Función para crear partículas de brillo
+        function createShineParticle(element) {
+            const particle = document.createElement('div');
+            particle.style.cssText = `
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background: white;
+                border-radius: 50%;
+                left: ${Math.random() * 100}%;
+                top: ${Math.random() * 100}%;
+                opacity: 0;
+                pointer-events: none;
+                z-index: 10;
+                animation: sparkle 1s ease-out forwards;
+            `;
+
+            element.appendChild(particle);
+
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 1000);
+        }
+
+        // Inicializar animaciones de badges
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                animateCredentialBadges();
+                addShineEffects();
+            }, 800);
+        });
+
+        // Añadir estilos CSS para animaciones de badges
+        const badgeStyles = `
+            @keyframes shine {
+                0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+                100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            }
+
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) scale(1); }
+                50% { transform: translateY(-3px) scale(1.01); }
+            }
+
+            @keyframes sparkle {
+                0% {
+                    opacity: 0;
+                    transform: scale(0);
+                }
+                50% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: scale(0) translateY(-20px);
+                }
+            }
+
+            .credential-badge {
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+                position: relative;
+            }
+
+            .credential-badge:hover {
+                z-index: 10;
+            }
+
+            .credential-badge::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                border-radius: 15px;
+            }
+
+            .credential-badge:hover::before {
+                opacity: 1;
+            }
+
+            .badge-icon {
+                transition: all 0.3s ease;
+                position: relative;
+                z-index: 2;
+            }
+
+            .badge-icon::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                transition: all 0.5s ease;
+            }
+
+            .credential-badge:hover .badge-icon::after {
+                width: 80px;
+                height: 80px;
+            }
+
+            .seal-item {
+                transition: all 0.3s ease;
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            .seal-item:hover {
+                transform: translateY(-5px) scale(1.1);
+            }
+
+            .seal-item div {
+                transition: all 0.3s ease;
+            }
+
+            .seal-item:hover div {
+                transform: scale(1.1);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+            @media (max-width: 768px) {
+                .credentials-container {
+                    grid-template-columns: 1fr;
+                    gap: 1.5rem;
+                }
+
+                .credential-badge {
+                    padding: 1.5rem;
+                }
+
+                .badge-icon {
+                    font-size: 2.5rem;
+                }
+
+                .quality-seals > div {
+                    gap: 2rem;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .seal-item {
+                    min-width: 100px;
+                }
+
+                .seal-item span {
+                    font-size: 0.8rem;
+                }
+            }
+        `;
+
+        const badgeStyleSheet = document.createElement('style');
+        badgeStyleSheet.textContent = badgeStyles;
+        document.head.appendChild(badgeStyleSheet);
+
+        // =======================================
+        // ANIMACIÓN DE INDICADORES DE BLOQUES
+        // =======================================
+
+        // Función para animar los indicadores de dificultad y progreso
+        function animateBlockIndicators() {
+            const blocks = document.querySelectorAll('.bloque[data-difficulty]');
+
+            blocks.forEach((block, index) => {
+                const difficulty = block.dataset.difficulty;
+                const progress = parseInt(block.dataset.progress);
+
+                // Animar barras de progreso al cargar
+                const progressFills = block.querySelectorAll('.progress-fill');
+                progressFills.forEach(fill => {
+                    const targetWidth = fill.style.width;
+                    fill.style.width = '0%';
+
+                    setTimeout(() => {
+                        fill.style.width = targetWidth;
+                    }, index * 200 + 500);
+                });
+
+                // Añadir efectos interactivos
+                block.addEventListener('mouseenter', function() {
+                    // Resaltar indicadores
+                    const indicators = this.querySelectorAll('.difficulty-indicator, .progress-indicator');
+                    indicators.forEach(indicator => {
+                        indicator.style.background = 'rgba(255,255,255,0.2)';
+                        indicator.style.transform = 'scale(1.05)';
+                    });
+
+                    // Animar barras
+                    const fills = this.querySelectorAll('.difficulty-fill, .progress-fill');
+                    fills.forEach(fill => {
+                        fill.style.animation = 'progressPulse 0.8s ease-in-out infinite';
+                    });
+                });
+
+                block.addEventListener('mouseleave', function() {
+                    // Restaurar indicadores
+                    const indicators = this.querySelectorAll('.difficulty-indicator, .progress-indicator');
+                    indicators.forEach(indicator => {
+                        indicator.style.background = 'rgba(255,255,255,0.1)';
+                        indicator.style.transform = 'scale(1)';
+                    });
+
+                    // Detener animación de barras
+                    const fills = this.querySelectorAll('.difficulty-fill, .progress-fill');
+                    fills.forEach(fill => {
+                        fill.style.animation = '';
+                    });
+                });
+
+                // Añadir efecto de clic para mostrar detalles
+                block.addEventListener('click', function(e) {
+                    if (!e.target.closest('h3') && !e.target.closest('ul')) {
+                        showBlockDetails(this);
+                    }
+                });
+            });
+        }
+
+        // Función para mostrar detalles del bloque
+        function showBlockDetails(block) {
+            const difficulty = block.dataset.difficulty;
+            const progress = block.dataset.progress;
+            const title = block.querySelector('h3').textContent;
+
+            // Crear tooltip o modal con información detallada
+            const tooltip = document.createElement('div');
+            tooltip.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 2rem;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                z-index: 10000;
+                max-width: 400px;
+                animation: modalFadeIn 0.3s ease;
+            `;
+
+            const difficultyColors = {
+                'beginner': '#4caf50',
+                'intermediate': '#ff9800',
+                'advanced': '#f44336'
+            };
+
+            const difficultyLabels = {
+                'beginner': 'Principiante',
+                'intermediate': 'Intermedio',
+                'advanced': 'Avanzado'
+            };
+
+            tooltip.innerHTML = `
+                <div style="text-align: center;">
+                    <h3 style="margin: 0 0 1rem 0; color: #1a237e;">${title}</h3>
+                    <div style="display: flex; justify-content: space-around; margin-bottom: 1.5rem;">
+                        <div>
+                            <div style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">Dificultad</div>
+                            <div style="font-size: 1.2rem; font-weight: bold; color: ${difficultyColors[difficulty]};">
+                                ${difficultyLabels[difficulty]}
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">Progreso</div>
+                            <div style="font-size: 1.2rem; font-weight: bold; color: #1a237e;">
+                                ${progress}%
+                            </div>
+                        </div>
+                    </div>
+                    <p style="color: #666; line-height: 1.5; margin-bottom: 1.5rem;">
+                        Haz clic en cualquier bloque para ver más detalles sobre los contenidos y actividades.
+                    </p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="
+                        background: #1a237e;
+                        color: white;
+                        border: none;
+                        padding: 0.5rem 1.5rem;
+                        border-radius: 20px;
+                        cursor: pointer;
+                        font-size: 0.9rem;
+                    ">Cerrar</button>
+                </div>
+            `;
+
+            document.body.appendChild(tooltip);
+
+            // Cerrar automáticamente después de 5 segundos
+            setTimeout(() => {
+                if (tooltip.parentElement) {
+                    tooltip.style.animation = 'modalFadeOut 0.3s ease';
+                    setTimeout(() => {
+                        if (tooltip.parentElement) {
+                            tooltip.parentElement.removeChild(tooltip);
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+
+        // Función para crear animación de seguimiento de progreso general
+        function createOverallProgressTracker() {
+            const blocks = document.querySelectorAll('.bloque[data-progress]');
+            let totalProgress = 0;
+
+            blocks.forEach(block => {
+                totalProgress += parseInt(block.dataset.progress);
+            });
+
+            const averageProgress = Math.round(totalProgress / blocks.length);
+
+            // Crear indicador de progreso general
+            const progressTracker = document.createElement('div');
+            progressTracker.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: white;
+                padding: 1rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                z-index: 1000;
+                min-width: 200px;
+                opacity: 0;
+                transform: translateY(20px);
+                transition: all 0.3s ease;
+            `;
+
+            progressTracker.innerHTML = `
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; text-align: center;">
+                    Progreso del Programa
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="flex: 1; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
+                        <div id="overallProgress" style="height: 100%; background: linear-gradient(90deg, #4caf50, #2196f3); width: 0%; transition: width 1s ease; border-radius: 4px;"></div>
+                    </div>
+                    <span style="font-weight: bold; color: #1a237e; font-size: 0.9rem;">${averageProgress}%</span>
+                </div>
+                <div style="font-size: 0.75rem; color: #999; margin-top: 0.5rem; text-align: center;">
+                    ${blocks.length} bloques completados
+                </div>
+            `;
+
+            document.body.appendChild(progressTracker);
+
+            // Animar entrada y progreso
+            setTimeout(() => {
+                progressTracker.style.opacity = '1';
+                progressTracker.style.transform = 'translateY(0)';
+
+                setTimeout(() => {
+                    document.getElementById('overallProgress').style.width = averageProgress + '%';
+                }, 300);
+            }, 2000);
+
+            // Ocultar después de 10 segundos
+            setTimeout(() => {
+                progressTracker.style.opacity = '0';
+                setTimeout(() => {
+                    if (progressTracker.parentElement) {
+                        progressTracker.parentElement.removeChild(progressTracker);
+                    }
+                }, 300);
+            }, 10000);
+        }
+
+        // Inicializar animaciones de indicadores
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                animateBlockIndicators();
+                createOverallProgressTracker();
+            }, 1000);
+        });
+
+        // Añadir estilos CSS adicionales para animaciones
+        const indicatorStyles = `
+            @keyframes modalFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translate(-50%, -50%) scale(0.8);
+                }
+                to {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1);
+                }
+            }
+
+            @keyframes modalFadeOut {
+                from {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1);
+                }
+                to {
+                    opacity: 0;
+                    transform: translate(-50%, -50%) scale(0.8);
+                }
+            }
+
+            .bloque {
+                cursor: pointer;
+                position: relative;
+            }
+
+            .bloque::after {
+                content: 'ℹ️';
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                font-size: 0.8rem;
+                opacity: 0.5;
+                transition: opacity 0.3s ease;
+            }
+
+            .bloque:hover::after {
+                opacity: 1;
+            }
+
+            @media (max-width: 768px) {
+                .difficulty-indicator,
+                .progress-indicator {
+                    font-size: 0.75rem;
+                    padding: 0.2rem 0.4rem;
+                }
+
+                .difficulty-bar,
+                .progress-bar {
+                    width: 50px;
+                    height: 4px;
+                }
+
+                .difficulty-text,
+                .progress-text {
+                    font-size: 0.75rem;
+                    min-width: 50px;
+                }
+            }
+        `;
+
+        const indicatorStyleSheet = document.createElement('style');
+        indicatorStyleSheet.textContent = indicatorStyles;
+        document.head.appendChild(indicatorStyleSheet);
+
+        // =======================================
+        // NAVEGACIÓN STICKY CON SCROLL SUAVE
+        // =======================================
+
+        // Función para inicializar navegación sticky
+        function initStickyNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section[id]');
+
+            // Smooth scroll para enlaces de navegación
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+
+                    if (targetSection) {
+                        const offsetTop = targetSection.offsetTop - 80; // Compensar altura de nav sticky
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+
+                        // Cerrar menú móvil si está abierto
+                        const mobileMenu = document.querySelector('.nav-menu');
+                        if (mobileMenu && mobileMenu.classList.contains('active')) {
+                            mobileMenu.classList.remove('active');
+                        }
+                    }
+                });
+            });
+
+            // Detectar sección activa al hacer scroll
+            function updateActiveSection() {
+                const scrollY = window.pageYOffset;
+
+                sections.forEach(section => {
+                    const sectionHeight = section.offsetHeight;
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionId = section.getAttribute('id');
+
+                    if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                        // Remover clase activa de todos los enlaces
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            link.style.background = 'rgba(255,255,255,0.1)';
+                        });
+
+                        // Añadir clase activa al enlace correspondiente
+                        const activeLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
+                        if (activeLink) {
+                            activeLink.classList.add('active');
+                            activeLink.style.background = 'rgba(255,255,255,0.3)';
+                            activeLink.style.transform = 'scale(1.05)';
+                        }
+                    }
+                });
+
+                // Mostrar/ocultar navegación sticky según scroll
+                const stickyNav = document.getElementById('stickyNav');
+                if (stickyNav) {
+                    if (scrollY > 300) {
+                        stickyNav.style.position = 'sticky';
+                        stickyNav.style.top = '0';
+                    } else {
+                        stickyNav.style.position = 'absolute';
+                        stickyNav.style.top = '-100px';
+                    }
+                }
+            }
+
+            // Event listeners
+            window.addEventListener('scroll', updateActiveSection);
+            window.addEventListener('resize', updateActiveSection);
+
+            // Inicializar
+            updateActiveSection();
+
+            // Efectos hover mejorados
+            navLinks.forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.background = 'rgba(255,255,255,0.25)';
+                        this.style.transform = 'scale(1.02)';
+                    }
+                });
+
+                link.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.background = 'rgba(255,255,255,0.1)';
+                        this.style.transform = 'scale(1)';
+                    }
+                });
+            });
+
+            // Animar contador rápido en navegación sticky
+            animateQuickSpots();
+        }
+
+        // Función para animar el contador rápido
+        function animateQuickSpots() {
+            const quickSpotsEl = document.getElementById('quickSpots');
+            const targetValue = spotsConfig.totalSpots - spotsConfig.currentEnrolled;
+            let currentValue = 0;
+
+            if (quickSpotsEl) {
+                const animationDuration = 2000; // 2 segundos
+                const stepTime = 50;
+                const steps = animationDuration / stepTime;
+                const increment = targetValue / steps;
+
+                const counter = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= targetValue) {
+                        currentValue = targetValue;
+                        clearInterval(counter);
+                    }
+                    quickSpotsEl.textContent = Math.floor(currentValue);
+                }, stepTime);
+            }
+        }
+
+        // Función para integrar con backend real
+        async function fetchRealEnrollmentData() {
+            try {
+                const API_URL = typeof BACKEND_CONFIG !== 'undefined'
+                    ? BACKEND_CONFIG.apiUrl
+                    : 'https://sindicato-mu.vercel.app';
+
+                // Endpoint para obtener datos de inscripciones reales
+                const response = await fetch(`${API_URL}/api/course-ia/enrollment-stats`);
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Actualizar configuración con datos reales
+                    if (data.totalSpots !== undefined) spotsConfig.totalSpots = data.totalSpots;
+                    if (data.currentEnrolled !== undefined) spotsConfig.currentEnrolled = data.currentEnrolled;
+                    if (data.reserved !== undefined) spotsConfig.reserved = data.reserved;
+
+                    // Actualizar todos los contadores
+                    updateSpotsCounter();
+                    showNotification('📊 Datos de inscripciones actualizados', 'success');
+                } else {
+                    console.warn('No se pudieron obtener datos reales del backend');
+                }
+            } catch (error) {
+                console.error('Error obteniendo datos de inscripciones:', error);
+                // Mostrar notificación de que se usan datos simulados
+                showNotification('⚠️ Usando datos de inscripciones simulados', 'info');
+            }
+        }
+
+        // Inicializar navegación sticky
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                initStickyNavigation();
+
+                // Intentar obtener datos reales del backend
+                fetchRealEnrollmentData();
+
+                // Actualizar datos periódicamente
+                setInterval(fetchRealEnrollmentData, 60000); // Cada minuto
+            }, 1500);
+        });
+
+        // Añadir estilos CSS para navegación sticky
+        const navStyles = `
+            .nav-link {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .nav-link.active {
+                background: rgba(255,255,255,0.3) !important;
+                transform: scale(1.05);
+                box-shadow: 0 2px 10px rgba(255,255,255,0.2);
+            }
+
+            .nav-link:hover {
+                transform: scale(1.02);
+            }
+
+            .quick-spots {
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            .quick-enroll:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4) !important;
+            }
+
+            .sticky-navigation {
+                transition: all 0.3s ease;
+            }
+
+            /* Responsive para móvil */
+            @media (max-width: 768px) {
+                .nav-container {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .nav-links {
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 0.5rem;
+                }
+
+                .nav-link {
+                    font-size: 0.8rem;
+                    padding: 0.4rem 0.8rem;
+                }
+
+                .quick-spots,
+                .quick-enroll {
+                    width: 100%;
+                    text-align: center;
+                }
+            }
+
+            /* Animación de pulso para indicador de urgencia */
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+            }
+
+            /* Scroll suave */
+            html {
+                scroll-behavior: smooth;
+            }
+        `;
+
+        const navStyleSheet = document.createElement('style');
+        navStyleSheet.textContent = navStyles;
+        document.head.appendChild(navStyleSheet);
     </script>
 </body>
 </html>
