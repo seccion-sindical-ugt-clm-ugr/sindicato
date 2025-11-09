@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Inscripción Confirmada! - UGT-CLM-UGR Granada</title>
+    <title>¡Inscripción Confirmada! - Jornadas IA UGT-CLM-UGR</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <style>
         .success-container {
             min-height: 100vh;
@@ -131,6 +132,30 @@
             box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
         }
 
+        .btn-download {
+            background: #9c27b0;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-download:hover {
+            background: #7b1fa2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+        }
+
+        .btn-download:active {
+            transform: translateY(0);
+        }
+
         .next-steps {
             background: #fff3e0;
             border-left: 4px solid #ff9800;
@@ -180,38 +205,45 @@
                 <i class="fas fa-check-circle"></i>
             </div>
 
-            <h1 class="success-title">¡Inscripción Confirmada!</h1>
-            <p class="success-subtitle">Tu pago se ha procesado correctamente</p>
+            <h1 class="success-title">🎓 ¡Inscripción Confirmada!</h1>
+            <p class="success-subtitle">¡Bienvenido/a a las Jornadas de Inteligencia Artificial!</p>
 
-            <div class="info-box">
-                <i class="fas fa-envelope"></i>
-                <strong>Revisa tu email</strong><br>
-                <p style="margin: 0.5rem 0 0 2rem;">
-                    Hemos enviado un correo a <span id="userEmail">tu dirección de email</span> con todos los detalles
-                    de acceso al curso, el enlace de Zoom para las sesiones y el material didáctico.
+            <div class="info-box" style="background: #e3f2fd; border-color: #2196F3;">
+                <i class="fas fa-robot" style="color: #2196F3;"></i>
+                <strong>🎯 Has sido inscrito en:</strong><br>
+                <p style="margin: 0.5rem 0 0 2rem; font-weight: 600; color: #1976D2;">
+                    Jornadas de Inteligencia Artificial para el Centro de Lenguas Modernas
                 </p>
             </div>
 
             <div class="details-section">
                 <h3>📋 Detalles de tu Inscripción</h3>
                 <div class="detail-item">
-                    <span class="detail-label">Curso:</span>
-                    <span class="detail-value" id="courseName">Cargando...</span>
+                    <span class="detail-label">🎓 Formación:</span>
+                    <span class="detail-value">Jornadas de IA - CLM</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Modalidad:</span>
-                    <span class="detail-value">Pago Completo - Externo</span>
+                    <span class="detail-label">📅 Duración:</span>
+                    <span class="detail-value">20 horas (30 sesiones)</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Importe Pagado:</span>
-                    <span class="detail-value" id="amountPaid">160,00 €</span>
+                    <span class="detail-label">💻 Modalidad:</span>
+                    <span class="detail-value">Virtual por Zoom</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Fecha de Pago:</span>
+                    <span class="detail-label">💰 Inversión:</span>
+                    <span class="detail-value" id="amountPaid">Cargando...</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📧 Email:</span>
+                    <span class="detail-value" id="userEmail">Cargando...</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📅 Fecha:</span>
                     <span class="detail-value" id="paymentDate">Cargando...</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">ID de Transacción:</span>
+                    <span class="detail-label">🆔 ID Transacción:</span>
                     <span class="detail-value" id="transactionId" style="font-size: 0.9rem;">Cargando...</span>
                 </div>
             </div>
@@ -220,30 +252,52 @@
                 <h4><i class="fas fa-rocket"></i> Próximos Pasos</h4>
                 <ul>
                     <li>
-                        <i class="fas fa-check"></i>
-                        <span>Revisa tu email (incluyendo la carpeta de spam) para encontrar el mensaje de confirmación</span>
+                        <i class="fas fa-envelope"></i>
+                        <span>Revisa tu email (incluyendo spam) - recibirás acceso a Zoom y materiales</span>
                     </li>
                     <li>
-                        <i class="fas fa-check"></i>
-                        <span>Guarda el enlace de Zoom que te hemos enviado para las sesiones en directo</span>
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Las sesiones son los viernes (mañana y tarde) durante 5 semanas</span>
                     </li>
                     <li>
-                        <i class="fas fa-check"></i>
-                        <span>Accede al material del curso a través del enlace proporcionado en el email</span>
+                        <i class="fas fa-laptop"></i>
+                        <span>Prepara tu equipo con cámara y micrófono para las sesiones interactivas</span>
                     </li>
                     <li>
-                        <i class="fas fa-check"></i>
-                        <span>Recuerda: Las sesiones son los jueves y viernes durante 5 semanas</span>
+                        <i class="fas fa-book"></i>
+                        <span>Accede al material de estudio desde el enlace que recibirás por email</span>
                     </li>
                 </ul>
             </div>
 
-            <div class="info-box" style="background: #e8f5e9; border-color: #4CAF50;">
-                <i class="fas fa-gift" style="color: #4CAF50;"></i>
-                <strong>¿Sabías que...?</strong><br>
+            <!-- Material Didáctico Descargable -->
+            <div class="info-box" style="background: #f3e5f5; border-color: #9c27b0;">
+                <i class="fas fa-download" style="color: #9c27b0;"></i>
+                <strong>📚 Material Didáctico Gratuito</strong><br>
                 <p style="margin: 0.5rem 0 0 2rem;">
-                    Los afiliados a UGT-CLM-UGR acceden a este curso por solo 15€ (90% de descuento).
-                    <a href="index.html#afiliate" style="color: #2196F3;">Más información sobre la afiliación</a>
+                    Descarga material complementario para las jornadas:
+                </p>
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button onclick="downloadWorkbook()" class="btn-download">
+                        <i class="fas fa-book"></i> Cuaderno de Ejercicios
+                    </button>
+                    <button onclick="downloadResources()" class="btn-download">
+                        <i class="fas fa-tools"></i> Recursos IA
+                    </button>
+                    <button onclick="downloadTemplates()" class="btn-download">
+                        <i class="fas fa-file-alt"></i> Plantillas
+                    </button>
+                </div>
+            </div>
+
+            <div class="info-box" style="background: #fff3e0; border-color: #ff9800;">
+                <i class="fas fa-gift" style="color: #ff9800;"></i>
+                <strong>🎁 Beneficios Adicionales</strong><br>
+                <p style="margin: 0.5rem 0 0 2rem;">
+                    • Acceso a comunidad de participantes<br>
+                    • Soporte técnico durante las jornadas<br>
+                    • Certificado oficial UGT-CLM al finalizar<br>
+                    • Material actualizado permanentemente
                 </p>
             </div>
 
@@ -309,6 +363,280 @@
                 console.error('Error cargando detalles:', error);
                 // Los valores por defecto ya están en el HTML
             }
+        }
+
+        // Funciones para descargar material didáctico
+        function downloadWorkbook() {
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                generateWorkbookPDF();
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                showNotification('📚 Cuaderno de ejercicios descargado', 'success');
+            }, 1000);
+        }
+
+        function downloadResources() {
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                generateResourcesPDF();
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                showNotification('🔧 Recursos IA descargados', 'success');
+            }, 1000);
+        }
+
+        function downloadTemplates() {
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                generateTemplatesPDF();
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                showNotification('📄 Plantillas descargadas', 'success');
+            }, 1000);
+        }
+
+        // Función para generar cuaderno de ejercicios
+        function generateWorkbookPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 20;
+            let yPosition = margin;
+
+            // Portada
+            doc.setFontSize(24);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Cuaderno de Ejercicios', margin, yPosition);
+            yPosition += 10;
+
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Jornadas de Inteligencia Artificial', margin, yPosition);
+            yPosition += 10;
+
+            doc.setFontSize(12);
+            doc.text('Para el Centro de Lenguas Modernas', margin, yPosition);
+            yPosition += 20;
+
+            // Ejercicios
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Ejercicio 1: Conceptos básicos de IA', margin, yPosition);
+            yPosition += 8;
+
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            const exercises = [
+                '1. Define con tus propias palabras qué es la Inteligencia Artificial.',
+                '2. Menciona 3 ejemplos de IA que uses en tu vida diaria.',
+                '3. ¿Cuál es la diferencia entre IA débil y IA fuerte?',
+                '4. Investiga un avance reciente en IA y describe brevemente en qué consiste.',
+                '5. ¿Cómo crees que la IA puede ayudar en tu trabajo específico en el CLM?'
+            ];
+
+            exercises.forEach(exercise => {
+                const lines = doc.splitTextToSize(exercise, pageWidth - (margin * 2));
+                lines.forEach(line => {
+                    doc.text(line, margin, yPosition);
+                    yPosition += 6;
+                });
+                yPosition += 4;
+            });
+
+            // Guardar PDF
+            doc.save('cuaderno-ejercicios-jornadas-ia.pdf');
+        }
+
+        // Función para generar recursos IA
+        function generateResourcesPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 20;
+            let yPosition = margin;
+
+            // Portada
+            doc.setFontSize(24);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Recursos de IA', margin, yPosition);
+            yPosition += 10;
+
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Herramientas y Plataformas', margin, yPosition);
+            yPosition += 20;
+
+            // Lista de recursos
+            const resources = [
+                {
+                    name: 'ChatGPT',
+                    description: 'Asistente de IA conversacional para generar texto, traducir, resumir, etc.',
+                    url: 'https://chat.openai.com'
+                },
+                {
+                    name: 'Claude',
+                    description: 'Asistente avanzado para análisis, escritura y razonamiento.',
+                    url: 'https://claude.ai'
+                },
+                {
+                    name: 'Gemini',
+                    description: 'IA generativa de Google con capacidades multimodales.',
+                    url: 'https://gemini.google.com'
+                },
+                {
+                    name: 'DALL-E',
+                    description: 'Generación de imágenes a partir de descripciones textuales.',
+                    url: 'https://openai.com/dall-e'
+                },
+                {
+                    name: 'Canva Magic Design',
+                    description: 'Diseño asistido por IA para presentaciones y documentos.',
+                    url: 'https://www.canva.com/magic-design'
+                }
+            ];
+
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Herramientas recomendadas:', margin, yPosition);
+            yPosition += 10;
+
+            resources.forEach(resource => {
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`• ${resource.name}`, margin, yPosition);
+                yPosition += 6;
+
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                const lines = doc.splitTextToSize(resource.description, pageWidth - (margin * 2) - 5);
+                lines.forEach(line => {
+                    doc.text(`  ${line}`, margin, yPosition);
+                    yPosition += 5;
+                });
+                doc.text(`  URL: ${resource.url}`, margin, yPosition);
+                yPosition += 8;
+            });
+
+            doc.save('recursos-herramientas-ia.pdf');
+        }
+
+        // Función para generar plantillas
+        function generateTemplatesPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 20;
+            let yPosition = margin;
+
+            // Portada
+            doc.setFontSize(24);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Plantillas de IA', margin, yPosition);
+            yPosition += 10;
+
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Prompts y Ejemplos Prácticos', margin, yPosition);
+            yPosition += 20;
+
+            // Plantillas de prompts
+            const templates = [
+                {
+                    title: 'Para crear contenido educativo',
+                    prompt: 'Actúa como un experto en educación. Crea una [actividad] sobre [tema] para [nivel/aplicación]. Incluye [elementos específicos].'
+                },
+                {
+                    title: 'Para traducir y adaptar',
+                    prompt: 'Traduce el siguiente texto al [idioma]: [texto]. Luego adapta el tono para [audiencia específica].'
+                },
+                {
+                    title: 'Para resumir documentos',
+                    prompt: 'Resume el siguiente texto en [número] puntos clave: [texto]. Destalla las ideas principales y las conclusiones más importantes.'
+                },
+                {
+                    title: 'Para brainstorming',
+                    prompt: 'Genera [número] ideas innovadoras para [propósito]. Considera el contexto de [situación específica].'
+                },
+                {
+                    title: 'Para corrección',
+                    prompt: 'Revisa y corrige el siguiente texto: [texto]. Mejora la claridad, gramática y estilo. Sugiere alternativas.'
+                }
+            ];
+
+            templates.forEach((template, index) => {
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`${index + 1}. ${template.title}`, margin, yPosition);
+                yPosition += 8;
+
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Prompt:', margin, yPosition);
+                yPosition += 5;
+
+                const lines = doc.splitTextToSize(template.prompt, pageWidth - (margin * 2) - 5);
+                lines.forEach(line => {
+                    doc.text(`  ${line}`, margin, yPosition);
+                    yPosition += 5;
+                });
+
+                yPosition += 10;
+            });
+
+            doc.save('plantillas-prompts-ia.pdf');
+        }
+
+        // Función para mostrar notificaciones
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                font-size: 14px;
+                max-width: 300px;
+                word-wrap: break-word;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
 
         // Cargar detalles al cargar la página

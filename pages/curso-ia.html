@@ -462,12 +462,16 @@
                     y accede a todos los cursos con descuento
                 </p>
 
-                <!-- Botón de descarga del programa -->
-                <div style="margin-top: 2rem; text-align: center;">
+                <!-- Botones de descarga y certificado -->
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                     <a href="#" onclick="event.preventDefault(); downloadProgramaPDF();" class="btn btn-secondary" style="background: white; color: #667eea; border: 2px solid white; display: inline-flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-download"></i>
                         Descargar Programa Completo (PDF)
                     </a>
+                    <button onclick="generateCertificate()" class="btn btn-success" style="background: #10b981; color: white; border: 2px solid #10b981; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <i class="fas fa-certificate"></i>
+                        Generar Certificado
+                    </button>
                 </div>
             </div>
         </div>
@@ -1175,7 +1179,8 @@
         async function enrollCourse(type) {
             const isMember = type === 'member';
             const price = isMember ? 15 : 160;
-            const description = isMember ? 'Curso IA CLM - Afiliado UGT' : 'Curso IA CLM - Externo';
+            const courseType = 'jornadas-ia'; // Específico para estas jornadas
+            const description = isMember ? 'Jornadas IA CLM - Afiliado UGT' : 'Jornadas IA CLM - Externo';
 
             // Si intenta inscribirse como afiliado, verificar autenticación
             if (isMember) {
@@ -1188,16 +1193,19 @@
                 // Verificar que sea afiliado
                 const isAffiliate = await verifyAffiliate();
                 if (!isAffiliate) {
-                    showMessage('error', 'Debes ser afiliado para acceder al precio de 15€. Por favor, completa tu afiliación primero.');
+                    showNotification('❌ Debes ser afiliado para acceder al precio de 15€. Por favor, completa tu afiliación primero.', 'error');
                     return;
                 }
             }
 
             showEnrollmentForm({
-                courseType: 'ia',
+                courseType: courseType,
                 isMember: isMember,
                 price: price,
-                description: description
+                description: description,
+                courseName: 'Jornadas de Inteligencia Artificial para el CLM',
+                duration: '20 horas (30 sesiones)',
+                modality: 'Virtual por Zoom'
             });
         }
 
@@ -1245,51 +1253,67 @@
                 <div class="modal-content">
                     <span class="close">&times;</span>
                     <div class="enrollment-form">
-                        <h3>Inscripción - Jornadas de IA</h3>
+                        <h3>🎓 Inscripción - Jornadas de Inteligencia Artificial</h3>
                         <div class="course-summary">
-                            <h4>Detalles del curso:</h4>
-                            <p><strong>IA en Acción: Transformando el Centro de Lenguas Modernas</strong></p>
-                            <p>Tipo: ${courseData.isMember ? 'Afiliado UGT' : 'Externo'}</p>
-                            <p>Duración: 20 horas (30 sesiones de 40 min)</p>
+                            <h4>📋 Detalles de la formación:</h4>
+                            <p><strong>${courseData.courseName}</strong></p>
+                            <p>📅 Duración: ${courseData.duration}</p>
+                            <p>💻 Modalidad: ${courseData.modality}</p>
+                            <p>👤 Tipo: ${courseData.isMember ? 'Afiliado UGT' : 'Participante Externo'}</p>
+                            <p>📍 Dirigido a: Personal del Centro de Lenguas Modernas UGR</p>
                             <div class="price-total">
-                                <span>Precio:</span>
+                                <span>💰 Inversión:</span>
                                 <span><strong>${courseData.price}€</strong></span>
                             </div>
                         </div>
                         <form id="enrollmentForm">
                             <div class="form-group">
-                                <input type="text" name="name" placeholder="Nombre completo" required>
+                                <label>👤 Nombre completo *</label>
+                                <input type="text" name="name" placeholder="Tu nombre completo" required>
                             </div>
                             <div class="form-group">
-                                <input type="email" name="email" placeholder="Email" required>
+                                <label>📧 Email *</label>
+                                <input type="email" name="email" placeholder="tu@email.com" required>
                             </div>
                             <div class="form-group">
-                                <input type="tel" name="phone" placeholder="Teléfono (opcional)">
+                                <label>📱 Teléfono (opcional)</label>
+                                <input type="tel" name="phone" placeholder="600 000 000">
                             </div>
                             <div class="form-group">
+                                <label>🏢 Perfil profesional *</label>
                                 <select name="department" required>
                                     <option value="">Selecciona tu perfil</option>
-                                    <option value="profesor-espanol">Profesor/a de Español</option>
-                                    <option value="profesor-lenguas">Profesor/a de Otras Lenguas</option>
-                                    <option value="administracion">Personal de Administración</option>
-                                    <option value="conserjeria">Personal de Conserjería</option>
-                                    <option value="servicios">Personal de Servicios</option>
-                                    <option value="otro">Otro</option>
+                                    <option value="profesor-espanol">👨‍🏫 Profesor/a de Español</option>
+                                    <option value="profesor-lenguas">🌍 Profesor/a de Otras Lenguas</option>
+                                    <option value="administracion">💼 Personal de Administración</option>
+                                    <option value="conserjeria">🔑 Personal de Conserjería</option>
+                                    <option value="servicios">🛠️ Personal de Servicios</option>
+                                    <option value="otro">📋 Otro</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>
                                     <input type="checkbox" required>
-                                    Acepto los términos y condiciones
+                                    ✅ Acepto los términos y condiciones de participación
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" checked>
+                                    📧 Deseo recibir información sobre futuras formaciones
                                 </label>
                             </div>
                             <button type="submit" class="btn btn-primary btn-full">
-                                <i class="fas fa-lock"></i> Pagar con Stripe ${courseData.price}€
+                                <i class="fas fa-lock"></i> Inscribirse y Pagar ${courseData.price}€
                             </button>
                         </form>
-                        <p style="margin-top: 1rem; font-size: 0.9rem; text-align: center;">
-                            <i class="fas fa-shield-alt"></i> Pago seguro mediante Stripe
-                        </p>
+                        <div style="margin-top: 1rem; padding: 1rem; background: #f0f8ff; border-radius: 8px; text-align: center;">
+                            <p style="margin: 0; font-size: 0.9rem;">
+                                <i class="fas fa-shield-alt" style="color: #4CAF50;"></i>
+                                Pago 100% seguro mediante Stripe<br>
+                                <small>Acceso inmediato tras el pago</small>
+                            </p>
+                        </div>
                     </div>
                 </div>
             `;
@@ -1975,6 +1999,105 @@
             }
 
             return doc.output('blob');
+        }
+
+        // Función para generar certificado del curso
+        async function generateCertificate(courseType = 'jornadas-ia') {
+            try {
+                // Verificar si el usuario está autenticado
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    showNotification('❌ Debes iniciar sesión para generar tu certificado', 'error');
+                    showLoginModal();
+                    return;
+                }
+
+                // Mostrar indicador de carga
+                const btn = event.target.closest('button');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando certificado...';
+                btn.disabled = true;
+
+                // Obtener información del usuario
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+                // Verificar elegibilidad primero
+                const eligibilityResponse = await fetch(`${BACKEND_URL}/api/certificates/check-eligibility/${courseType}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!eligibilityResponse.ok) {
+                    throw new Error('No se pudo verificar la elegibilidad para el certificado');
+                }
+
+                const eligibilityData = await eligibilityResponse.json();
+
+                if (!eligibilityData.eligible) {
+                    showNotification('❌ Aún no eres elegible para el certificado. Debes completar el curso primero.', 'error');
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Generar certificado
+                const certificateData = {
+                    courseType: courseType,
+                    participantName: user.nombre || user.name || 'Nombre del Participante',
+                    participantEmail: user.email,
+                    duration: '20 horas',
+                    completionDate: new Date().toISOString().split('T')[0]
+                };
+
+                const response = await fetch(`${BACKEND_URL}/api/certificates/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(certificateData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Error al generar el certificado');
+                }
+
+                // Descargar el certificado PDF
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `certificado-${courseType}-${user.nombre.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                // Restaurar botón
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+
+                showNotification('🎉 ¡Certificado generado y descargado exitosamente!', 'success');
+
+            } catch (error) {
+                console.error('Error generando certificado:', error);
+
+                const btn = event.target.closest('button');
+                if (btn) {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                }
+
+                if (error.message.includes('401') || error.message.includes('403')) {
+                    showNotification('❌ Tu sesión ha expirado. Por favor, inicia sesión nuevamente.', 'error');
+                    showLoginModal();
+                } else {
+                    showNotification('❌ Error al generar el certificado: ' + error.message, 'error');
+                }
+            }
         }
 
         // Función para mostrar notificaciones (compatible con versión existente)
