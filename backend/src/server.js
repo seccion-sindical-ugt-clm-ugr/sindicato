@@ -21,6 +21,7 @@ const userRoutes = require('./routes/user');
 const completeRegistrationRoutes = require('./routes/complete-registration');
 const documentsRoutes = require('./routes/documents');
 const cursoIAPdfRoutes = require('./routes/curso-ia-pdf');
+const certificatesRoutes = require('./routes/certificates');
 
 // Importar middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -197,6 +198,9 @@ app.use('/api', documentsRoutes);
 // Ruta PDF del curso de IA
 app.use('/api/curso-ia', cursoIAPdfRoutes);
 
+// Rutas de Certificados
+app.use('/api/certificates', certificatesRoutes);
+
 // Ruta raíz
 app.get('/', (req, res) => {
     const mongoState = mongoose.connection.readyState;
@@ -245,7 +249,10 @@ app.get('/', (req, res) => {
             // Sugerencias
             suggestions: 'POST /api/suggestions',
             suggestionsAdmin: 'GET /api/suggestions/admin (requiere auth)',
-            suggestionsStats: 'GET /api/suggestions/stats'
+            suggestionsStats: 'GET /api/suggestions/stats',
+            // Certificados
+            generateCertificate: 'POST /api/certificates/generate (requiere auth)',
+            checkEligibility: 'GET /api/certificates/check-eligibility/:courseType (requiere auth)'
         },
         documentation: 'Ver README.md para más información'
     };
