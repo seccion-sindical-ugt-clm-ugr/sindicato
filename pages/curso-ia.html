@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Curso de Inteligencia Artificial - UGT-CLM-UGR Granada</title>
+    <title>IA en Acción: Centro de Lenguas Modernas - UGT-CLM-UGR Granada</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -17,10 +17,17 @@
         .course-hero h1 {
             font-size: 3rem;
             margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .course-hero .subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
         }
 
         .course-content {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
@@ -39,6 +46,7 @@
             background: rgba(255,255,255,0.1);
             padding: 0.5rem 1rem;
             border-radius: 25px;
+            backdrop-filter: blur(10px);
         }
 
         .program-section {
@@ -49,35 +57,72 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        .module {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 2rem;
+        .bloque {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 2.5rem;
             margin-bottom: 2rem;
-            border-left: 4px solid var(--primary-color);
+            border-left: 5px solid var(--primary-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .module h3 {
+        .bloque:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .bloque-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .bloque-number {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .bloque-duration {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .bloque h3 {
             color: var(--primary-color);
             margin-bottom: 1rem;
+            font-size: 1.5rem;
         }
 
-        .module-topics {
+        .bloque-topics {
             list-style: none;
             padding-left: 0;
         }
 
-        .module-topics li {
-            padding: 0.5rem 0;
+        .bloque-topics li {
+            padding: 0.7rem 0;
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            align-items: flex-start;
+            gap: 0.8rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
-        .module-topics li::before {
+        .bloque-topics li:last-child {
+            border-bottom: none;
+        }
+
+        .bloque-topics li::before {
             content: '✓';
             color: #4CAF50;
             font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
         }
 
         .enrollment-section {
@@ -99,9 +144,14 @@
         .price-card {
             background: white;
             color: var(--text-dark);
-            padding: 2rem;
+            padding: 2.5rem;
             border-radius: 15px;
             position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .price-card:hover {
+            transform: translateY(-10px);
         }
 
         .price-card.featured {
@@ -123,19 +173,85 @@
             font-weight: bold;
         }
 
-        .course-benefits {
+        .perfiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .perfil-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .perfil-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .perfil-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .week-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .week-number {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .metodologia-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 2rem;
             margin: 3rem 0;
         }
 
-        .benefit-card {
+        .metodologia-item {
             text-align: center;
             padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
         }
 
-        .benefit-icon {
+        .metodologia-item:hover {
+            transform: translateY(-10px);
+        }
+
+        .metodologia-icon {
             width: 80px;
             height: 80px;
             margin: 0 auto 1rem;
@@ -148,9 +264,43 @@
             font-size: 2rem;
         }
 
+        .session-structure {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .session-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
         @media (max-width: 768px) {
             .course-hero h1 {
                 font-size: 2rem;
+            }
+
+            .course-hero .subtitle {
+                font-size: 1.2rem;
             }
 
             .price-cards {
@@ -160,16 +310,20 @@
             .price-card.featured {
                 transform: none;
             }
+
+            .bloque {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Header (mismo que index.html) -->
+    <!-- Header -->
     <header class="header">
         <nav class="navbar">
             <div class="container">
-                <div class="nav-brand">
-                  <img src="../images/brand/ugt-logo.PNG" alt="UGT Logo" class="logo">
+                <div class="nav-brand" id="navBrand">
+                    <img src="../images/brand/ugt-logo.PNG" alt="UGT Logo" class="logo">
                     <div class="brand-text">
                         <h1>UGT-CLM-UGR Granada</h1>
                         <p>Sección Sindical</p>
@@ -194,20 +348,29 @@
     <!-- Course Hero -->
     <section class="course-hero">
         <div class="course-content">
-            <h1>Inteligencia Artificial Aplicada</h1>
-            <p class="hero-subtitle">Domina las herramientas de IA más avanzadas para potenciar tu desarrollo profesional</p>
+            <p class="subtitle">Jornadas de Introducción a la IA</p>
+            <h1>IA en Acción: Transformando el Centro de Lenguas Modernas</h1>
+            <p class="hero-subtitle">Formación práctica en Inteligencia Artificial diseñada específicamente para el personal del Centro de Lenguas Modernas de la Universidad de Granada</p>
             <div class="course-meta-header">
                 <div class="meta-item">
                     <i class="fas fa-clock"></i>
-                    <span>20 horas</span>
+                    <span>20 horas (30 sesiones)</span>
                 </div>
                 <div class="meta-item">
                     <i class="fas fa-video"></i>
-                    <span>Online</span>
+                    <span>Por Zoom</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Jueves y Viernes</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-laptop-code"></i>
+                    <span>40 min/sesión</span>
                 </div>
                 <div class="meta-item">
                     <i class="fas fa-certificate"></i>
-                    <span>Certificado</span>
+                    <span>Certificado UGT</span>
                 </div>
                 <div class="meta-item">
                     <i class="fas fa-users"></i>
@@ -217,134 +380,412 @@
         </div>
     </section>
 
-    <!-- Course Overview -->
+    <!-- Descripción General -->
     <section class="section">
         <div class="course-content">
             <div class="section-header">
-                <h2>Descripción del Curso</h2>
-                <p>Aprende a utilizar la inteligencia artificial para transformar tu forma de trabajar</p>
+                <h2>Sobre las Jornadas</h2>
+                <p>Formación práctica en IA adaptada a las necesidades del Centro de Lenguas Modernas</p>
             </div>
 
             <div class="program-section">
-                <h3>¿Qué aprenderás?</h3>
-                <p>Este curso te proporcionará los conocimientos y habilidades necesarios para aprovechar las herramientas de inteligencia artificial más avanzadas en tu entorno profesional. Aprenderás desde los conceptos básicos hasta aplicaciones prácticas que podrás implementar inmediatamente en tu trabajo.</p>
+                <h3>¿Qué son estas jornadas?</h3>
+                <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem;">
+                    Las <strong>Jornadas de Introducción a la IA</strong> están diseñadas específicamente para el personal del
+                    <strong>Centro de Lenguas Modernas de la Universidad de Granada</strong>, con el objetivo de proporcionar
+                    una formación práctica y útil en el uso de herramientas de Inteligencia Artificial adaptadas a las necesidades
+                    específicas de cada departamento.
+                </p>
 
-                <h3 style="margin-top: 2rem;">¿A quién va dirigido?</h3>
-                <ul style="margin: 1rem 0;">
-                    <li>Profesionales que quieren incorporar IA en su trabajo diario</li>
-                    <li>Trabajadores que buscan mejorar su productividad con herramientas de IA</li>
-                    <li>Personas interesadas en comprender el impacto de la IA en el mundo laboral</li>
-                    <li>Cualquier persona que quiera estar preparada para el futuro del trabajo</li>
+                <div style="background: #e8f4f8; padding: 2rem; border-radius: 10px; border-left: 4px solid #2196F3; margin: 2rem 0;">
+                    <h4 style="color: #1976D2; margin-bottom: 1rem;"><i class="fas fa-lightbulb"></i> Enfoque Práctico</h4>
+                    <p style="margin: 0; font-size: 1.05rem;">
+                        Con una duración total de <strong>20 horas</strong> distribuidas en sesiones de <strong>40 minutos</strong>
+                        durante días <strong>jueves y viernes</strong>, estas jornadas ofrecen un enfoque eminentemente práctico,
+                        permitiendo a los participantes interactuar con herramientas de IA desde la primera sesión y aplicarlas
+                        en tareas relevantes para su trabajo diario.
+                    </p>
+                </div>
+
+                <h3 style="margin-top: 2.5rem;">Distribución Temporal</h3>
+                <ul style="font-size: 1.05rem; line-height: 1.8;">
+                    <li><strong>Duración:</strong> 5 semanas (10 días en total)</li>
+                    <li><strong>Horario:</strong> 6 sesiones por día (3 horas por franja)</li>
+                    <li><strong>Sesiones:</strong> 30 sesiones de 40 minutos</li>
+                    <li><strong>Descansos:</strong> 10 minutos entre sesiones</li>
+                    <li><strong>Total:</strong> 20 horas de formación práctica</li>
                 </ul>
             </div>
         </div>
     </section>
 
-    <!-- Program Content -->
+    <!-- Perfiles Profesionales -->
     <section class="section section-alt">
         <div class="course-content">
             <div class="section-header">
-                <h2>Programa del Curso</h2>
-                <p>Un recorrido completo por el mundo de la inteligencia artificial aplicada</p>
+                <h2>¿A quién va dirigido?</h2>
+                <p>Diseñado para todos los perfiles del Centro de Lenguas Modernas</p>
+            </div>
+
+            <div class="perfiles-grid">
+                <div class="perfil-card">
+                    <div class="perfil-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3>Profesores de Español</h3>
+                    <p>Enseñanza de español como lengua extranjera, creación de materiales didácticos y evaluación de competencias</p>
+                </div>
+
+                <div class="perfil-card">
+                    <div class="perfil-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <h3>Profesores de Otras Lenguas</h3>
+                    <p>Enseñanza multilingüe, traducción y actividades interculturales</p>
+                </div>
+
+                <div class="perfil-card">
+                    <div class="perfil-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h3>Personal de Administración</h3>
+                    <p>Gestión de matrículas, atención multilingüe y trámites administrativos</p>
+                </div>
+
+                <div class="perfil-card">
+                    <div class="perfil-icon">
+                        <i class="fas fa-door-open"></i>
+                    </div>
+                    <h3>Personal de Conserjería</h3>
+                    <p>Control de accesos, información y atención presencial a estudiantes</p>
+                </div>
+
+                <div class="perfil-card">
+                    <div class="perfil-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3>Personal de Servicios</h3>
+                    <p>Mantenimiento, gestión de recursos tecnológicos y apoyo logístico</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programa: Bloques Temáticos -->
+    <section class="section">
+        <div class="course-content">
+            <div class="section-header">
+                <h2>Bloques Temáticos</h2>
+                <p>5 bloques especializados con enfoque práctico desde el primer día</p>
             </div>
 
             <div class="program-section">
-                <div class="module">
-                    <h3>Módulo 1: Introducción a la Inteligencia Artificial</h3>
-                    <ul class="module-topics">
-                        <li>¿Qué es la Inteligencia Artificial?</li>
-                        <li>Historia y evolución de la IA</li>
-                        <li>Tipos de IA: Débil vs Fuerte</li>
-                        <li>Machine Learning y Deep Learning explicados</li>
-                        <li>Impacto de la IA en el mundo laboral actual</li>
+                <!-- Bloque 1 -->
+                <div class="bloque">
+                    <div class="bloque-header">
+                        <span class="bloque-number">Bloque 1</span>
+                        <span class="bloque-duration">4 horas · 6 sesiones</span>
+                    </div>
+                    <h3>Fundamentos de la IA</h3>
+                    <ul class="bloque-topics">
+                        <li>Introducción a la IA: conceptos básicos y evolución</li>
+                        <li>Tipos de IA: débil vs. fuerte, estrecha vs. general</li>
+                        <li>Principales tecnologías: machine learning, procesamiento de lenguaje natural, visión artificial</li>
+                        <li>Herramientas de IA accesibles: panorama actual</li>
+                        <li>Ética y responsabilidad en el uso de la IA</li>
+                        <li><strong>Enfoque práctico:</strong> Primeros pasos con ChatGPT y otras herramientas básicas</li>
                     </ul>
                 </div>
 
-                <div class="module">
-                    <h3>Módulo 2: Herramientas de IA Generativa</h3>
-                    <ul class="module-topics">
-                        <li>Introducción a ChatGPT y otros modelos de lenguaje</li>
-                        <li>Prompt engineering: Cómo obtener mejores resultados</li>
-                        <li>Generación de imágenes con DALL-E, Midjourney y Stable Diffusion</li>
-                        <li>Herramientas de IA para la creación de contenido</li>
-                        <li>Ejemplos prácticos y casos de uso</li>
+                <!-- Bloque 2 -->
+                <div class="bloque">
+                    <div class="bloque-header">
+                        <span class="bloque-number">Bloque 2</span>
+                        <span class="bloque-duration">6 horas · 9 sesiones</span>
+                    </div>
+                    <h3>IA en el Ámbito Educativo</h3>
+                    <ul class="bloque-topics">
+                        <li>IA para la creación de contenidos educativos</li>
+                        <li>Herramientas de IA para la enseñanza de idiomas</li>
+                        <li>Evaluación y feedback automático</li>
+                        <li>Personalización del aprendizaje mediante IA</li>
+                        <li>Traducción y adaptación de materiales</li>
+                        <li>Creación de recursos multimedia con IA</li>
+                        <li>Detección de plagio y uso ético</li>
+                        <li>Asistentes virtuales para estudiantes</li>
+                        <li><strong>Enfoque práctico:</strong> Talleres específicos para profesores de español y otras lenguas</li>
                     </ul>
                 </div>
 
-                <div class="module">
-                    <h3>Módulo 3: IA para la Productividad Profesional</h3>
-                    <ul class="module-topics">
-                        <li>Automatización de tareas repetitivas</li>
-                        <li>Análisis de datos con IA</li>
-                        <li>Herramientas de IA para la comunicación</li>
-                        <li>Gestión de proyectos asistida por IA</li>
-                        <li>Integración de IA en flujos de trabajo</li>
+                <!-- Bloque 3 -->
+                <div class="bloque">
+                    <div class="bloque-header">
+                        <span class="bloque-number">Bloque 3</span>
+                        <span class="bloque-duration">4 horas · 6 sesiones</span>
+                    </div>
+                    <h3>IA en la Gestión Administrativa</h3>
+                    <ul class="bloque-topics">
+                        <li>Automatización de procesos administrativos</li>
+                        <li>IA para la atención multilingüe</li>
+                        <li>Gestión documental inteligente</li>
+                        <li>Análisis de datos para la toma de decisiones</li>
+                        <li>Optimización de recursos mediante IA</li>
+                        <li><strong>Enfoque práctico:</strong> Talleres específicos para personal administrativo</li>
                     </ul>
                 </div>
 
-                <div class="module">
-                    <h3>Módulo 4: IA en el Entorno Laboral</h3>
-                    <ul class="module-topics">
-                        <li>IA para la toma de decisiones</li>
-                        <li>Herramientas de reclutamiento y selección con IA</li>
-                        <li>IA en la formación y desarrollo profesional</li>
-                        <li>Aspectos éticos y legales de la IA en el trabajo</li>
-                        <li>Preparación para el futuro laboral con IA</li>
+                <!-- Bloque 4 -->
+                <div class="bloque">
+                    <div class="bloque-header">
+                        <span class="bloque-number">Bloque 4</span>
+                        <span class="bloque-duration">2 horas · 3 sesiones</span>
+                    </div>
+                    <h3>IA en Servicios y Conserjería</h3>
+                    <ul class="bloque-topics">
+                        <li>Sistemas de información inteligentes</li>
+                        <li>Gestión de espacios y recursos</li>
+                        <li>Asistencia multilingüe automatizada</li>
+                        <li><strong>Enfoque práctico:</strong> Talleres específicos para personal de conserjería y servicios</li>
                     </ul>
                 </div>
 
-                <div class="module">
-                    <h3>Módulo 5: Proyecto Práctico</h3>
-                    <ul class="module-topics">
-                        <li>Desarrollo de un proyecto personalizado</li>
-                        <li>Aplicación de conocimientos adquiridos</li>
-                        <li>Presentación y evaluación del proyecto</li>
-                        <li>Certificación final</li>
+                <!-- Bloque 5 -->
+                <div class="bloque">
+                    <div class="bloque-header">
+                        <span class="bloque-number">Bloque 5</span>
+                        <span class="bloque-duration">4 horas · 6 sesiones</span>
+                    </div>
+                    <h3>Proyectos Colaborativos Interdepartamentales</h3>
+                    <ul class="bloque-topics">
+                        <li>Diseño de soluciones basadas en IA para el centro</li>
+                        <li>Implementación de casos prácticos</li>
+                        <li>Presentación de proyectos y retroalimentación</li>
+                        <li>Evaluación de impacto y sostenibilidad</li>
+                        <li>Plan de acción futuro</li>
+                        <li><strong>Enfoque práctico:</strong> Trabajo en equipos mixtos para resolver problemas reales del centro</li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Benefits Section -->
+    <!-- Metodología -->
+    <section class="section section-alt">
+        <div class="course-content">
+            <div class="section-header">
+                <h2>Metodología</h2>
+                <p>Aprendizaje activo y práctico desde el primer momento</p>
+            </div>
+
+            <div class="program-section">
+                <h3>Principios Metodológicos</h3>
+                <div class="metodologia-grid">
+                    <div class="metodologia-item">
+                        <div class="metodologia-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h4>Aprendizaje Activo</h4>
+                        <p>Utilizarás herramientas de IA desde la primera sesión</p>
+                    </div>
+
+                    <div class="metodologia-item">
+                        <div class="metodologia-icon">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <h4>Enfoque Práctico</h4>
+                        <p>Mínimo contenido teórico, máxima aplicación práctica</p>
+                    </div>
+
+                    <div class="metodologia-item">
+                        <div class="metodologia-icon">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <h4>Personalización</h4>
+                        <p>Actividades adaptadas a cada perfil profesional</p>
+                    </div>
+
+                    <div class="metodologia-item">
+                        <div class="metodologia-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4>Colaboración</h4>
+                        <p>Fomento del trabajo en equipo e intercambio de experiencias</p>
+                    </div>
+
+                    <div class="metodologia-item">
+                        <div class="metodologia-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4>Progresión</h4>
+                        <p>De lo simple a lo complejo, construyendo sobre lo aprendido</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 3rem;">Estructura de las Sesiones (40 minutos)</h3>
+                <div class="session-structure">
+                    <div class="session-step">
+                        <div class="step-number">1</div>
+                        <div>
+                            <h4>Introducción (5 min)</h4>
+                            <p>Presentación del tema y objetivos de la sesión</p>
+                        </div>
+                    </div>
+                    <div class="session-step">
+                        <div class="step-number">2</div>
+                        <div>
+                            <h4>Demostración (10 min)</h4>
+                            <p>Ejemplo práctico de aplicación con herramientas reales</p>
+                        </div>
+                    </div>
+                    <div class="session-step">
+                        <div class="step-number">3</div>
+                        <div>
+                            <h4>Práctica Guiada (15 min)</h4>
+                            <p>Los participantes aplican lo aprendido con apoyo del formador</p>
+                        </div>
+                    </div>
+                    <div class="session-step">
+                        <div class="step-number">4</div>
+                        <div>
+                            <h4>Reflexión y Dudas (10 min)</h4>
+                            <p>Discusión sobre aplicaciones específicas y resolución de problemas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calendario -->
     <section class="section">
         <div class="course-content">
             <div class="section-header">
-                <h2>Beneficios del Curso</h2>
-                <p>¿Qué ganarás al completar esta formación?</p>
+                <h2>Calendario de las Jornadas</h2>
+                <p>5 semanas intensivas de formación práctica</p>
             </div>
 
-            <div class="course-benefits">
-                <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-brain"></i>
+            <div class="program-section">
+                <div class="calendar-grid">
+                    <div class="week-card">
+                        <span class="week-number">Semana 1</span>
+                        <h4>Fundamentos de IA</h4>
+                        <p><i class="fas fa-calendar"></i> Jueves y Viernes</p>
+                        <p><i class="fas fa-clock"></i> 6 sesiones</p>
                     </div>
-                    <h3>Competencias Digitales</h3>
-                    <p>Desarrolla habilidades clave para el futuro del trabajo digital</p>
+
+                    <div class="week-card">
+                        <span class="week-number">Semana 2</span>
+                        <h4>IA Educativa (Parte 1)</h4>
+                        <p><i class="fas fa-calendar"></i> Jueves y Viernes</p>
+                        <p><i class="fas fa-clock"></i> 6 sesiones</p>
+                    </div>
+
+                    <div class="week-card">
+                        <span class="week-number">Semana 3</span>
+                        <h4>IA Educativa (Parte 2)</h4>
+                        <p><i class="fas fa-calendar"></i> Jueves y Viernes</p>
+                        <p><i class="fas fa-clock"></i> 6 sesiones</p>
+                    </div>
+
+                    <div class="week-card">
+                        <span class="week-number">Semana 4</span>
+                        <h4>IA Administrativa + Servicios</h4>
+                        <p><i class="fas fa-calendar"></i> Jueves y Viernes</p>
+                        <p><i class="fas fa-clock"></i> 6 sesiones</p>
+                    </div>
+
+                    <div class="week-card">
+                        <span class="week-number">Semana 5</span>
+                        <h4>Proyectos Colaborativos</h4>
+                        <p><i class="fas fa-calendar"></i> Jueves y Viernes</p>
+                        <p><i class="fas fa-clock"></i> 6 sesiones</p>
+                    </div>
                 </div>
 
-                <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-rocket"></i>
-                    </div>
-                    <h3>Productividad</h3>
-                    <p>Aumenta tu eficiencia con herramientas de última generación</p>
+                <div style="background: #fff3cd; padding: 1.5rem; border-radius: 10px; margin-top: 2rem; border-left: 4px solid #ffc107;">
+                    <p style="margin: 0; color: #856404;"><i class="fas fa-info-circle"></i>
+                        <strong>Nota:</strong> Cada día incluye 6 sesiones de 40 minutos con descansos de 10 minutos entre sesiones (3 horas por franja).
+                    </p>
                 </div>
+            </div>
+        </div>
+    </section>
 
-                <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-shield-alt"></i>
+    <!-- Recursos Tecnológicos -->
+    <section class="section section-alt">
+        <div class="course-content">
+            <div class="section-header">
+                <h2>Herramientas y Recursos</h2>
+                <p>Trabajarás con las herramientas de IA más avanzadas</p>
+            </div>
+
+            <div class="program-section">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px;">
+                        <h4><i class="fas fa-robot"></i> Plataformas de IA</h4>
+                        <p>ChatGPT, Claude, Bard y otros modelos de lenguaje</p>
                     </div>
-                    <h3>Competitividad</h3>
-                    <p>Diferénciate en el mercado laboral con conocimientos de IA</p>
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px;">
+                        <h4><i class="fas fa-image"></i> Generación de Imágenes</h4>
+                        <p>DALL-E, Midjourney, Stable Diffusion</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px;">
+                        <h4><i class="fas fa-language"></i> Traducción Automática</h4>
+                        <p>DeepL, Google Translate y herramientas especializadas</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px;">
+                        <h4><i class="fas fa-paint-brush"></i> Creación de Contenido</h4>
+                        <p>Canva con IA, Beautiful.ai y más</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px;">
+                        <h4><i class="fas fa-cogs"></i> Automatización</h4>
+                        <p>Zapier, IFTTT y flujos de trabajo inteligentes</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px;">
+                        <h4><i class="fas fa-graduation-cap"></i> Asistentes Educativos</h4>
+                        <p>Herramientas específicas para educación</p>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </section>
 
-                <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-certificate"></i>
+    <!-- Evaluación -->
+    <section class="section">
+        <div class="course-content">
+            <div class="section-header">
+                <h2>Evaluación y Certificación</h2>
+                <p>Sistema de evaluación continua y proyecto final</p>
+            </div>
+
+            <div class="program-section">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 10px;">
+                        <h4><i class="fas fa-tasks"></i> Evaluación Continua</h4>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li style="padding: 0.3rem 0;"><i class="fas fa-check"></i> Participación activa en las sesiones</li>
+                            <li style="padding: 0.3rem 0;"><i class="fas fa-check"></i> Realización de actividades prácticas</li>
+                            <li style="padding: 0.3rem 0;"><i class="fas fa-check"></i> Aplicación en el entorno laboral</li>
+                        </ul>
                     </div>
-                    <h3>Certificación</h3>
-                    <p>Obtén un certificado reconocido de UGT-CLM-UGR</p>
+
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 10px;">
+                        <h4><i class="fas fa-project-diagram"></i> Proyecto Final</h4>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li style="padding: 0.3rem 0;"><i class="fas fa-check"></i> Solución basada en IA para el centro</li>
+                            <li style="padding: 0.3rem 0;"><i class="fas fa-check"></i> Presentación en la última sesión</li>
+                            <li style="padding: 0.3rem 0;"><i class="fas fa-check"></i> Evaluación por pares</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 10px;">
+                        <h4><i class="fas fa-headset"></i> Seguimiento Post-Jornadas</h4>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li style="padding: 0.3rem 0;"><i class="fas fa-check"></i> Sesiones mensuales (2 horas)</li>
+                            <li style="padding: 0.3rem 0;"><i class="fas fa-check"></i> Comunidad virtual</li>
+                            <li style="padding: 0.3rem 0;"><i class="fas fa-check"></i> Repositorio de casos de éxito</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -354,7 +795,7 @@
     <section class="section section-alt">
         <div class="course-content">
             <div class="enrollment-section">
-                <h2>Inscríbete en el Curso de IA</h2>
+                <h2>Inscríbete en las Jornadas de IA</h2>
                 <p>Elige la modalidad que mejor se adapte a tu situación</p>
 
                 <div class="price-cards">
@@ -363,13 +804,15 @@
                         <div class="price-display">
                             <span class="currency">€</span>
                             <span class="amount">160</span>
-                            <span class="period">por módulo</span>
+                            <span class="period">precio completo</span>
                         </div>
                         <ul class="price-features">
-                            <li><i class="fas fa-check"></i> Acceso a todos los módulos</li>
+                            <li><i class="fas fa-check"></i> Acceso a las 30 sesiones</li>
                             <li><i class="fas fa-check"></i> Material didáctico completo</li>
-                            <li><i class="fas fa-check"></i> Certificado final</li>
+                            <li><i class="fas fa-check"></i> Certificado UGT-CLM-UGR</li>
+                            <li><i class="fas fa-check"></i> Acceso a herramientas de IA</li>
                             <li><i class="fas fa-check"></i> Soporte técnico</li>
+                            <li><i class="fas fa-check"></i> Seguimiento post-jornadas</li>
                         </ul>
                         <button class="btn btn-secondary btn-full" onclick="enrollCourse('external')">
                             Inscribirme por 160€
@@ -381,13 +824,15 @@
                         <div class="price-display">
                             <span class="currency">€</span>
                             <span class="amount">15</span>
-                            <span class="period">por módulo</span>
+                            <span class="period">precio afiliado</span>
                         </div>
                         <ul class="price-features">
                             <li><i class="fas fa-check"></i> Todo lo anterior</li>
-                            <li><i class="fas fa-check"></i> Descuento especial</li>
+                            <li><i class="fas fa-check"></i> <strong>Descuento especial 90%</strong></li>
                             <li><i class="fas fa-check"></i> Sesiones exclusivas</li>
                             <li><i class="fas fa-check"></i> Tutoría personalizada</li>
+                            <li><i class="fas fa-check"></i> Prioridad en proyectos</li>
+                            <li><i class="fas fa-check"></i> Red de contactos UGT</li>
                         </ul>
                         <button class="btn btn-primary btn-full" onclick="enrollCourse('member')">
                             Inscribirme por 15€
@@ -426,7 +871,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 UGT-CLM-UGR Granada. Todos los derechos reservados.</p>
+                <p>&copy; 2025 UGT-CLM-UGR Granada. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
@@ -436,38 +881,30 @@
     <script src="../js/stripe-config.js"></script>
     <script src="../js/main.js"></script>
     <script>
-        // Asegurar que el logo funcione para volver al inicio
+        // Logo navigation
         document.addEventListener('DOMContentLoaded', function() {
             const navBrand = document.getElementById('navBrand');
             if (navBrand) {
-                console.log('🏠 Logo encontrado en página de curso IA - configurando navegación');
-
-                // Estilos para asegurar clicabilidad
                 navBrand.style.cursor = 'pointer';
                 navBrand.style.position = 'relative';
                 navBrand.style.zIndex = '1000';
 
-                // Función para volver al inicio
                 function goToHome() {
-                    console.log('🏠 Logo clicado en página de curso IA - volviendo al inicio principal');
                     window.location.href = '../index.html';
                 }
 
-                // Event listeners para todos los dispositivos
                 navBrand.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     goToHome();
                 });
 
-                // Soporte táctil para móviles
                 navBrand.addEventListener('touchend', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     goToHome();
                 }, { passive: false });
 
-                // Prevenir propagación desde elementos internos
                 const logoImage = navBrand.querySelector('.logo');
                 const brandText = navBrand.querySelector('.brand-text');
 
@@ -485,10 +922,6 @@
                         }, { passive: false });
                     }
                 });
-
-                console.log('✅ Logo de página de curso IA configurado correctamente');
-            } else {
-                console.error('❌ No se encontró el logo en la página de curso IA');
             }
         });
     </script>
@@ -496,9 +929,8 @@
         async function enrollCourse(type) {
             const isMember = type === 'member';
             const price = isMember ? 15 : 160;
-            const description = isMember ? 'Curso IA - Afiliado UGT' : 'Curso IA - Externo';
+            const description = isMember ? 'Curso IA CLM - Afiliado UGT' : 'Curso IA CLM - Externo';
 
-            // Mostrar formulario de datos del usuario
             showEnrollmentForm({
                 courseType: 'ia',
                 isMember: isMember,
@@ -508,18 +940,18 @@
         }
 
         function showEnrollmentForm(courseData) {
-            // Create enrollment modal
             const enrollmentModal = document.createElement('div');
             enrollmentModal.className = 'modal';
             enrollmentModal.innerHTML = `
                 <div class="modal-content">
                     <span class="close">&times;</span>
                     <div class="enrollment-form">
-                        <h3>Inscripción al Curso de IA</h3>
+                        <h3>Inscripción - Jornadas de IA</h3>
                         <div class="course-summary">
                             <h4>Detalles del curso:</h4>
-                            <p><strong>Curso de Inteligencia Artificial Aplicada</strong></p>
+                            <p><strong>IA en Acción: Transformando el Centro de Lenguas Modernas</strong></p>
                             <p>Tipo: ${courseData.isMember ? 'Afiliado UGT' : 'Externo'}</p>
+                            <p>Duración: 20 horas (30 sesiones de 40 min)</p>
                             <div class="price-total">
                                 <span>Precio:</span>
                                 <span><strong>${courseData.price}€</strong></span>
@@ -536,7 +968,15 @@
                                 <input type="tel" name="phone" placeholder="Teléfono" required>
                             </div>
                             <div class="form-group">
-                                <input type="text" name="department" placeholder="Empresa/Institución" required>
+                                <select name="department" required>
+                                    <option value="">Selecciona tu perfil</option>
+                                    <option value="profesor-espanol">Profesor/a de Español</option>
+                                    <option value="profesor-lenguas">Profesor/a de Otras Lenguas</option>
+                                    <option value="administracion">Personal de Administración</option>
+                                    <option value="conserjeria">Personal de Conserjería</option>
+                                    <option value="servicios">Personal de Servicios</option>
+                                    <option value="otro">Otro</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label>
@@ -558,7 +998,6 @@
             document.body.appendChild(enrollmentModal);
             enrollmentModal.style.display = 'block';
 
-            // Handle form submission
             const enrollmentForm = enrollmentModal.querySelector('#enrollmentForm');
             const closeBtn = enrollmentModal.querySelector('.close');
 
@@ -583,19 +1022,13 @@
                 submitBtn.disabled = true;
 
                 try {
-                    // Validate user data
                     validateUserData(userData);
-
-                    // Create checkout session for course
                     const session = await createCourseCheckout(
                         courseData.courseType,
                         userData,
                         courseData.isMember
                     );
-
-                    // Redirect to Stripe Checkout
                     await redirectToStripeCheckout(session.id);
-
                 } catch (error) {
                     console.error('Enrollment error:', error);
                     showMessage('error', 'Error al procesar la inscripción: ' + error.message);
@@ -606,7 +1039,7 @@
             });
         }
 
-        // Add CSS for price display
+        // Price display styles
         const priceStyles = document.createElement('style');
         priceStyles.textContent = `
             .price-display {
@@ -647,6 +1080,14 @@
 
             .price-features i {
                 color: #4CAF50;
+            }
+
+            select {
+                width: 100%;
+                padding: 0.8rem;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 1rem;
             }
         `;
         document.head.appendChild(priceStyles);
