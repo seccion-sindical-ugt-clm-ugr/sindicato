@@ -1535,7 +1535,7 @@
                 doc.text('Jornadas de Inteligencia Artificial', margin + 70, 10);
 
                 // Número de página
-                doc.text('Página ' + doc.internal.getNumberOfPages(), pageWidth - margin - 15, 10);
+                doc.text('Página ' + doc.internal.getNumberOfPages(), pageWidth - margin - 20, 10);
 
                 // Reset para contenido
                 doc.setTextColor(0, 0, 0);
@@ -1642,7 +1642,7 @@
             // Descripción en columna con mejor formato
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(12);
-            const description = 'Formación práctica en IA adaptada específicamente a las necesidades del personal del Centro de Lenguas Modernas de la Universidad de Granada. Un enfoque eminentemente práctico con 20 horas distribuidas en sesiones interactivas.';
+            const description = 'Formación práctica en IA adaptada específicamente a las necesidades del personal del Centro de Lenguas Modernas. Un enfoque eminentemente práctico con 20 horas distribuidas en sesiones interactivas.';
             addText(description, 12, 'normal');
 
             // Quick info box
@@ -1738,7 +1738,8 @@
             addSeparator(yPosition);
             yPosition += 8;
 
-            addText('PERFILES PROFESIONALES DIRIGIDOS', 16, 'bold', secondaryColor);
+            // Título con fondo de color para perfiles profesionales
+            yPosition = addTextWithBackground('PERFILES PROFESIONALES DIRIGIDOS', 16, 'bold', secondaryColor, [245, 240, 255]);
             yPosition += 3;
 
             const perfiles = [
@@ -1750,7 +1751,7 @@
             ];
 
             perfiles.forEach(perfil => {
-                addText(`${perfil.icon} ${perfil.text}`, 11, 'normal');
+                yPosition = addTextWithBackground(`${perfil.icon} ${perfil.text}`, 11, 'normal', [0, 0, 0], [245, 240, 255]);
             });
 
             yPosition += 8;
@@ -1803,15 +1804,9 @@
                 }
 
                 // Título del bloque con color y fondo
-                yPosition = addTextWithBackground(bloque.title, 14, 'bold', bloque.color, [240, 240, 250]);
+                yPosition = addTextWithBackground(bloque.title + ' - ' + bloque.duration, 14, 'bold', bloque.color, [240, 240, 250]);
 
-                // Duración
-                doc.setTextColor(...bloque.color);
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.text(bloque.duration, margin, yPosition);
-
-                yPosition += 8;
+                yPosition += 5;
 
                 // Tópicos con fondo continuo
                 bloque.topics.forEach(topic => {
@@ -1872,15 +1867,9 @@
                 }
 
                 // Título del bloque con color y fondo
-                yPosition = addTextWithBackground(bloque.title, 14, 'bold', bloque.color, [245, 245, 255]);
+                yPosition = addTextWithBackground(bloque.title + ' - ' + bloque.duration, 14, 'bold', bloque.color, [245, 245, 255]);
 
-                // Duración
-                doc.setTextColor(...bloque.color);
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.text(bloque.duration, margin, yPosition);
-
-                yPosition += 8;
+                yPosition += 5;
 
                 // Tópicos con fondo continuo
                 bloque.topics.forEach(topic => {
@@ -1961,7 +1950,9 @@
             addSeparator(yPosition);
             yPosition += 10;
 
-            // Información de contacto con diseño
+            // Información de contacto con diseño - Posicionado más abajo
+            yPosition += 15; // Espacio adicional antes de la sección de contacto
+
             yPosition = addTextWithBackground('INFORMACIÓN DE CONTACTO', 16, 'bold', primaryColor, [240, 240, 250]);
 
             doc.setTextColor(0, 0, 0);
@@ -1972,10 +1963,14 @@
 
             doc.setFontSize(10);
             doc.setFont('helvetica', 'normal');
-            yPosition = addTextWithBackground('Seccion Sindical - Centro de Lenguas Modernas - Universidad de Granada', 10, 'normal', [0, 0, 0], [240, 240, 250]);
+            yPosition = addTextWithBackground('Sección Sindical - Centro de Lenguas Modernas - Universidad de Granada', 10, 'normal', [0, 0, 0], [240, 240, 250]);
             yPosition = addTextWithBackground('Para cualquier consulta sobre las jornadas:', 10, 'normal', [0, 0, 0], [240, 240, 250]);
 
-            const contactInfo = ['📧 Email: ugt.clm.ugr@gmail.com', '🌐 Web: www.ugtclmgranada.org', '📱 Telefono: 958 24 09 77'];
+            const contactInfo = [
+                '📧 Email: ugtclmgranada@gmail.com',
+                '🌐 Web: www.ugtclmgranada.org',
+                '📱 Teléfono: 622 54 54 77'
+            ];
             contactInfo.forEach(info => {
                 yPosition = addTextWithBackground(info, 10, 'normal', [0, 0, 0], [240, 240, 250]);
             });
@@ -1987,15 +1982,19 @@
 
                 // Footer bar
                 doc.setFillColor(...primaryColor);
-                doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+                doc.rect(0, pageHeight - 20, pageWidth, 20, 'F');
 
-                // Footer text
+                // Footer text - Dividido en dos líneas para mejor visualización
                 doc.setTextColor(255, 255, 255);
-                doc.setFontSize(8);
+                doc.setFontSize(7);
                 doc.setFont('helvetica', 'normal');
-                doc.text('© 2025 UGT-CLM-UGR Granada - Todos los derechos reservados', margin, pageHeight - 8);
-                doc.text('Jornadas de Inteligencia Artificial para el Centro de Lenguas Modernas', margin + 80, pageHeight - 8);
-                doc.text(`Página ${i} de ${pageCount}`, pageWidth - margin - 20, pageHeight - 8);
+
+                // Primera línea
+                doc.text('© 2025 UGT-CLM-UGR Granada - Todos los derechos reservados', margin, pageHeight - 16);
+                doc.text(`Página ${i} de ${pageCount}`, pageWidth - margin - 25, pageHeight - 16);
+
+                // Segunda línea
+                doc.text('Jornadas de Inteligencia Artificial para el CLM', margin, pageHeight - 10);
             }
 
             return doc.output('blob');
