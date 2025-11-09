@@ -245,11 +245,18 @@
 
     <script src="js/backend-config.js"></script>
     <script>
-        const sessionId = new URLSearchParams(window.location.search).get('session_id');
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        const courseType = urlParams.get('course');
 
         if (!sessionId) {
             showMessage('error', '⚠️ No se encontró información del pago. Por favor, contacta con soporte.');
             document.getElementById('completeRegistrationForm').style.display = 'none';
+        }
+
+        // Si es un curso, verificar el tipo de pago primero
+        if (courseType) {
+            checkCoursePaymentType();
         }
 
         document.getElementById('completeRegistrationForm').addEventListener('submit', async (e) => {
@@ -363,6 +370,32 @@
                 setTimeout(() => {
                     container.style.display = 'none';
                 }, 5000);
+            }
+        }
+
+        // Verificar tipo de pago para cursos
+        async function checkCoursePaymentType() {
+            try {
+                const API_URL = typeof BACKEND_CONFIG !== 'undefined'
+                    ? BACKEND_CONFIG.apiUrl
+                    : 'https://sindicato-mu.vercel.app';
+
+                // Obtener información de la sesión
+                const response = await fetch(`${API_URL}/api/session/${sessionId}`);
+                const sessionData = await response.json();
+
+                if (sessionData && sessionData.metadata) {
+                    const isMember = sessionData.metadata.isMember === 'true';
+
+                    // Si es un curso para externos, redirigir a página de éxito específica
+                    if (!isMember) {
+                        window.location.href = `course-success.html?session_id=${sessionId}&course=${courseType}`;
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error verificando tipo de pago:', error);
+                // Si hay error, continuar con el flujo normal
             }
         }
     </script>

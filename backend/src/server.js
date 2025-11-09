@@ -48,6 +48,7 @@ if (process.env.MONGODB_URI) {
         serverSelectionTimeoutMS: 30000, // 30 segundos para encontrar servidor
         socketTimeoutMS: 45000, // 45 segundos para operaciones
         connectTimeoutMS: 30000, // 30 segundos para conexión inicial
+        bufferTimeoutMS: 30000, // 30 segundos para buffering de operaciones
     })
     .then(() => {
         console.log('✅ MongoDB conectado correctamente');
@@ -84,19 +85,35 @@ if (process.env.MONGODB_URI) {
 app.use(helmet());
 
 // CORS: Configurar dominios permitidos
-const allowedOrigins = process.env.ALLOWED_ORIGINS
+// En producción, priorizar variables de Vercel sobre .env local
+const allowedOrigins = (process.env.NODE_ENV === 'production' && process.env.ALLOWED_ORIGINS)
     ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['http://localhost:8000', 'http://localhost:3000'];
+    : process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(',')
+        : ['http://localhost:8000', 'http://localhost:3000', 'https://ugtclmgranada.org'];
 
+// Forzar inclusión del dominio principal
+if (!allowedOrigins.includes('https://ugtclmgranada.org')) {
+    allowedOrigins.push('https://ugtclmgranada.org');
+}
+
+// CORS más permisivo temporalmente para diagnóstico
 app.use(cors({
     origin: function(origin, callback) {
         // Log de debug para CORS
         console.log('🔍 CORS check - Origin:', origin);
         console.log('🔍 CORS check - Allowed origins:', allowedOrigins);
+        console.log('🔍 ENV ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS);
 
         // Permitir requests sin origin (como Postman o mismo servidor)
         if (!origin) {
             console.log('✅ CORS: Request sin origin permitido');
+            return callback(null, true);
+        }
+
+        // TEMPORAL: Permitir todos los orígenes que empiecen con https://ugtclmgranada.org
+        if (origin && origin.startsWith('https://ugtclmgranada.org')) {
+            console.log(`✅ CORS: Origin ${origin} permitido (match con ugtclmgranada.org)`);
             return callback(null, true);
         }
 
@@ -110,7 +127,7 @@ app.use(cors({
         return callback(null, true);
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -141,9 +158,9 @@ app.use('/api/', limiter);
 // Para Stripe webhooks - debe ir ANTES de express.json()
 app.use('/webhook', express.raw({ type: 'application/json' }));
 
-// Para el resto de endpoints
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Para el resto de endpoints - aumentar límite para permitir imágenes Base64
+app.use(express.json({ limit: '5mb' })); // Aumentado para fotos de perfil
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // Logger personalizado
 app.use(logger);
@@ -273,6 +290,10 @@ app.listen(PORT, () => {
     console.log(`   💳 Stripe: ${process.env.STRIPE_SECRET_KEY ? '✓ Configurado' : '✗ No configurado'}`);
     console.log(`   💾 MongoDB: ${process.env.MONGODB_URI ? '✓ Configurado' : '✗ No configurado'}`);
     console.log(`   🔐 JWT: ${process.env.JWT_SECRET ? '✓ Configurado' : '✗ No configurado'}`);
+    console.log(`   🌐 CORS: ${process.env.ALLOWED_ORIGINS ? '✓ Configurado' : '✗ No configurado'}`);
+    if (process.env.ALLOWED_ORIGINS) {
+        console.log(`   📋 ALLOWED_ORIGINS: ${process.env.ALLOWED_ORIGINS}`);
+    }
     console.log('   ===================================\n');
 });
 
