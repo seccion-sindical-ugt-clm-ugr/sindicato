@@ -1181,28 +1181,21 @@ recoveryForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
 
     try {
-        // Simulate API call
-        await simulateAPICall();
+        // TODO: Implementar endpoint de recovery en el backend
+        // Por ahora, mostrar mensaje genérico de seguridad
 
-        // Check if email exists in database
-        const userExists = usersDatabase.some(user => user.email === email);
+        // Simular delay de procesamiento
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
-        if (userExists) {
-            showMessage('success', 'Se han enviado instrucciones a tu email');
-            setTimeout(() => {
-                recoveryModal.style.display = 'none';
-                loginModal.style.display = 'block';
-                recoveryForm.reset();
-            }, 2000);
-        } else {
-            // Security: Don't reveal if email exists or not
-            showMessage('success', 'Si el email está registrado, recibirás instrucciones');
-            setTimeout(() => {
-                recoveryModal.style.display = 'none';
-                loginModal.style.display = 'block';
-                recoveryForm.reset();
-            }, 2000);
-        }
+        // Por seguridad, siempre mostrar el mismo mensaje
+        // (no revelar si el email existe o no)
+        showMessage('info', 'Si el email está registrado, recibirás instrucciones para recuperar tu contraseña');
+
+        setTimeout(() => {
+            recoveryModal.style.display = 'none';
+            loginModal.style.display = 'block';
+            recoveryForm.reset();
+        }, 2000);
 
     } catch (error) {
         showMessage('error', 'Error al enviar el email. Inténtalo de nuevo.');

@@ -13,6 +13,7 @@ const mongoose = require('mongoose');
 
 // Importar rutas
 const stripeRoutes = require('./routes/stripe');
+const webhookRoutes = require('./routes/webhook');
 const healthRoutes = require('./routes/health');
 const suggestionsRoutes = require('./routes/suggestions');
 const authRoutes = require('./routes/auth');
@@ -43,7 +44,12 @@ if (process.env.MONGODB_URI) {
     console.log('🔄 Intentando conectar a MongoDB...');
     console.log('📍 URI detectada (primeros 20 chars):', process.env.MONGODB_URI.substring(0, 20) + '...');
 
-    mongoose.connect(process.env.MONGODB_URI)
+    mongoose.connect(process.env.MONGODB_URI, {
+        serverSelectionTimeoutMS: 30000, // 30 segundos para encontrar servidor
+        socketTimeoutMS: 45000, // 45 segundos para operaciones
+        connectTimeoutMS: 30000, // 30 segundos para conexión inicial
+        bufferTimeoutMS: 30000, // 30 segundos para buffering de operaciones
+    })
     .then(() => {
         console.log('✅ MongoDB conectado correctamente');
         console.log('📊 Estado de conexión:', mongoose.connection.readyState);
@@ -121,7 +127,7 @@ app.use(cors({
         return callback(null, true);
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -132,6 +138,15 @@ const limiter = rateLimit({
     message: 'Demasiadas solicitudes desde esta IP, intenta de nuevo más tarde.',
     standardHeaders: true,
     legacyHeaders: false,
+    // Configuración para Vercel/proxies - usar X-Forwarded-For
+    keyGenerator: (req) => {
+        return req.headers['x-forwarded-for']?.split(',')[0] ||
+               req.headers['x-real-ip'] ||
+               req.ip ||
+               'unknown';
+    },
+    // Deshabilitar validación de trust proxy para evitar warning
+    validate: { trustProxy: false }
 });
 
 app.use('/api/', limiter);
@@ -143,9 +158,9 @@ app.use('/api/', limiter);
 // Para Stripe webhooks - debe ir ANTES de express.json()
 app.use('/webhook', express.raw({ type: 'application/json' }));
 
-// Para el resto de endpoints
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Para el resto de endpoints - aumentar límite para permitir imágenes Base64
+app.use(express.json({ limit: '5mb' })); // Aumentado para fotos de perfil
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // Logger personalizado
 app.use(logger);
@@ -153,6 +168,9 @@ app.use(logger);
 // ====================================
 // RUTAS
 // ====================================
+
+// Webhook de Stripe (DEBE ir antes de otras rutas porque usa express.raw)
+app.use('/webhook', webhookRoutes);
 
 // Health check
 app.use('/health', healthRoutes);

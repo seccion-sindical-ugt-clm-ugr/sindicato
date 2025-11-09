@@ -11,7 +11,7 @@ const PDFDocument = require('pdfkit');
 async function generateCertificadoAfiliado(userData) {
     return new Promise((resolve, reject) => {
         try {
-            const doc = new PDFDocument({ size: 'A4', margin: 50 });
+            const doc = new PDFDocument({ size: 'A4', margin: 40 });
             const chunks = [];
 
             doc.on('data', chunk => chunks.push(chunk));
@@ -30,44 +30,44 @@ async function generateCertificadoAfiliado(userData) {
             const darkGray = '#333333';
 
             // Encabezado
-            doc.fontSize(24)
+            doc.fontSize(20)
                 .fillColor(ugtRed)
                 .text('CERTIFICADO DE AFILIACIÓN', { align: 'center' })
-                .moveDown(0.5);
+                .moveDown(0.2);
 
-            doc.fontSize(16)
+            doc.fontSize(13)
                 .fillColor(darkGray)
                 .text('UGT-CLM-UGR Granada', { align: 'center' })
-                .moveDown(2);
+                .moveDown(0.6);
 
             // Contenido
-            doc.fontSize(12)
+            doc.fontSize(10)
                 .fillColor(darkGray)
                 .text('Mediante el presente documento, la Sección Sindical de UGT-CLM-UGR Granada certifica que:', { align: 'justify' })
-                .moveDown(1.5);
+                .moveDown(0.6);
 
             // Nombre del afiliado (destacado)
-            doc.fontSize(16)
+            doc.fontSize(14)
                 .fillColor(ugtRed)
                 .text(userData.nombre.toUpperCase(), { align: 'center' })
-                .moveDown(1);
+                .moveDown(0.4);
 
-            doc.fontSize(12)
+            doc.fontSize(10)
                 .fillColor(darkGray)
                 .text(`Con email: ${userData.email}`, { align: 'center' })
-                .moveDown(0.5);
+                .moveDown(0.2);
 
             if (userData.departamento) {
                 doc.text(`Departamento: ${userData.departamento}`, { align: 'center' })
-                    .moveDown(1.5);
+                    .moveDown(0.6);
             } else {
-                doc.moveDown(1.5);
+                doc.moveDown(0.6);
             }
 
             // Información de afiliación
-            doc.fontSize(12)
+            doc.fontSize(10)
                 .text('Se encuentra afiliado/a a nuestra organización sindical desde:', { align: 'justify' })
-                .moveDown(0.5);
+                .moveDown(0.2);
 
             const startDate = userData.membershipStartDate
                 ? new Date(userData.membershipStartDate).toLocaleDateString('es-ES', {
@@ -77,44 +77,44 @@ async function generateCertificadoAfiliado(userData) {
                 })
                 : new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            doc.fontSize(14)
+            doc.fontSize(12)
                 .fillColor(ugtRed)
                 .text(startDate, { align: 'center' })
-                .moveDown(1.5);
+                .moveDown(0.6);
 
-            doc.fontSize(12)
-                .fillColor(darkGray)
-                .text('Con estado de membresía:', { align: 'justify' })
-                .moveDown(0.5);
-
-            const status = userData.membershipStatus === 'activo' ? 'ACTIVA' : userData.membershipStatus.toUpperCase();
-            doc.fontSize(14)
-                .fillColor(ugtRed)
-                .text(status, { align: 'center' })
-                .moveDown(2);
-
-            // Pie de documento
             doc.fontSize(10)
                 .fillColor(darkGray)
+                .text('Con estado de membresía:', { align: 'justify' })
+                .moveDown(0.2);
+
+            const status = userData.membershipStatus === 'activo' ? 'ACTIVA' : userData.membershipStatus.toUpperCase();
+            doc.fontSize(12)
+                .fillColor(ugtRed)
+                .text(status, { align: 'center' })
+                .moveDown(0.6);
+
+            // Pie de documento
+            doc.fontSize(9)
+                .fillColor(darkGray)
                 .text('Este certificado es válido como acreditación de afiliación a UGT-CLM-UGR Granada.', { align: 'justify' })
-                .moveDown(3);
+                .moveDown(0.6);
 
             // Fecha de emisión
             const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-            doc.fontSize(10)
+            doc.fontSize(9)
                 .text(`Granada, ${today}`, { align: 'right' })
-                .moveDown(2);
+                .moveDown(0.5);
 
             // Firma
-            doc.fontSize(10)
+            doc.fontSize(9)
                 .text('_________________________', { align: 'center' })
-                .moveDown(0.3)
+                .moveDown(0.1)
                 .text('Sección Sindical UGT-CLM-UGR Granada', { align: 'center' });
 
             // Footer
             doc.fontSize(8)
                 .fillColor('#666666')
-                .text('Universidad de Granada | Email: ugtclmgranada@gmail.com', 50, doc.page.height - 50, { align: 'center' });
+                .text('Universidad de Granada | Email: ugtclmgranada@gmail.com', 40, doc.page.height - 40, { align: 'center' });
 
             doc.end();
         } catch (error) {
@@ -317,7 +317,7 @@ async function generateCertificadoCurso(userData, courseData) {
 async function generateFichaAfiliacion(userData) {
     return new Promise((resolve, reject) => {
         try {
-            const doc = new PDFDocument({ size: 'A4', margin: 50 });
+            const doc = new PDFDocument({ size: 'A4', margin: 40 });
             const chunks = [];
 
             doc.on('data', chunk => chunks.push(chunk));
@@ -335,86 +335,86 @@ async function generateFichaAfiliacion(userData) {
             const darkGray = '#333333';
 
             // Encabezado
-            doc.fontSize(20)
+            doc.fontSize(16)
                 .fillColor(ugtRed)
                 .text('FICHA DE AFILIACIÓN', { align: 'center' })
-                .moveDown(0.5);
-
-            doc.fontSize(14)
-                .fillColor(darkGray)
-                .text('Sección Sindical UGT-CLM-UGR Granada', { align: 'center' })
-                .moveDown(2);
-
-            // Datos personales
-            doc.fontSize(14)
-                .fillColor(ugtRed)
-                .text('DATOS PERSONALES', { underline: true })
-                .moveDown(0.5);
+                .moveDown(0.2);
 
             doc.fontSize(11)
                 .fillColor(darkGray)
-                .text(`Nombre completo: ${userData.nombre}`)
-                .moveDown(0.3)
-                .text(`Email: ${userData.email}`)
+                .text('Sección Sindical UGT-CLM-UGR Granada', { align: 'center' })
+                .moveDown(0.6);
+
+            // Datos personales
+            doc.fontSize(12)
+                .fillColor(ugtRed)
+                .text('DATOS PERSONALES', { underline: true })
                 .moveDown(0.3);
+
+            doc.fontSize(9)
+                .fillColor(darkGray)
+                .text(`Nombre completo: ${userData.nombre}`)
+                .moveDown(0.15)
+                .text(`Email: ${userData.email}`)
+                .moveDown(0.15);
 
             if (userData.telefono) {
                 doc.text(`Teléfono: ${userData.telefono}`)
-                    .moveDown(0.3);
+                    .moveDown(0.15);
             }
 
             if (userData.departamento) {
                 doc.text(`Departamento: ${userData.departamento}`)
-                    .moveDown(0.3);
+                    .moveDown(0.15);
             }
 
-            doc.moveDown(1.5);
+            doc.moveDown(0.5);
 
             // Datos de afiliación
-            doc.fontSize(14)
+            doc.fontSize(12)
                 .fillColor(ugtRed)
                 .text('DATOS DE AFILIACIÓN', { underline: true })
-                .moveDown(0.5);
+                .moveDown(0.3);
 
-            doc.fontSize(11)
+            doc.fontSize(9)
                 .fillColor(darkGray)
                 .text(`Número de afiliado: ${userData._id}`)
-                .moveDown(0.3);
+                .moveDown(0.15);
 
             const startDate = userData.membershipStartDate
                 ? new Date(userData.membershipStartDate).toLocaleDateString('es-ES')
                 : new Date().toLocaleDateString('es-ES');
 
             doc.text(`Fecha de alta: ${startDate}`)
-                .moveDown(0.3);
+                .moveDown(0.15);
 
             const expiryDate = userData.membershipExpiryDate
                 ? new Date(userData.membershipExpiryDate).toLocaleDateString('es-ES')
                 : 'N/A';
 
             doc.text(`Fecha de expiración: ${expiryDate}`)
-                .moveDown(0.3)
+                .moveDown(0.15)
                 .text(`Estado: ${userData.membershipStatus}`)
-                .moveDown(0.3)
+                .moveDown(0.15)
                 .text(`Rol: ${userData.role}`)
-                .moveDown(2);
+                .moveDown(0.5);
 
             // Notas
-            doc.fontSize(9)
+            doc.fontSize(8)
                 .fillColor('#666666')
                 .text('Esta ficha es un documento interno de UGT-CLM-UGR Granada.', { align: 'justify' })
                 .text('Contiene información confidencial y de uso exclusivo para la gestión sindical.', { align: 'justify' })
-                .moveDown(2);
+                .moveDown(0.5);
 
             // Fecha de generación
             const today = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-            doc.fontSize(9)
+            doc.fontSize(8)
                 .text(`Generado el: ${today}`, { align: 'right' });
 
             // Footer
             doc.fontSize(8)
                 .fillColor('#666666')
-                .text('UGT-CLM-UGR Granada | Universidad de Granada', 50, doc.page.height - 50, { align: 'center' });
+                .text('UGT-CLM-UGR Granada | Universidad de Granada', 40, doc.page.height - 40, { align: 'center' });
 
             doc.end();
         } catch (error) {
