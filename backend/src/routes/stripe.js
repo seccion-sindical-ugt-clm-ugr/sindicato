@@ -18,14 +18,14 @@ const { generateReciboPago } = require('../services/pdfService');
 const affiliationValidators = [
     body('name').trim().notEmpty().withMessage('El nombre es requerido'),
     body('email').isEmail().withMessage('Email inválido'),
-    body('phone').trim().notEmpty().withMessage('El teléfono es requerido'),
+    body('phone').optional().trim(),
     body('department').trim().notEmpty().withMessage('El departamento es requerido')
 ];
 
 const courseValidators = [
     body('name').trim().notEmpty().withMessage('El nombre es requerido'),
     body('email').isEmail().withMessage('Email inválido'),
-    body('phone').trim().notEmpty().withMessage('El teléfono es requerido'),
+    body('phone').optional().trim(),
     body('department').trim().notEmpty().withMessage('El departamento/empresa es requerido'),
     body('courseType').trim().notEmpty().withMessage('El tipo de curso es requerido'),
     body('isMember').isBoolean().withMessage('isMember debe ser boolean')
