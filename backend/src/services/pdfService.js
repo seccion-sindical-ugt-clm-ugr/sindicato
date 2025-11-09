@@ -407,9 +407,555 @@ async function generateFichaAfiliacion(userData) {
     });
 }
 
+/**
+ * Genera el programa completo del curso de IA
+ */
+async function generateProgramaCursoIA() {
+    return new Promise((resolve, reject) => {
+        try {
+            const doc = new PDFDocument({
+                size: 'A4',
+                margin: 60,
+                bufferPages: true
+            });
+            const chunks = [];
+
+            doc.on('data', chunk => chunks.push(chunk));
+            doc.on('end', () => {
+                const pdfBuffer = Buffer.concat(chunks);
+                const base64 = pdfBuffer.toString('base64');
+                resolve({
+                    buffer: pdfBuffer,
+                    base64: base64,
+                    filename: 'Programa_Jornadas_IA_UGT.pdf'
+                });
+            });
+
+            // Colores
+            const darkBlue = '#1a237e';
+            const lightBlue = '#0d47a1';
+            const ugtRed = '#E30613';
+            const darkGray = '#333333';
+            const lightGray = '#666666';
+
+            // ===== PORTADA =====
+            doc.rect(0, 0, doc.page.width, doc.page.height)
+                .fill(darkBlue);
+
+            doc.image('assets/logo-ugt.png', (doc.page.width - 120) / 2, 100, { width: 120 })
+                .catch(() => {
+                    // Si no existe el logo, continuamos sin él
+                });
+
+            doc.fillColor('white')
+                .fontSize(28)
+                .font('Helvetica-Bold')
+                .text('JORNADAS DE INTRODUCCIÓN A LA IA', 60, 280, {
+                    width: doc.page.width - 120,
+                    align: 'center'
+                })
+                .moveDown(1);
+
+            doc.fontSize(36)
+                .text('IA en Acción:', { align: 'center' })
+                .moveDown(0.3)
+                .fontSize(24)
+                .text('Transformando el Centro de Lenguas Modernas', {
+                    width: doc.page.width - 120,
+                    align: 'center'
+                })
+                .moveDown(3);
+
+            doc.fontSize(14)
+                .font('Helvetica')
+                .text('Formación práctica en Inteligencia Artificial', { align: 'center' })
+                .text('Universidad de Granada', { align: 'center' })
+                .moveDown(2);
+
+            doc.fontSize(12)
+                .text('20 horas | 30 sesiones | Por Zoom', { align: 'center' })
+                .moveDown(1);
+
+            doc.fontSize(10)
+                .fillColor('#cccccc')
+                .text('UGT-CLM-UGR Granada', { align: 'center' })
+                .text(new Date().getFullYear().toString(), { align: 'center' });
+
+            // ===== PÁGINA 2: INFORMACIÓN GENERAL =====
+            doc.addPage();
+            doc.fillColor(darkGray);
+
+            doc.fontSize(24)
+                .font('Helvetica-Bold')
+                .fillColor(ugtRed)
+                .text('Información General', { align: 'left' })
+                .moveDown(1.5);
+
+            doc.fontSize(12)
+                .fillColor(darkGray)
+                .font('Helvetica');
+
+            // Descripción
+            doc.fontSize(11)
+                .fillColor(lightGray)
+                .text('DESCRIPCIÓN', { underline: true })
+                .moveDown(0.5);
+
+            doc.fontSize(11)
+                .fillColor(darkGray)
+                .text(
+                    'Las Jornadas de Introducción a la IA están diseñadas específicamente para el personal del Centro de Lenguas Modernas de la Universidad de Granada, con el objetivo de proporcionar una formación práctica y útil en el uso de herramientas de Inteligencia Artificial adaptadas a las necesidades específicas de cada departamento.',
+                    { align: 'justify', lineGap: 4 }
+                )
+                .moveDown(1.5);
+
+            // Características del curso
+            doc.fontSize(11)
+                .fillColor(lightGray)
+                .text('CARACTERÍSTICAS DEL CURSO', { underline: true })
+                .moveDown(0.5);
+
+            const caracteristicas = [
+                { icon: '⏱', label: 'Duración:', valor: '20 horas (30 sesiones de 40 minutos)' },
+                { icon: '📅', label: 'Calendario:', valor: '5 semanas (5 viernes)' },
+                { icon: '🎥', label: 'Modalidad:', valor: 'Online por Zoom' },
+                { icon: '🕐', label: 'Horario:', valor: '6 sesiones por viernes (mañana y tarde)' },
+                { icon: '📜', label: 'Certificación:', valor: 'Certificado UGT-CLM-UGR' },
+                { icon: '👥', label: 'Plazas:', valor: 'Limitadas' }
+            ];
+
+            caracteristicas.forEach(item => {
+                doc.fontSize(11)
+                    .fillColor(darkBlue)
+                    .font('Helvetica-Bold')
+                    .text(`${item.icon} ${item.label}`, { continued: true })
+                    .font('Helvetica')
+                    .fillColor(darkGray)
+                    .text(` ${item.valor}`)
+                    .moveDown(0.8);
+            });
+
+            // ===== PÁGINA 3: PERFILES PROFESIONALES =====
+            doc.addPage();
+
+            doc.fontSize(24)
+                .font('Helvetica-Bold')
+                .fillColor(ugtRed)
+                .text('¿A quién va dirigido?', { align: 'left' })
+                .moveDown(1);
+
+            doc.fontSize(11)
+                .fillColor(darkGray)
+                .font('Helvetica')
+                .text('Diseñado para todos los perfiles del Centro de Lenguas Modernas:', { align: 'justify' })
+                .moveDown(1.5);
+
+            const perfiles = [
+                {
+                    titulo: '👨‍🏫 Profesores de Español',
+                    descripcion: 'Enseñanza de español como lengua extranjera, creación de materiales didácticos y evaluación de competencias.'
+                },
+                {
+                    titulo: '🌍 Profesores de Otras Lenguas',
+                    descripcion: 'Enseñanza multilingüe, traducción y actividades interculturales.'
+                },
+                {
+                    titulo: '💼 Personal de Administración',
+                    descripcion: 'Gestión de matrículas, atención multilingüe y trámites administrativos.'
+                },
+                {
+                    titulo: '🚪 Personal de Conserjería',
+                    descripcion: 'Control de accesos, información y atención presencial a estudiantes.'
+                },
+                {
+                    titulo: '🔧 Personal de Servicios',
+                    descripcion: 'Mantenimiento, gestión de recursos tecnológicos y apoyo logístico.'
+                }
+            ];
+
+            perfiles.forEach(perfil => {
+                doc.fontSize(12)
+                    .font('Helvetica-Bold')
+                    .fillColor(darkBlue)
+                    .text(perfil.titulo)
+                    .moveDown(0.3);
+
+                doc.fontSize(10)
+                    .font('Helvetica')
+                    .fillColor(darkGray)
+                    .text(perfil.descripcion, { align: 'justify', lineGap: 3 })
+                    .moveDown(1.2);
+            });
+
+            // ===== PÁGINA 4-5: BLOQUES TEMÁTICOS =====
+            doc.addPage();
+
+            doc.fontSize(24)
+                .font('Helvetica-Bold')
+                .fillColor(ugtRed)
+                .text('Programa: Bloques Temáticos', { align: 'left' })
+                .moveDown(1.5);
+
+            const bloques = [
+                {
+                    numero: '1',
+                    titulo: 'Fundamentos de la IA',
+                    duracion: '4 horas · 6 sesiones',
+                    temas: [
+                        'Introducción a la IA: conceptos básicos y evolución',
+                        'Tipos de IA: débil vs. fuerte, estrecha vs. general',
+                        'Principales tecnologías: machine learning, procesamiento de lenguaje natural, visión artificial',
+                        'Herramientas de IA accesibles: panorama actual',
+                        'Ética y responsabilidad en el uso de la IA',
+                        'Enfoque práctico: Primeros pasos con ChatGPT y otras herramientas básicas'
+                    ]
+                },
+                {
+                    numero: '2',
+                    titulo: 'IA en el Ámbito Educativo',
+                    duracion: '6 horas · 9 sesiones',
+                    temas: [
+                        'IA para la creación de contenidos educativos',
+                        'Herramientas de IA para la enseñanza de idiomas',
+                        'Evaluación y feedback automático',
+                        'Personalización del aprendizaje mediante IA',
+                        'Traducción y adaptación de materiales',
+                        'Creación de recursos multimedia con IA',
+                        'Detección de plagio y uso ético',
+                        'Asistentes virtuales para estudiantes',
+                        'Enfoque práctico: Talleres específicos para profesores'
+                    ]
+                },
+                {
+                    numero: '3',
+                    titulo: 'IA en la Gestión Administrativa',
+                    duracion: '4 horas · 6 sesiones',
+                    temas: [
+                        'Automatización de procesos administrativos',
+                        'IA para la atención multilingüe',
+                        'Gestión documental inteligente',
+                        'Análisis de datos para la toma de decisiones',
+                        'Optimización de recursos mediante IA',
+                        'Enfoque práctico: Talleres específicos para personal administrativo'
+                    ]
+                }
+            ];
+
+            bloques.forEach(bloque => {
+                // Encabezado del bloque
+                doc.roundedRect(60, doc.y, doc.page.width - 120, 60, 8)
+                    .fillAndStroke(darkBlue, darkBlue);
+
+                const bloqueY = doc.y + 15;
+
+                doc.fontSize(14)
+                    .fillColor('white')
+                    .font('Helvetica-Bold')
+                    .text(`BLOQUE ${bloque.numero}`, 80, bloqueY, { continued: true })
+                    .fontSize(10)
+                    .font('Helvetica')
+                    .text(`  •  ${bloque.duracion}`, { align: 'left' });
+
+                doc.fontSize(13)
+                    .font('Helvetica-Bold')
+                    .text(bloque.titulo, 80, bloqueY + 20);
+
+                doc.moveDown(3.5);
+
+                // Temas
+                bloque.temas.forEach(tema => {
+                    doc.fontSize(10)
+                        .fillColor('#4CAF50')
+                        .text('✓', 80, doc.y, { continued: true, width: 20 })
+                        .fillColor(darkGray)
+                        .text(` ${tema}`, { width: doc.page.width - 160, align: 'left', lineGap: 2 })
+                        .moveDown(0.6);
+                });
+
+                doc.moveDown(1);
+
+                // Si no hay espacio para el siguiente bloque, agregar página
+                if (doc.y > doc.page.height - 200) {
+                    doc.addPage();
+                }
+            });
+
+            // Continuación de bloques en nueva página si es necesario
+            doc.addPage();
+
+            const bloques2 = [
+                {
+                    numero: '4',
+                    titulo: 'IA en Servicios y Conserjería',
+                    duracion: '2 horas · 3 sesiones',
+                    temas: [
+                        'Sistemas de información inteligentes',
+                        'Gestión de espacios y recursos',
+                        'Asistencia multilingüe automatizada',
+                        'Enfoque práctico: Talleres específicos para personal de conserjería y servicios'
+                    ]
+                },
+                {
+                    numero: '5',
+                    titulo: 'Proyectos Colaborativos Interdepartamentales',
+                    duracion: '4 horas · 6 sesiones',
+                    temas: [
+                        'Diseño de soluciones basadas en IA para el centro',
+                        'Implementación de casos prácticos',
+                        'Presentación de proyectos y retroalimentación',
+                        'Evaluación de impacto y sostenibilidad',
+                        'Plan de acción futuro',
+                        'Enfoque práctico: Trabajo en equipos mixtos para resolver problemas reales del centro'
+                    ]
+                }
+            ];
+
+            bloques2.forEach(bloque => {
+                doc.roundedRect(60, doc.y, doc.page.width - 120, 60, 8)
+                    .fillAndStroke(darkBlue, darkBlue);
+
+                const bloqueY = doc.y + 15;
+
+                doc.fontSize(14)
+                    .fillColor('white')
+                    .font('Helvetica-Bold')
+                    .text(`BLOQUE ${bloque.numero}`, 80, bloqueY, { continued: true })
+                    .fontSize(10)
+                    .font('Helvetica')
+                    .text(`  •  ${bloque.duracion}`, { align: 'left' });
+
+                doc.fontSize(13)
+                    .font('Helvetica-Bold')
+                    .text(bloque.titulo, 80, bloqueY + 20);
+
+                doc.moveDown(3.5);
+
+                bloque.temas.forEach(tema => {
+                    doc.fontSize(10)
+                        .fillColor('#4CAF50')
+                        .text('✓', 80, doc.y, { continued: true, width: 20 })
+                        .fillColor(darkGray)
+                        .text(` ${tema}`, { width: doc.page.width - 160, align: 'left', lineGap: 2 })
+                        .moveDown(0.6);
+                });
+
+                doc.moveDown(1);
+            });
+
+            // ===== PÁGINA: METODOLOGÍA =====
+            doc.addPage();
+
+            doc.fontSize(24)
+                .font('Helvetica-Bold')
+                .fillColor(ugtRed)
+                .text('Metodología', { align: 'left' })
+                .moveDown(1);
+
+            doc.fontSize(11)
+                .fillColor(darkGray)
+                .font('Helvetica')
+                .text('Aprendizaje activo y práctico desde el primer momento', { align: 'justify' })
+                .moveDown(1.5);
+
+            // Principios metodológicos
+            doc.fontSize(11)
+                .fillColor(lightGray)
+                .text('PRINCIPIOS METODOLÓGICOS', { underline: true })
+                .moveDown(0.8);
+
+            const principios = [
+                { icono: '🤝', titulo: 'Aprendizaje Activo', desc: 'Utilizarás herramientas de IA desde la primera sesión' },
+                { icono: '💻', titulo: 'Enfoque Práctico', desc: 'Mínimo contenido teórico, máxima aplicación práctica' },
+                { icono: '⚙️', titulo: 'Personalización', desc: 'Actividades adaptadas a cada perfil profesional' },
+                { icono: '👥', titulo: 'Colaboración', desc: 'Fomento del trabajo en equipo e intercambio de experiencias' },
+                { icono: '📈', titulo: 'Progresión', desc: 'De lo simple a lo complejo, construyendo sobre lo aprendido' }
+            ];
+
+            principios.forEach(p => {
+                doc.fontSize(11)
+                    .fillColor(darkBlue)
+                    .font('Helvetica-Bold')
+                    .text(`${p.icono} ${p.titulo}`, { continued: false })
+                    .moveDown(0.3);
+
+                doc.fontSize(10)
+                    .font('Helvetica')
+                    .fillColor(darkGray)
+                    .text(p.desc, { indent: 30 })
+                    .moveDown(1);
+            });
+
+            doc.moveDown(1);
+
+            // Estructura de sesiones
+            doc.fontSize(11)
+                .fillColor(lightGray)
+                .text('ESTRUCTURA DE LAS SESIONES (40 minutos)', { underline: true })
+                .moveDown(0.8);
+
+            const estructura = [
+                { paso: '1', titulo: 'Introducción (5 min)', desc: 'Presentación del tema y objetivos de la sesión' },
+                { paso: '2', titulo: 'Demostración (10 min)', desc: 'Ejemplo práctico de aplicación con herramientas reales' },
+                { paso: '3', titulo: 'Práctica Guiada (15 min)', desc: 'Los participantes aplican lo aprendido con apoyo del formador' },
+                { paso: '4', titulo: 'Reflexión y Dudas (10 min)', desc: 'Discusión sobre aplicaciones específicas y resolución de problemas' }
+            ];
+
+            estructura.forEach(e => {
+                doc.fontSize(11)
+                    .fillColor(darkBlue)
+                    .font('Helvetica-Bold')
+                    .text(`${e.paso}. ${e.titulo}`, { continued: false })
+                    .moveDown(0.3);
+
+                doc.fontSize(10)
+                    .font('Helvetica')
+                    .fillColor(darkGray)
+                    .text(e.desc, { indent: 20 })
+                    .moveDown(0.8);
+            });
+
+            // ===== PÁGINA: CALENDARIO =====
+            doc.addPage();
+
+            doc.fontSize(24)
+                .font('Helvetica-Bold')
+                .fillColor(ugtRed)
+                .text('Calendario de las Jornadas', { align: 'left' })
+                .moveDown(1);
+
+            doc.fontSize(11)
+                .fillColor(darkGray)
+                .font('Helvetica')
+                .text('5 semanas intensivas de formación práctica', { align: 'justify' })
+                .moveDown(1.5);
+
+            const calendario = [
+                { semana: '1', tema: 'Fundamentos de IA', sesiones: '6 sesiones' },
+                { semana: '2', tema: 'IA Educativa (Parte 1)', sesiones: '6 sesiones' },
+                { semana: '3', tema: 'IA Educativa (Parte 2)', sesiones: '6 sesiones' },
+                { semana: '4', tema: 'IA Administrativa + Servicios', sesiones: '6 sesiones' },
+                { semana: '5', tema: 'Proyectos Colaborativos', sesiones: '6 sesiones' }
+            ];
+
+            calendario.forEach(c => {
+                doc.roundedRect(60, doc.y, doc.page.width - 120, 50, 5)
+                    .fillAndStroke('#f0f0f0', '#cccccc');
+
+                const cardY = doc.y + 10;
+
+                doc.fontSize(12)
+                    .fillColor(darkBlue)
+                    .font('Helvetica-Bold')
+                    .text(`SEMANA ${c.semana}`, 80, cardY);
+
+                doc.fontSize(11)
+                    .fillColor(darkGray)
+                    .font('Helvetica')
+                    .text(c.tema, 80, cardY + 18);
+
+                doc.fontSize(9)
+                    .fillColor(lightGray)
+                    .text(`📅 Viernes  |  🕐 ${c.sesiones}`, 80, cardY + 33);
+
+                doc.moveDown(3.5);
+            });
+
+            doc.moveDown(1);
+            doc.fontSize(10)
+                .fillColor('#856404')
+                .fillOpacity(0.1)
+                .roundedRect(60, doc.y, doc.page.width - 120, 40, 5)
+                .fill()
+                .fillOpacity(1);
+
+            doc.fillColor('#856404')
+                .text('ℹ️ Nota: Cada día incluye 6 sesiones de 40 minutos con descansos de 10 minutos entre sesiones (3 horas por franja).',
+                    70, doc.y - 25, { width: doc.page.width - 140, align: 'left', lineGap: 3 });
+
+            // ===== PÁGINA FINAL: CONTACTO E INSCRIPCIÓN =====
+            doc.addPage();
+
+            doc.fontSize(24)
+                .font('Helvetica-Bold')
+                .fillColor(ugtRed)
+                .text('Información de Contacto e Inscripción', { align: 'left' })
+                .moveDown(2);
+
+            doc.fontSize(11)
+                .fillColor(darkGray)
+                .font('Helvetica')
+                .text('Para más información o inscripción, contacta con:', { align: 'left' })
+                .moveDown(1.5);
+
+            doc.fontSize(12)
+                .fillColor(darkBlue)
+                .font('Helvetica-Bold')
+                .text('UGT-CLM-UGR Granada')
+                .moveDown(0.5);
+
+            doc.fontSize(11)
+                .font('Helvetica')
+                .fillColor(darkGray)
+                .text('📧 Email: ugtclmgranada@gmail.com')
+                .text('🌐 Web: https://ugtclmgranada.org')
+                .text('📱 WhatsApp: +34 690 026 370')
+                .moveDown(2);
+
+            // Precio en caja destacada
+            doc.roundedRect(60, doc.y, doc.page.width - 120, 120, 10)
+                .fillAndStroke('#e8f4f8', '#2196F3');
+
+            const priceBoxY = doc.y + 20;
+
+            doc.fontSize(13)
+                .fillColor(darkBlue)
+                .font('Helvetica-Bold')
+                .text('TARIFAS', 80, priceBoxY, { align: 'left' })
+                .moveDown(0.8);
+
+            doc.fontSize(11)
+                .font('Helvetica')
+                .fillColor(darkGray)
+                .text('👥 Afiliados UGT: ', 80, doc.y, { continued: true })
+                .fontSize(14)
+                .fillColor(ugtRed)
+                .font('Helvetica-Bold')
+                .text('15€')
+                .moveDown(0.5);
+
+            doc.fontSize(11)
+                .font('Helvetica')
+                .fillColor(darkGray)
+                .text('👤 No afiliados: ', 80, doc.y, { continued: true })
+                .fontSize(14)
+                .fillColor(darkGray)
+                .font('Helvetica-Bold')
+                .text('160€')
+                .moveDown(1);
+
+            doc.fontSize(9)
+                .fillColor(lightGray)
+                .font('Helvetica-Oblique')
+                .text('* Los afiliados UGT disfrutan de un 90% de descuento', 80);
+
+            // Footer final
+            doc.fontSize(8)
+                .fillColor(lightGray)
+                .font('Helvetica')
+                .text(`Documento generado el ${new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+                    60, doc.page.height - 50, { align: 'center' });
+
+            doc.end();
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
 module.exports = {
     generateCertificadoAfiliado,
     generateReciboPago,
     generateCertificadoCurso,
-    generateFichaAfiliacion
+    generateFichaAfiliacion,
+    generateProgramaCursoIA
 };

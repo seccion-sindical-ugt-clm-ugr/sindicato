@@ -460,6 +460,14 @@
                     ¿No eres afiliado? <a href="../index.html#afiliate" style="color: white; text-decoration: underline;">Afíliate ahora por solo 15€/año</a>
                     y accede a todos los cursos con descuento
                 </p>
+
+                <!-- Botón de descarga del programa -->
+                <div style="margin-top: 2rem; text-align: center;">
+                    <a href="#" onclick="event.preventDefault(); downloadProgramaPDF();" class="btn btn-secondary" style="background: white; color: #667eea; border: 2px solid white; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-download"></i>
+                        Descargar Programa Completo (PDF)
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -1392,6 +1400,48 @@
             }
         `;
         document.head.appendChild(priceStyles);
+
+        // Función para descargar el programa en PDF
+        async function downloadProgramaPDF() {
+            try {
+                const btn = event.target.closest('a');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
+                btn.style.pointerEvents = 'none';
+
+                const response = await fetch(`${API_URL}/api/curso-ia/programa-pdf`);
+
+                if (!response.ok) {
+                    throw new Error('Error al generar el PDF');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Programa_Jornadas_IA_UGT.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                btn.innerHTML = originalHTML;
+                btn.style.pointerEvents = 'auto';
+
+                if (typeof showMessage === 'function') {
+                    showMessage('success', '✅ Programa descargado correctamente');
+                }
+            } catch (error) {
+                console.error('Error descargando PDF:', error);
+                const btn = event.target.closest('a');
+                btn.innerHTML = '<i class="fas fa-download"></i> Descargar Programa Completo (PDF)';
+                btn.style.pointerEvents = 'auto';
+
+                if (typeof showMessage === 'function') {
+                    showMessage('error', 'Error al descargar el programa. Por favor, inténtalo de nuevo.');
+                }
+            }
+        }
     </script>
 </body>
 </html>
