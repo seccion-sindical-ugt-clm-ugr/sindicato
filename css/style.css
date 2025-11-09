@@ -682,6 +682,8 @@ body {
     border-radius: 15px;
     width: 90%;
     max-width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
     position: relative;
     animation: slideIn 0.3s;
 }
