@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pago Exitoso - UGT-CLM-UGR Granada</title>
+    <title>Completar Registro - UGT-CLM-UGR Granada</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -13,101 +13,120 @@
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, #4CAF50, #45a049);
-            color: white;
-            text-align: center;
             padding: 2rem;
         }
 
         .success-content {
-            background: rgba(255,255,255,0.1);
+            background: white;
             padding: 3rem;
             border-radius: 20px;
-            backdrop-filter: blur(10px);
             max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.2);
             animation: fadeInUp 0.8s ease;
         }
 
         .success-icon {
             font-size: 4rem;
             color: #4CAF50;
-            background: white;
-            width: 120px;
-            height: 120px;
+            background: #e8f5e9;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 2rem;
-            animation: pulse 2s infinite;
+            margin: 0 auto 1.5rem;
         }
 
         .success-title {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: white;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+            text-align: center;
         }
 
-        .success-message {
-            font-size: 1.2rem;
+        .success-subtitle {
+            font-size: 1.1rem;
             margin-bottom: 2rem;
-            opacity: 0.9;
+            color: #666;
+            text-align: center;
         }
 
-        .payment-details {
-            background: rgba(255,255,255,0.1);
+        .form-section {
+            background: #f9f9f9;
             padding: 1.5rem;
-            border-radius: 15px;
-            margin: 2rem 0;
-            text-align: left;
+            border-radius: 10px;
+            margin: 1.5rem 0;
         }
 
-        .payment-details h4 {
-            margin-bottom: 1rem;
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .btn-complete {
+            width: 100%;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
             color: white;
-        }
-
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            margin: 0.5rem 0;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .btn-success {
-            background: white;
-            color: #4CAF50;
-            padding: 12px 30px;
+            padding: 15px;
             border: none;
-            border-radius: 25px;
-            text-decoration: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
             font-weight: 600;
-            display: inline-block;
-            margin: 0.5rem;
+            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .btn-success:hover {
+        .btn-complete:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
         }
 
-        .btn-secondary {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
-            padding: 12px 30px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-block;
-            margin: 0.5rem;
-            transition: all 0.3s ease;
+        .btn-complete:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        .btn-secondary:hover {
-            background: white;
-            color: #4CAF50;
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1.5rem 0;
+        }
+
+        .info-box i {
+            color: #2196F3;
+            margin-right: 0.5rem;
         }
 
         @keyframes fadeInUp {
@@ -121,19 +140,7 @@
             }
         }
 
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 20px rgba(76, 175, 80, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
-            }
-        }
-
-        .loading {
+        .loading-spinner {
             display: inline-block;
             width: 20px;
             height: 20px;
@@ -146,6 +153,27 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        #messageContainer {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        #messageContainer.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        #messageContainer.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -155,102 +183,187 @@
                 <i class="fas fa-check"></i>
             </div>
 
-            <h1 class="success-title">¡Pago Exitoso!</h1>
-            <p class="success-message">Tu transacción ha sido procesada correctamente</p>
+            <h1 class="success-title">¡Pago Completado!</h1>
+            <p class="success-subtitle">Ahora completa tu registro para acceder a tu área personal</p>
 
-            <div id="loadingMessage" class="payment-details">
-                <h4><div class="loading"></div> Verificando detalles del pago...</h4>
-                <p>Por favor, espera un momento mientras confirmamos tu transacción.</p>
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>Último paso:</strong> Crea tu contraseña para acceder a todos los beneficios de afiliado.
             </div>
 
-            <div id="paymentDetails" class="payment-details" style="display: none;">
-                <h4>Resumen del Pago</h4>
-                <div id="detailsContent"></div>
-            </div>
+            <div id="messageContainer"></div>
 
-            <div class="success-actions">
-                <a href="index.html" class="btn-success">
-                    <i class="fas fa-home"></i> Ir al Inicio
-                </a>
-                <a href="#cursos" class="btn-secondary">
-                    <i class="fas fa-graduation-cap"></i> Ver Cursos
-                </a>
-            </div>
+            <form id="completeRegistrationForm">
+                <div class="form-section">
+                    <h3 style="margin-bottom: 1rem; color: #333;">Completa tus datos</h3>
 
-            <div class="next-steps" style="margin-top: 2rem;">
-                <h4>¿Qué pasa ahora?</h4>
-                <p>Recibirás un email de confirmación con todos los detalles.</p>
-                <p>Si te has afiliado, tu acceso de miembro estará activo en las próximas horas.</p>
-                <p>Si es un curso, recibirás las instrucciones de acceso por email.</p>
+                    <div class="form-group">
+                        <label for="nombre">
+                            <i class="fas fa-user"></i> Nombre *
+                        </label>
+                        <input type="text" id="nombre" name="nombre" required>
+                        <span class="error-message" id="nombreError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apellidos">
+                            <i class="fas fa-user"></i> Apellidos *
+                        </label>
+                        <input type="text" id="apellidos" name="apellidos" required>
+                        <span class="error-message" id="apellidosError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Contraseña *
+                        </label>
+                        <input type="password" id="password" name="password" required minlength="6">
+                        <small style="color: #666;">Mínimo 6 caracteres</small>
+                        <span class="error-message" id="passwordError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">
+                            <i class="fas fa-lock"></i> Confirmar Contraseña *
+                        </label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+                        <span class="error-message" id="confirmPasswordError"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-complete" id="submitBtn">
+                    <i class="fas fa-rocket"></i> Completar Registro
+                </button>
+            </form>
+
+            <div class="info-box" style="margin-top: 2rem; background: #fff3e0; border-color: #ff9800;">
+                <i class="fas fa-gift" style="color: #ff9800;"></i>
+                <strong>Beneficios de afiliado:</strong> Acceso a cursos con descuento, asesoramiento jurídico, documentación automática y más.
             </div>
         </div>
     </div>
 
+    <script src="js/backend-config.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Obtener el session_id de la URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const sessionId = urlParams.get('session_id');
-            const courseType = urlParams.get('course');
+        const sessionId = new URLSearchParams(window.location.search).get('session_id');
 
-            // Verificar que venimos de Stripe
-            if (!sessionId) {
-                console.warn('No se encontró session_id en la URL');
+        if (!sessionId) {
+            showMessage('error', '⚠️ No se encontró información del pago. Por favor, contacta con soporte.');
+            document.getElementById('completeRegistrationForm').style.display = 'none';
+        }
+
+        document.getElementById('completeRegistrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Limpiar errores
+            document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+
+            const nombre = document.getElementById('nombre').value.trim();
+            const apellidos = document.getElementById('apellidos').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validaciones
+            let hasErrors = false;
+
+            if (!nombre) {
+                showFieldError('nombreError', 'El nombre es obligatorio');
+                hasErrors = true;
             }
 
-            // Mostrar detalles del pago exitoso
-            displayPaymentSuccess(sessionId, courseType);
+            if (!apellidos) {
+                showFieldError('apellidosError', 'Los apellidos son obligatorios');
+                hasErrors = true;
+            }
+
+            if (password.length < 6) {
+                showFieldError('passwordError', 'La contraseña debe tener al menos 6 caracteres');
+                hasErrors = true;
+            }
+
+            if (password !== confirmPassword) {
+                showFieldError('confirmPasswordError', 'Las contraseñas no coinciden');
+                hasErrors = true;
+            }
+
+            if (hasErrors) return;
+
+            // Enviar al backend
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="loading-spinner"></span> Creando cuenta...';
+            submitBtn.disabled = true;
+
+            try {
+                const API_URL = typeof BACKEND_CONFIG !== 'undefined'
+                    ? BACKEND_CONFIG.apiUrl
+                    : 'https://sindicato-mu.vercel.app';
+
+                const response = await fetch(`${API_URL}/api/complete-registration`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sessionId: sessionId,
+                        nombre: nombre,
+                        apellidos: apellidos,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showMessage('success', '✅ ¡Registro completado! Redirigiendo al área personal...');
+
+                    // Guardar tokens
+                    if (data.data.accessToken) {
+                        localStorage.setItem('accessToken', data.data.accessToken);
+                    }
+                    if (data.data.refreshToken) {
+                        localStorage.setItem('refreshToken', data.data.refreshToken);
+                    }
+                    if (data.data.user) {
+                        localStorage.setItem('user', JSON.stringify(data.data.user));
+                    }
+
+                    // Redirigir al inicio con sesión activa
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+
+                } else {
+                    showMessage('error', data.error || 'Error al completar el registro. Por favor, contacta con soporte.');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('error', 'Error de conexión. Por favor, intenta de nuevo.');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
 
-        function displayPaymentSuccess(sessionId, courseType) {
-            const loadingDiv = document.getElementById('loadingMessage');
-            const detailsDiv = document.getElementById('paymentDetails');
-            const detailsContent = document.getElementById('detailsContent');
+        function showFieldError(fieldId, message) {
+            const errorEl = document.getElementById(fieldId);
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
 
-            // Ocultar mensaje de carga
-            loadingDiv.style.display = 'none';
+        function showMessage(type, message) {
+            const container = document.getElementById('messageContainer');
+            container.className = type;
+            container.innerHTML = message;
+            container.style.display = 'block';
 
-            // Determinar el producto comprado
-            let productName = 'Afiliación Anual UGT-CLM-UGR';
-            let productPrice = '15,00 €';
-
-            if (courseType) {
-                productName = 'Curso Inteligencia Artificial';
-                productPrice = '15,00 € - 160,00 €';
+            if (type === 'success') {
+                setTimeout(() => {
+                    container.style.display = 'none';
+                }, 5000);
             }
-
-            // Construir HTML de detalles
-            const detailsHTML = `
-                <div class="detail-item">
-                    <span>Producto:</span>
-                    <span><strong>${productName}</strong></span>
-                </div>
-                <div class="detail-item">
-                    <span>Precio:</span>
-                    <span><strong>${productPrice}</strong></span>
-                </div>
-                <div class="detail-item">
-                    <span>Fecha:</span>
-                    <span>${new Date().toLocaleDateString('es-ES')}</span>
-                </div>
-                <div class="detail-item">
-                    <span>Estado:</span>
-                    <span style="color: #4CAF50;"><strong>✓ Pagado</strong></span>
-                </div>
-                ${sessionId ? `
-                <div class="detail-item">
-                    <span>ID de Transacción:</span>
-                    <span style="font-size: 0.8em; font-family: monospace;">${sessionId.substring(0, 20)}...</span>
-                </div>
-                ` : ''}
-            `;
-
-            detailsContent.innerHTML = detailsHTML;
-            detailsDiv.style.display = 'block';
-
-            // Log para debugging
-            console.log('✅ Pago completado exitosamente');
-            console.log('Session ID:', sessionId);
         }
     </script>
 </body>
