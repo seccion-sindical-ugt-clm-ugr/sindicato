@@ -12,7 +12,7 @@ const getBackendConfig = () => {
     return {
         API_URL: window.location.hostname === 'localhost'
             ? 'http://localhost:3000'
-            : 'https://sindicato-backend.vercel.app'
+            : 'https://sindicato-mu.vercel.app'
     };
 };
 
