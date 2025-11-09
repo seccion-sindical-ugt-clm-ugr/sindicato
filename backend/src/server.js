@@ -142,9 +142,9 @@ app.use('/api/', limiter);
 // Para Stripe webhooks - debe ir ANTES de express.json()
 app.use('/webhook', express.raw({ type: 'application/json' }));
 
-// Para el resto de endpoints
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Para el resto de endpoints - aumentar límite para permitir imágenes Base64
+app.use(express.json({ limit: '5mb' })); // Aumentado para fotos de perfil
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // Logger personalizado
 app.use(logger);
