@@ -1,11 +1,12 @@
 /**
  * Ruta para completar registro después del pago
- * El usuario recibe un email con un link para crear su contraseña
+ * El usuario viene desde success.html con sessionId de Stripe
  */
 
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const User = require('../models/User');
 const Document = require('../models/Document');
 const { generateAccessToken, generateRefreshToken } = require('../middleware/auth');
@@ -17,24 +18,27 @@ const { generateCertificadoAfiliado, generateFichaAfiliacion } = require('../ser
  */
 router.post('/complete-registration',
     [
-        body('email')
+        body('sessionId')
+            .notEmpty().withMessage('El ID de sesión es obligatorio'),
+        body('nombre')
             .trim()
-            .notEmpty().withMessage('El email es obligatorio')
-            .isEmail().withMessage('Email inválido')
-            .normalizeEmail(),
+            .notEmpty().withMessage('El nombre es obligatorio'),
+        body('apellidos')
+            .trim()
+            .notEmpty().withMessage('Los apellidos son obligatorios'),
         body('password')
             .notEmpty().withMessage('La contraseña es obligatoria')
-            .isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
-        body('sessionId')
-            .notEmpty().withMessage('El ID de sesión es obligatorio')
+            .isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres')
     ],
     async (req, res) => {
         try {
             // 1. Validar entrada
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
+                console.log('❌ Errores de validación:', errors.array());
                 return res.status(400).json({
                     success: false,
+                    error: 'Datos incompletos o inválidos',
                     errors: errors.array().map(err => ({
                         field: err.path,
                         message: err.msg
@@ -42,41 +46,57 @@ router.post('/complete-registration',
                 });
             }
 
-            const { email, password, sessionId } = req.body;
+            const { sessionId, nombre, apellidos, password } = req.body;
 
-            // 2. Verificar si ya existe un usuario con este email
+            console.log('🔄 Completando registro para sessionId:', sessionId);
+
+            // 2. Obtener información de la sesión de Stripe
+            let session;
+            try {
+                session = await stripe.checkout.sessions.retrieve(sessionId);
+                console.log('✅ Sesión de Stripe recuperada:', session.customer_email);
+            } catch (stripeError) {
+                console.error('❌ Error obteniendo sesión de Stripe:', stripeError.message);
+                return res.status(400).json({
+                    success: false,
+                    error: 'Sesión de pago inválida o expirada'
+                });
+            }
+
+            const email = session.customer_email;
+            const phone = session.customer_details?.phone || '';
+
+            if (!email) {
+                console.error('❌ No se pudo obtener email de la sesión');
+                return res.status(400).json({
+                    success: false,
+                    error: 'No se pudo recuperar el email del pago'
+                });
+            }
+
+            // 3. Verificar si ya existe un usuario con este email
             const existingUser = await User.findByEmail(email);
             if (existingUser) {
+                console.log('⚠️ Usuario ya existe:', email);
                 return res.status(409).json({
                     success: false,
                     error: 'Este email ya está registrado. Por favor inicia sesión.'
                 });
             }
 
-            // 3. Aquí deberías verificar que el sessionId corresponde a un pago exitoso
-            // Por ahora, vamos a asumir que viene desde success.html después de un pago válido
-            // En producción, deberías verificar con Stripe que el pago fue exitoso
-
-            // 4. Buscar datos pendientes de registro en algún lugar temporal
-            // (Esto lo implementaremos cuando modifiquemos el webhook)
-            // Por ahora, vamos a requerir que vengan todos los datos
+            // 4. Obtener metadata del pago
+            const metadata = session.metadata || {};
+            const departamento = metadata.department || session.custom_fields?.find(f => f.key === 'department')?.text?.value || '';
 
             // 5. Crear el usuario
-            const { nombre, telefono, departamento } = req.body;
-
-            if (!nombre) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'El nombre es obligatorio'
-                });
-            }
+            const nombreCompleto = `${nombre} ${apellidos}`;
 
             const user = new User({
-                nombre,
+                nombre: nombreCompleto,
                 email,
                 password,
-                telefono: telefono || '',
-                departamento: departamento || '',
+                telefono: phone,
+                departamento,
                 role: 'afiliado',
                 membershipStatus: 'activo', // Ya pagó
                 membershipStartDate: new Date(),
@@ -86,6 +106,7 @@ router.post('/complete-registration',
             });
 
             await user.save();
+            console.log(`✅ Usuario creado: ${email}`);
 
             // 6. Generar tokens
             const accessToken = generateAccessToken(user._id, user.email, user.role);
@@ -103,7 +124,7 @@ router.post('/complete-registration',
 
             // 8. Auto-generar documentos de afiliación
             try {
-                console.log('📄 Generando documentos iniciales para nuevo afiliado...');
+                console.log('📄 Generando documentos iniciales...');
 
                 // Generar Ficha de Afiliación
                 const fichaResult = await generateFichaAfiliacion(user);
@@ -133,17 +154,17 @@ router.post('/complete-registration',
                 user.documents.push(fichaDocument._id, certificadoDocument._id);
                 await user.save();
 
-                console.log(`✅ Documentos generados: Ficha (${fichaDocument._id}) y Certificado (${certificadoDocument._id})`);
+                console.log(`✅ Documentos generados para ${email}`);
 
             } catch (docError) {
-                console.error('⚠️ Error generando documentos iniciales:', docError.message);
+                console.error('⚠️ Error generando documentos:', docError.message);
                 // No fallar el registro si hay error en documentos
             }
 
             // 9. Enviar respuesta
             res.status(201).json({
                 success: true,
-                message: '¡Registro completado! Ya puedes iniciar sesión',
+                message: '¡Registro completado! Ya puedes acceder a tu área personal',
                 data: {
                     user: user.toPublicJSON(),
                     accessToken,
@@ -152,13 +173,13 @@ router.post('/complete-registration',
                 }
             });
 
-            console.log(`✅ Registro completado para: ${email} (Sesión Stripe: ${sessionId})`);
+            console.log(`✅ Registro completado: ${email} (Sesión: ${sessionId})`);
 
         } catch (error) {
             console.error('❌ Error al completar registro:', error);
             res.status(500).json({
                 success: false,
-                error: 'Error al completar el registro'
+                error: 'Error al completar el registro. Por favor, contacta con soporte.'
             });
         }
     }
