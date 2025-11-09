@@ -363,7 +363,7 @@
                     <li><a href="../index.html#cursos">Cursos</a></li>
                     <li><a href="../index.html#afiliate">Afíliate</a></li>
                     <li><a href="../index.html#contacto">Contacto</a></li>
-                    <li><a href="#login" class="btn-login"><i class="fas fa-user"></i> Acceso</a></li>
+                    <li><a href="#" class="btn-login" onclick="event.preventDefault(); document.getElementById('loginModal').style.display='block';"><i class="fas fa-user"></i> Acceso</a></li>
                 </ul>
                 <div class="hamburger">
                     <span></span>
@@ -1059,8 +1059,9 @@
     <script src="../js/stripe-config.js"></script>
     <script src="../js/main.js"></script>
     <script>
-        // Logo navigation
+        // Logo navigation and modal handlers
         document.addEventListener('DOMContentLoaded', function() {
+            // Logo navigation
             const navBrand = document.getElementById('navBrand');
             if (navBrand) {
                 navBrand.style.cursor = 'pointer';
@@ -1099,6 +1100,57 @@
                             goToHome();
                         }, { passive: false });
                     }
+                });
+            }
+
+            // Modal handlers
+            const loginModal = document.getElementById('loginModal');
+            const recoveryModal = document.getElementById('recoveryModal');
+            const registerModal = document.getElementById('registerModal');
+
+            // Close buttons
+            const closeButtons = document.querySelectorAll('.close');
+            closeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    if (modal) modal.style.display = 'none';
+                });
+            });
+
+            // Close modals when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                }
+            });
+
+            // Handle "Olvidaste tu contraseña" link
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            if (forgotPasswordLink && loginModal && recoveryModal) {
+                forgotPasswordLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loginModal.style.display = 'none';
+                    recoveryModal.style.display = 'block';
+                });
+            }
+
+            // Handle "Volver al login" link
+            const backToLogin = document.getElementById('backToLogin');
+            if (backToLogin && loginModal && recoveryModal) {
+                backToLogin.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    recoveryModal.style.display = 'none';
+                    loginModal.style.display = 'block';
+                });
+            }
+
+            // Handle "Iniciar sesión" from register modal
+            const backToLoginFromRegister = document.getElementById('backToLoginFromRegister');
+            if (backToLoginFromRegister && loginModal && registerModal) {
+                backToLoginFromRegister.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    registerModal.style.display = 'none';
+                    loginModal.style.display = 'block';
                 });
             }
         });
