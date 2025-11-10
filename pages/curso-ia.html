@@ -9,6 +9,144 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <style>
+        /* CSS Variables for Dark Mode */
+        :root {
+            /* Light Mode Variables */
+            --primary-color: #1a237e;
+            --secondary-color: #3949ab;
+            --accent-color: #667eea;
+            --text-color: #333333;
+            --background-color: #ffffff;
+            --light-gray: #f8f9fa;
+            --section-alt-bg: #f8f9fa;
+            --border-color: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --card-bg: #ffffff;
+            --text-secondary: #666666;
+            --nav-bg: rgba(255,255,255,0.1);
+        }
+
+        /* Dark Mode Variables */
+        [data-theme="dark"] {
+            --primary-color: #60a5fa;
+            --secondary-color: #3b82f6;
+            --accent-color: #818cf8;
+            --text-color: #f1f5f9;
+            --background-color: #0f172a;
+            --light-gray: #1e293b;
+            --section-alt-bg: #1e293b;
+            --border-color: #334155;
+            --shadow: 0 2px 10px rgba(0,0,0,0.3);
+            --card-bg: #1e293b;
+            --text-secondary: #94a3b8;
+            --nav-bg: rgba(30, 41, 59, 0.9);
+        }
+
+        /* Dark Mode Toggle Button - Ultra visible */
+        .dark-mode-toggle {
+            background: rgba(26, 35, 126, 0.9) !important;
+            border: 3px solid rgba(255,255,255,0.9) !important;
+            border-radius: 50% !important;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white !important;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.4) !important;
+            margin-left: 15px;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .dark-mode-toggle:hover {
+            background: rgba(26, 35, 126, 1) !important;
+            transform: scale(1.15) rotate(15deg) !important;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5) !important;
+            border-color: white !important;
+            border-width: 4px !important;
+        }
+
+        .dark-mode-toggle:active {
+            transform: scale(0.9) rotate(-8deg) !important;
+        }
+
+        .dark-mode-toggle #darkModeIcon {
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 4px rgba(255,255,255,1)) !important;
+            text-shadow: 0 0 8px rgba(255,255,255,0.8);
+        }
+
+        [data-theme="dark"] .dark-mode-toggle {
+            background: rgba(15, 23, 42, 0.95) !important;
+            border-color: rgba(96, 165, 250, 1) !important;
+            color: #60a5fa !important;
+            box-shadow: 0 6px 25px rgba(96, 165, 250, 0.5) !important;
+        }
+
+        [data-theme="dark"] .dark-mode-toggle:hover {
+            background: rgba(30, 58, 138, 0.95) !important;
+            transform: scale(1.15) rotate(15deg) !important;
+            box-shadow: 0 8px 35px rgba(96, 165, 250, 0.7) !important;
+            border-color: #60a5fa !important;
+            border-width: 4px !important;
+        }
+
+        [data-theme="dark"] .dark-mode-toggle #darkModeIcon {
+            color: #fbbf24 !important;
+            filter: drop-shadow(0 0 6px rgba(251, 191, 36, 1)) !important;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
+        }
+
+        /* Efecto de brillo potente para el botón */
+        .dark-mode-toggle::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.6), transparent);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+            animation: toggleGlow 3s ease-in-out infinite;
+        }
+
+        .dark-mode-toggle:hover::before {
+            opacity: 1;
+            animation: toggleGlowPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes toggleGlow {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(255,255,255,0.3);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(255,255,255,0.6);
+            }
+        }
+
+        @keyframes toggleGlowPulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255,255,255,0.8);
+            }
+            50% {
+                box-shadow: 0 0 35px rgba(255,255,255,1);
+            }
+        }
+
+        /* Transiciones suaves para modo oscuro */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
         .course-hero {
             background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%) !important;
             color: white !important;
@@ -150,6 +288,20 @@
             border-radius: 15px;
             text-align: center;
             margin: 3rem 0;
+        }
+
+        .enrollment-section h2 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 1rem;
+        }
+
+        .enrollment-section p {
+            color: white;
+            opacity: 1;
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
 
         .price-cards {
@@ -346,6 +498,44 @@
                 padding: 1.5rem;
             }
 
+            /* Navegación principal en móvil */
+            nav {
+                padding: 1rem !important;
+            }
+
+            nav ul {
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 0.5rem !important;
+            }
+
+            nav li {
+                margin: 0 !important;
+            }
+
+            nav a {
+                padding: 0.5rem 0.8rem !important;
+                font-size: 0.9rem !important;
+                white-space: nowrap !important;
+            }
+
+            /* Dark Mode Toggle principal en móvil */
+            .dark-mode-toggle {
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 16px !important;
+                margin: 0.5rem !important;
+                background: rgba(26, 35, 126, 0.95) !important;
+                border: 3px solid rgba(255,255,255,1) !important;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+                position: relative !important;
+            }
+
+            .btn-login {
+                padding: 0.5rem 1rem !important;
+                font-size: 0.9rem !important;
+            }
+
             /* Estilos para indicadores de dificultad y progreso */
             .bloque-header {
                 flex-wrap: wrap;
@@ -498,6 +688,11 @@
                     <li><a href="../index.html#cursos">Cursos</a></li>
                     <li><a href="../index.html#afiliate">Afíliate</a></li>
                     <li><a href="../index.html#contacto">Contacto</a></li>
+                    <li>
+                        <button id="darkModeToggle" class="dark-mode-toggle" onclick="toggleDarkMode()" title="Cambiar modo oscuro">
+                            <i class="fas fa-moon" id="darkModeIcon"></i>
+                        </button>
+                    </li>
                     <li><a href="#" class="btn-login" onclick="event.preventDefault(); document.getElementById('loginModal').style.display='block';"><i class="fas fa-user"></i> Acceso</a></li>
                 </ul>
                 <div class="hamburger">
@@ -556,7 +751,7 @@
                 </div>
                 <div class="meta-item">
                     <i class="fas fa-calendar-alt"></i>
-                    <span>Viernes (mañana y tarde)</span>
+                    <span>Viernes 21 nov (10:00-13:00 y 16:00-19:00)</span>
                 </div>
                 <div class="meta-item">
                     <i class="fas fa-laptop-code"></i>
@@ -587,23 +782,36 @@
         border-bottom: 2px solid rgba(255,255,255,0.1);
     ">
         <div class="course-content">
-            <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; overflow-x: auto;">
+            <div class="nav-container" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; overflow-x: auto; padding: 0 2rem; margin: 0 auto; max-width: 1400px;">
                 <!-- Enlaces de navegación -->
-                <div class="nav-links" style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: nowrap;">
-                    <a href="#journey" class="nav-link" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 20px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.9rem;">
-                        <i class="fas fa-route"></i> Tu Ruta
+                <div class="nav-links" style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: nowrap;">
+                    <a href="#journey" class="nav-link" style="color: white; text-decoration: none; padding: 0.25rem 0.5rem; border-radius: 12px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.7rem; display: flex; align-items: center; gap: 0.2rem;">
+                        <i class="fas fa-route" style="font-size: 0.65rem;"></i>
+                        <span>Ruta</span>
                     </a>
-                    <a href="#program" class="nav-link" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 20px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.9rem;">
-                        <i class="fas fa-book-open"></i> Programa
+                    <a href="#program" class="nav-link" style="color: white; text-decoration: none; padding: 0.25rem 0.5rem; border-radius: 12px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.7rem; display: flex; align-items: center; gap: 0.2rem;">
+                        <i class="fas fa-book-open" style="font-size: 0.65rem;"></i>
+                        <span>Prog</span>
                     </a>
-                    <a href="#profiles" class="nav-link" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 20px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.9rem;">
-                        <i class="fas fa-users"></i> Perfiles
+                    <a href="#profiles" class="nav-link" style="color: white; text-decoration: none; padding: 0.25rem 0.5rem; border-radius: 12px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.7rem; display: flex; align-items: center; gap: 0.2rem;">
+                        <i class="fas fa-users" style="font-size: 0.65rem;"></i>
+                        <span>Perf</span>
                     </a>
-                    <a href="#credentials" class="nav-link" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 20px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.9rem;">
-                        <i class="fas fa-award"></i> Certificaciones
+                    <a href="#methodology" class="nav-link" style="color: white; text-decoration: none; padding: 0.25rem 0.5rem; border-radius: 12px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.7rem; display: flex; align-items: center; gap: 0.2rem;">
+                        <i class="fas fa-chalkboard-teacher" style="font-size: 0.65rem;"></i>
+                        <span>Met</span>
                     </a>
-                    <a href="#enrollment" class="nav-link" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 20px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.9rem;">
-                        <i class="fas fa-rocket"></i> Inscripción
+                    <a href="#credentials" class="nav-link" style="color: white; text-decoration: none; padding: 0.25rem 0.5rem; border-radius: 12px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.7rem; display: flex; align-items: center; gap: 0.2rem;">
+                        <i class="fas fa-award" style="font-size: 0.65rem;"></i>
+                        <span>Cert</span>
+                    </a>
+                    <a href="#materials" class="nav-link" style="color: white; text-decoration: none; padding: 0.25rem 0.5rem; border-radius: 12px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.7rem; display: flex; align-items: center; gap: 0.2rem;">
+                        <i class="fas fa-book" style="font-size: 0.65rem;"></i>
+                        <span>Mat</span>
+                    </a>
+                    <a href="#enrollment" class="nav-link" style="color: white; text-decoration: none; padding: 0.25rem 0.5rem; border-radius: 12px; background: rgba(255,255,255,0.1); transition: all 0.3s ease; white-space: nowrap; font-size: 0.7rem; display: flex; align-items: center; gap: 0.2rem;">
+                        <i class="fas fa-rocket" style="font-size: 0.65rem;"></i>
+                        <span>Insc</span>
                     </a>
                 </div>
 
@@ -630,6 +838,28 @@
                 ">
                     <i class="fas fa-bolt"></i> Inscribirme Ya
                 </a>
+
+                <!-- Botón Dark Mode Toggle en sticky -->
+                <button id="darkModeToggleSticky" class="dark-mode-toggle" onclick="toggleDarkMode()" title="Cambiar modo oscuro" style="
+                    background: rgba(255,255,255,0.2) !important;
+                    border: 2px solid rgba(255,255,255,0.8) !important;
+                    border-radius: 50% !important;
+                    padding: 8px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    color: white !important;
+                    font-size: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                    height: 40px;
+                    backdrop-filter: blur(10px);
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    margin-left: 10px;
+                ">
+                    <i class="fas fa-moon" id="darkModeIconSticky"></i>
+                </button>
             </div>
         </div>
     </nav>
@@ -894,11 +1124,14 @@
                     </div>
                 </div>
 
-                <p style="margin-top: 2rem; opacity: 0.9; text-align: center;">
-                    <i class="fas fa-info-circle"></i>
-                    ¿No eres afiliado? <a href="../index.html#afiliate" style="color: white; text-decoration: underline;">Afíliate ahora por solo 15€/año</a>
-                    y accede a todos los cursos con descuento
-                </p>
+                <div style="margin-top: 2rem; opacity: 1; text-align: center; background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
+                    <i class="fas fa-info-circle" style="color: #fbbf24; margin-right: 0.5rem;"></i>
+                    <span style="color: white; font-size: 1.1rem; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                        ¿No eres afiliado?
+                        <a href="../index.html#afiliate" style="color: #fbbf24; text-decoration: underline; font-weight: 700;">Afíliate ahora por solo 15€/año</a>
+                        y accede a todos los cursos con descuento
+                    </span>
+                </div>
 
                 <!-- Botones de descarga y certificado -->
                 <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
@@ -945,7 +1178,7 @@
                 <h3 style="margin-top: 2.5rem;">Distribución Temporal</h3>
                 <ul style="font-size: 1.05rem; line-height: 1.8;">
                     <li><strong>Duración:</strong> 5 semanas (5 viernes)</li>
-                    <li><strong>Horario:</strong> 6 sesiones por viernes - mañana (3 sesiones) y tarde (3 sesiones)</li>
+                    <li><strong>Horario:</strong> Viernes 21 nov - Mañana (10:00-13:00) y Tarde (16:00-19:00)</li>
                     <li><strong>Sesiones:</strong> 30 sesiones de 40 minutos</li>
                     <li><strong>Descansos:</strong> 10 minutos entre sesiones</li>
                     <li><strong>Total:</strong> 20 horas de formación práctica</li>
@@ -1175,7 +1408,7 @@
     </section>
 
     <!-- Metodología -->
-    <section class="section section-alt">
+    <section id="methodology" class="section section-alt">
         <div class="course-content">
             <div class="section-header">
                 <h2>Metodología</h2>
@@ -1355,6 +1588,270 @@
         </div>
     </section>
 
+    <!-- Materiales Educativos Complementarios -->
+    <section id="materials" class="section" style="background: #f8f9fa; padding: 4rem 0;">
+        <div class="course-content">
+            <div class="section-header">
+                <h2 style="color: #1a237e; margin-bottom: 1rem;">📚 Materiales Educativos Complementarios</h2>
+                <p style="font-size: 1.2rem; color: #666;">Recursos adicionales para ampliar tu formación</p>
+            </div>
+
+            <div class="materials-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem;">
+
+                <!-- Material 1: Presentación Completa - Lazarillo de Tormes -->
+                <div class="material-card" style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: all 0.3s ease; border: 2px solid #e3f2fd;">
+                    <div style="background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; text-align: center;">
+                        <i class="fas fa-presentation-screen" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                        <h3 style="margin: 0; font-size: 1.2rem;">Presentación Completa</h3>
+                    </div>
+
+                    <h4 style="color: #1a237e; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-book-open" style="color: #ff6b6b;"></i>
+                        El Lazarillo de Tormes - Análisis Integral
+                    </h4>
+
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem;">
+                        Presentación resumen completa con análisis profundo de esta obra cumbre de la novela picaresca española.
+                        Contexto histórico, estructura narrativa, personajes principales y crítica social.
+                    </p>
+
+                    <div style="background: #fff3e0; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #ff9800;">
+                        <h5 style="color: #e65100; margin: 0 0 0.5rem 0; font-size: 0.9rem;">
+                            <i class="fas fa-list"></i> Contenido de la Presentación:
+                        </h5>
+                        <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.9rem; color: #666;">
+                            <li><strong>Contexto Histórico:</strong> España del Siglo de Oro (1554)</li>
+                            <li><strong>Autoría Anónima:</strong> La cuestión del autor y su significado</li>
+                            <li><strong>Estructura Narrativa:</strong> Tres tratados y su organización</li>
+                            <li><strong>Personajes Principales:</strong> Lázaro y sus amos</li>
+                            <li><strong>Novela Picaresca:</strong> Características y innovación literaria</li>
+                            <li><strong>Crítica Social:</strong> Sátira de la sociedad de la época</li>
+                            <li><strong>Lenguaje y Estilo:</strong> Coloquialismo y realismo</li>
+                            <li><strong>Legado Literario:</strong> Influencia en la literatura posterior</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #e8f5e9; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #4caf50;">
+                        <h5 style="color: #2e7d32; margin: 0 0 0.5rem 0; font-size: 0.9rem;">
+                            <i class="fas fa-graduation-cap"></i> Aspectos Pedagógicos:
+                        </h5>
+                        <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.9rem; color: #666;">
+                            <li>Análisis crítico de estructuras sociales</li>
+                            <li>Comprensión de géneros literarios</li>
+                            <li>Contextualización histórica-cultural</li>
+                            <li>Desarrollo del pensamiento crítico</li>
+                        </ul>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: #f3e5f5; padding: 0.8rem; border-radius: 8px; text-align: center;">
+                            <i class="fas fa-clock" style="color: #9c27b0; font-size: 1.2rem; margin-bottom: 0.3rem;"></i>
+                            <div style="font-size: 0.85rem; color: #666;">
+                                <strong>Duración:</strong><br>60 minutos
+                            </div>
+                        </div>
+                        <div style="background: #e3f2fd; padding: 0.8rem; border-radius: 8px; text-align: center;">
+                            <i class="fas fa-signal" style="color: #2196f3; font-size: 1.2rem; margin-bottom: 0.3rem;"></i>
+                            <div style="font-size: 0.85rem; color: #666;">
+                                <strong>Nivel:</strong><br>Medio-Avanzado
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <button onclick="openLazarilloPresentation()"
+                                style="background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; padding: 0.8rem 1.5rem; border-radius: 8px; border: none; text-decoration: none; text-align: center; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;">
+                            <i class="fas fa-play"></i>
+                            Ver Presentación Completa
+                        </button>
+
+                        <div style="text-align: center; color: #666; font-size: 0.8rem;">
+                            <i class="fas fa-presentation"></i> Presentación interactiva multimedia
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e0e0e0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #888;">
+                            <span><i class="fas fa-file-powerpoint"></i> 25 diapositivas</span>
+                            <span><i class="fas fa-video"></i> Contenido multimedia</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Material 2: Actividad Interactiva - Lazarillo de Tormes -->
+                <div class="material-card" style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: all 0.3s ease; border: 2px solid #f3e5f5;">
+                    <div style="background: linear-gradient(135deg, #9c27b0, #7b1fa2); color: white; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; text-align: center;">
+                        <i class="fas fa-gamepad" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                        <h3 style="margin: 0; font-size: 1.2rem;">Actividad Interactiva</h3>
+                    </div>
+
+                    <h4 style="color: #1a237e; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-graduation-cap" style="color: #9c27b0;"></i>
+                        Renacimiento Literario
+                    </h4>
+
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem;">
+                        Actividad interactiva gamificada sobre esta obra maestra de la literatura española del Siglo de Oro.
+                        Análisis del picaresco, la crítica social y la estructura narrativa mediante juegos educativos.
+                    </p>
+
+                    <div style="background: #e8f5e9; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #4caf50;">
+                        <h5 style="color: #2e7d32; margin: 0 0 0.5rem 0; font-size: 0.9rem;">
+                            <i class="fas fa-trophy"></i> Objetivos de aprendizaje:
+                        </h5>
+                        <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.9rem; color: #666;">
+                            <li>Comprensión del contexto histórico del Renacimiento</li>
+                            <li>Análisis de la novela picaresca española</li>
+                            <li>Identificación de recursos literarios y estilísticos</li>
+                            <li>Reflexión crítica sobre la estructura social de la época</li>
+                        </ul>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <a href="https://es.educaplay.com/recursos-educativos/2292695-el_lazarillo_de_tormes.html"
+                           target="_blank"
+                           style="background: linear-gradient(135deg, #9c27b0, #7b1fa2); color: white; padding: 0.8rem 1.5rem; border-radius: 8px; text-decoration: none; text-align: center; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="fas fa-play-circle"></i>
+                            Acceder a la Actividad
+                        </a>
+
+                        <div style="text-align: center; color: #666; font-size: 0.8rem;">
+                            <i class="fas fa-external-link-alt"></i> Se abrirá en Educaplay
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e0e0e0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #888;">
+                            <span><i class="fas fa-clock"></i> Duración: 45 min</span>
+                            <span><i class="fas fa-signal"></i> Nivel: Intermedio</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Material 2: Recursos Digitales para Educación -->
+                <div class="material-card" style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: all 0.3s ease; border: 2px solid #f3e5f5;">
+                    <div style="background: linear-gradient(135deg, #9c27b0, #7b1fa2); color: white; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; text-align: center;">
+                        <i class="fas fa-laptop" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                        <h3 style="margin: 0; font-size: 1.2rem;">Herramientas Digitales</h3>
+                    </div>
+
+                    <h4 style="color: #1a237e; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-tools" style="color: #9c27b0;"></i>
+                        Materiales Completos
+                    </h4>
+
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem;">
+                        Recopilación de recursos digitales y herramientas tecnológicas para la enseñanza
+                        en el siglo XXI. Integración de IA y tecnologías emergentes en el aula.
+                    </p>
+
+                    <div style="background: #e8f5e9; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #4caf50;">
+                        <h5 style="color: #2e7d32; margin: 0 0 0.5rem 0; font-size: 0.9rem;">
+                            <i class="fas fa-check-circle"></i> Contenido incluido:
+                        </h5>
+                        <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.9rem; color: #666;">
+                            <li>Guías de implementación de IA en educación</li>
+                            <li>Plantillas y recursos descargables</li>
+                            <li>Tutoriales interactivos</li>
+                            <li>Banco de actividades innovadoras</li>
+                        </ul>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <button onclick="showMaterialsInfo()" style="background: linear-gradient(135deg, #9c27b0, #7b1fa2); color: white; padding: 0.8rem 1.5rem; border-radius: 8px; border: none; text-decoration: none; text-align: center; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;">
+                            <i class="fas fa-download"></i>
+                            Solicitar Materiales
+                        </button>
+
+                        <div style="text-align: center; color: #666; font-size: 0.8rem;">
+                            <i class="fas fa-lock"></i> Acceso exclusivo para inscritos
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e0e0e0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #888;">
+                            <span><i class="fas fa-file"></i> 50+ recursos</span>
+                            <span><i class="fas fa-users"></i> Premium</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Material 3: Biblioteca Digital -->
+                <div class="material-card" style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: all 0.3s ease; border: 2px solid #e8f5e9;">
+                    <div style="background: linear-gradient(135deg, #00bcd4, #0097a7); color: white; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; text-align: center;">
+                        <i class="fas fa-university" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                        <h3 style="margin: 0; font-size: 1.2rem;">Biblioteca Digital</h3>
+                    </div>
+
+                    <h4 style="color: #1a237e; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-book-open" style="color: #00bcd4;"></i>
+                        Obras Clásicas Adaptadas
+                    </h4>
+
+                    <p style="color: #666; line-height: 1.6; margin-bottom: 1.5rem;">
+                        Colección de obras maestras de la literatura universal adaptadas para el aprendizaje
+                        digital, con actividades interactivas y análisis modernos.
+                    </p>
+
+                    <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid #2196f3;">
+                        <h5 style="color: #1565c0; margin: 0 0 0.5rem 0; font-size: 0.9rem;">
+                            <i class="fas fa-bookmark"></i> Colecciones disponibles:
+                        </h5>
+                        <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.9rem; color: #666;">
+                            <li>Literatura Española (Renacimiento, Barroco, Ilustración)</li>
+                            <li>Literatura Universal Clásica</li>
+                            <li>Obra teatral y poesía</li>
+                            <li>Ensayos y literatura contemporánea</li>
+                        </ul>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <button onclick="exploreLibrary()" style="background: linear-gradient(135deg, #00bcd4, #0097a7); color: white; padding: 0.8rem 1.5rem; border-radius: 8px; border: none; text-decoration: none; text-align: center; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;">
+                            <i class="fas fa-compass"></i>
+                            Explorar Biblioteca
+                        </button>
+
+                        <div style="text-align: center; color: #666; font-size: 0.8rem;">
+                            <i class="fas fa-infinity"></i> Acceso ilimitado
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e0e0e0;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #888;">
+                            <span><i class="fas fa-database"></i> 1000+ obras</span>
+                            <span><i class="fas fa-language"></i> Multilingüe</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nota informativa -->
+            <div style="background: linear-gradient(135deg, #1a237e, #3949ab); color: white; padding: 2rem; border-radius: 15px; margin-top: 3rem; text-align: center;">
+                <h3 style="margin: 0 0 1rem 0; font-size: 1.5rem;">
+                    <i class="fas fa-info-circle"></i> Materiales Educativos Complementarios
+                </h3>
+                <p style="margin: 0 0 1.5rem 0; font-size: 1.1rem; line-height: 1.6;">
+                    Estos recursos están diseñados para complementar tu formación en IA con conocimientos
+                    interdisciplinares que enriquecerán tu perfil profesional.
+                </p>
+                <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+                    <div style="text-align: center;">
+                        <i class="fas fa-graduation-cap" style="font-size: 2rem; margin-bottom: 0.5rem; color: #ffd54f;"></i>
+                        <p style="margin: 0; font-size: 0.9rem;">Formación Integral</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <i class="fas fa-globe" style="font-size: 2rem; margin-bottom: 0.5rem; color: #81c784;"></i>
+                        <p style="margin: 0; font-size: 0.9rem;">Alcance Global</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <i class="fas fa-certificate" style="font-size: 2rem; margin-bottom: 0.5rem; color: #64b5f6;"></i>
+                        <p style="margin: 0; font-size: 0.9rem;">Certificación</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Evaluación -->
     <section class="section">
         <div class="course-content">
@@ -1445,11 +1942,14 @@
                     </div>
                 </div>
 
-                <p style="margin-top: 2rem; opacity: 0.9;">
-                    <i class="fas fa-info-circle"></i>
-                    ¿No eres afiliado? <a href="../index.html#afiliate" style="color: white; text-decoration: underline;">Afíliate ahora por solo 15€/año</a>
-                    y accede a todos los cursos con descuento
-                </p>
+                <div style="margin-top: 2rem; opacity: 1; background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);">
+                    <i class="fas fa-info-circle" style="color: #fbbf24; margin-right: 0.5rem;"></i>
+                    <span style="color: white; font-size: 1.1rem; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                        ¿No eres afiliado?
+                        <a href="../index.html#afiliate" style="color: #fbbf24; text-decoration: underline; font-weight: 700;">Afíliate ahora por solo 15€/año</a>
+                        y accede a todos los cursos con descuento
+                    </span>
+                </div>
             </div>
         </div>
     </section>
@@ -3887,6 +4387,1350 @@
         const navStyleSheet = document.createElement('style');
         navStyleSheet.textContent = navStyles;
         document.head.appendChild(navStyleSheet);
+
+        // =======================================
+        // DARK MODE TOGGLE
+        // =======================================
+
+        // Función para cambiar entre modo claro y oscuro
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const darkModeIcon = document.getElementById('darkModeIcon');
+            const darkModeIconSticky = document.getElementById('darkModeIconSticky');
+
+            // Cambiar tema
+            html.setAttribute('data-theme', newTheme);
+
+            // Actualizar iconos
+            if (newTheme === 'dark') {
+                // Icono principal
+                darkModeIcon.className = 'fas fa-sun';
+                darkModeIcon.style.color = '#fbbf24';
+                // Icono sticky
+                if (darkModeIconSticky) {
+                    darkModeIconSticky.className = 'fas fa-sun';
+                    darkModeIconSticky.style.color = '#fbbf24';
+                }
+            } else {
+                // Icono principal
+                darkModeIcon.className = 'fas fa-moon';
+                darkModeIcon.style.color = 'white';
+                // Icono sticky
+                if (darkModeIconSticky) {
+                    darkModeIconSticky.className = 'fas fa-moon';
+                    darkModeIconSticky.style.color = 'white';
+                }
+            }
+
+            // Guardar preferencia en localStorage
+            localStorage.setItem('theme', newTheme);
+
+            // Añadir efecto de transición suave
+            document.body.style.transition = 'all 0.3s ease';
+
+            // Crear efecto de partículas al cambiar tema
+            createThemeChangeParticles();
+
+            // Mostrar notificación
+            showNotification(`🌙 Modo ${newTheme === 'dark' ? 'oscuro' : 'claro'} activado`, 'success');
+        }
+
+        // Función para crear partículas al cambiar tema
+        function createThemeChangeParticles() {
+            const colors = ['#60a5fa', '#a78bfa', '#f472b6', '#fbbf24', '#34d399'];
+            const button = document.getElementById('darkModeToggle');
+
+            if (!button) return;
+
+            const rect = button.getBoundingClientRect();
+
+            for (let i = 0; i < 8; i++) {
+                const particle = document.createElement('div');
+                const angle = (i / 8) * Math.PI * 2;
+                const distance = 30 + Math.random() * 50;
+
+                particle.style.cssText = `
+                    position: fixed;
+                    width: 6px;
+                    height: 6px;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    border-radius: 50%;
+                    left: ${rect.left + rect.width / 2}px;
+                    top: ${rect.top + rect.height / 2}px;
+                    pointer-events: none;
+                    z-index: 9999;
+                    animation: themeParticlePulse 0.8s ease-out forwards;
+                `;
+
+                particle.style.setProperty('--endX', Math.cos(angle) * distance + 'px');
+                particle.style.setProperty('--endY', Math.sin(angle) * distance + 'px');
+
+                document.body.appendChild(particle);
+
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 800);
+            }
+        }
+
+        // Función para inicializar el tema guardado
+        function initSavedTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light'; // Modo claro por defecto
+            const html = document.documentElement;
+            const darkModeIcon = document.getElementById('darkModeIcon');
+            const darkModeIconSticky = document.getElementById('darkModeIconSticky');
+
+            html.setAttribute('data-theme', savedTheme);
+
+            if (savedTheme === 'dark') {
+                // Icono principal
+                darkModeIcon.className = 'fas fa-sun';
+                darkModeIcon.style.color = '#fbbf24';
+                // Icono sticky
+                if (darkModeIconSticky) {
+                    darkModeIconSticky.className = 'fas fa-sun';
+                    darkModeIconSticky.style.color = '#fbbf24';
+                }
+            } else {
+                // Icono principal
+                darkModeIcon.className = 'fas fa-moon';
+                darkModeIcon.style.color = 'white';
+                // Icono sticky
+                if (darkModeIconSticky) {
+                    darkModeIconSticky.className = 'fas fa-moon';
+                    darkModeIconSticky.style.color = 'white';
+                }
+            }
+        }
+
+        // Función para añadir efectos hover al botón de modo oscuro
+        function addDarkModeHoverEffects() {
+            const toggle = document.getElementById('darkModeToggle');
+            const toggleSticky = document.getElementById('darkModeToggleSticky');
+
+            // Efectos para botón principal
+            if (toggle) {
+                toggle.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1) rotate(10deg)';
+                    this.style.boxShadow = '0 4px 20px rgba(255,255,255,0.3)';
+                });
+
+                toggle.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1) rotate(0deg)';
+                    this.style.boxShadow = 'none';
+                });
+
+                toggle.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95) rotate(-5deg)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1) rotate(0deg)';
+                    }, 150);
+                });
+            }
+
+            // Efectos para botón sticky
+            if (toggleSticky) {
+                toggleSticky.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1) rotate(10deg)';
+                    this.style.boxShadow = '0 4px 20px rgba(255,255,255,0.3)';
+                });
+
+                toggleSticky.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1) rotate(0deg)';
+                    this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
+                });
+
+                toggleSticky.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95) rotate(-5deg)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1) rotate(0deg)';
+                    }, 150);
+                });
+            }
+        }
+
+        // Añadir estilos CSS adicionales para Dark Mode
+        const darkModeStyles = `
+            /* Estilos adicionales para modo oscuro */
+            [data-theme="dark"] .hero-title {
+                color: #f1f5f9;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            }
+
+            [data-theme="dark"] .hero-subtitle {
+                color: #cbd5e1;
+            }
+
+            [data-theme="dark"] .course-info-card {
+                background: linear-gradient(135deg, #1e293b, #334155);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            [data-theme="dark"] .info-item {
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            [data-theme="dark"] .info-item i {
+                color: #60a5fa;
+            }
+
+            [data-theme="dark"] .sticky-navigation {
+                background: rgba(15, 23, 42, 0.95) !important;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            [data-theme="dark"] .nav-link {
+                color: #f1f5f9 !important;
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+
+            [data-theme="dark"] .nav-link:hover {
+                background: rgba(255,255,255,0.15) !important;
+                border-color: #60a5fa;
+            }
+
+            [data-theme="dark"] .nav-link.active {
+                background: rgba(96, 165, 250, 0.3) !important;
+                border-color: #60a5fa;
+                color: #f1f5f9 !important;
+            }
+
+            [data-theme="dark"] .quick-spots {
+                background: rgba(239, 68, 68, 0.9) !important;
+                color: white;
+                border: 2px solid rgba(255,255,255,0.2);
+            }
+
+            [data-theme="dark"] .quick-enroll {
+                background: rgba(34, 197, 94, 0.9) !important;
+                border: 2px solid rgba(255,255,255,0.2);
+            }
+
+            [data-theme="dark"] .section-title {
+                color: #f1f5f9;
+            }
+
+            [data-theme="dark"] .section-subtitle {
+                color: #cbd5e1;
+            }
+
+            [data-theme="dark"] .bloque {
+                background: linear-gradient(135deg, #1e293b, #334155);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            [data-theme="dark"] .bloque h3 {
+                color: #f1f5f9;
+            }
+
+            [data-theme="dark"] .difficulty-indicator,
+            [data-theme="dark"] .progress-indicator {
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+
+            [data-theme="dark"] .credential-badge {
+                background: linear-gradient(135deg, #1e293b, #334155);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            [data-theme="dark"] .badge-icon {
+                color: #60a5fa;
+            }
+
+            [data-theme="dark"] .quality-seals > div {
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            [data-theme="dark"] .seal-item div {
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+
+            [data-theme="dark"] .journey-stage {
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            [data-theme="dark"] .stage-content {
+                background: linear-gradient(135deg, #1e293b, #334155);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            [data-theme="dark"] .timeline-line {
+                background: linear-gradient(180deg, #374151, #4b5563, #6b7280) !important;
+            }
+
+            [data-theme="dark"] .stage-point {
+                background: #60a5fa;
+                border: 3px solid #1e293b;
+            }
+
+            [data-theme="dark"] .enrollment-form {
+                background: linear-gradient(135deg, #1e293b, #334155);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            [data-theme="dark"] .form-group input,
+            [data-theme="dark"] .form-group select,
+            [data-theme="dark"] .form-group textarea {
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.2);
+                color: #f1f5f9;
+            }
+
+            [data-theme="dark"] .form-group input::placeholder,
+            [data-theme="dark"] .form-group textarea::placeholder {
+                color: #9ca3af;
+            }
+
+            [data-theme="dark"] .form-group input:focus,
+            [data-theme="dark"] .form-group select:focus,
+            [data-theme="dark"] .form-group textarea:focus {
+                border-color: #60a5fa;
+                box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+            }
+
+            [data-theme="dark"] .btn-primary {
+                background: linear-gradient(135deg, #60a5fa, #3b82f6);
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+
+            [data-theme="dark"] .btn-primary:hover {
+                background: linear-gradient(135deg, #3b82f6, #2563eb);
+                box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+            }
+
+            [data-theme="dark"] .spots-info {
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            [data-theme="dark"] .spots-display {
+                background: rgba(255,255,255,0.1);
+                border: 2px solid rgba(255,255,255,0.2);
+            }
+
+            [data-theme="dark"] .spots-count {
+                color: #f1f5f9;
+            }
+
+            [data-theme="dark"] .price-tag {
+                background: linear-gradient(135deg, #dc2626, #b91c1c);
+                color: white;
+            }
+
+            [data-theme="dark"] .testimonial-card {
+                background: linear-gradient(135deg, #1e293b, #334155);
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            [data-theme="dark"] .testimonial-text {
+                color: #e2e8f0;
+            }
+
+            [data-theme="dark"] .testimonial-author {
+                color: #cbd5e1;
+            }
+
+            [data-theme="dark"] .enrollment-section {
+                background: linear-gradient(135deg, #1e40af, #3730a3);
+            }
+
+            [data-theme="dark"] .enrollment-section h2 {
+                color: #f1f5f9;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            }
+
+            [data-theme="dark"] .enrollment-section p {
+                color: #f1f5f9;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+            }
+
+            /* Corrección de legibilidad en modo oscuro para journey stages */
+            [data-theme="dark"] .journey-stage h3 {
+                color: #f1f5f9 !important;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+            }
+
+            [data-theme="dark"] .journey-stage p {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            [data-theme="dark"] .stage-content h3 {
+                color: #f1f5f9 !important;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+            }
+
+            [data-theme="dark"] .stage-content p {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            /* Corrección para títulos con color #1a237e en modo oscuro */
+            [data-theme="dark"] h3[style*="color: #1a237e"],
+            [data-theme="dark"] h3[style*="color:#1a237e"] {
+                color: #60a5fa !important;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+            }
+
+            /* Corrección para texto con color #666 en modo oscuro */
+            [data-theme="dark"] p[style*="color: #666"],
+            [data-theme="dark"] p[style*="color:#666"],
+            [data-theme="dark"] li[style*="color: #666"],
+            [data-theme="dark"] li[style*="color:#666"] {
+                color: #cbd5e1 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            /* Corrección para texto general en journey stages */
+            [data-theme="dark"] .stage-item {
+                color: #e2e8f0 !important;
+            }
+
+            [data-theme="dark"] .stage-item li {
+                color: #cbd5e1 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.2) !important;
+                line-height: 1.6 !important;
+            }
+
+            /* Corrección para bloques de contenido en modo oscuro */
+            [data-theme="dark"] .bloque ul li {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.2) !important;
+            }
+
+            [data-theme="dark"] .bloque .stage-list li {
+                color: #cbd5e1 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.2) !important;
+            }
+
+            /* Corrección para todos los elementos de lista en modo oscuro */
+            [data-theme="dark"] ul li {
+                color: #e2e8f0 !important;
+            }
+
+            [data-theme="dark"] ol li {
+                color: #e2e8f0 !important;
+            }
+
+            [data-theme="dark"] .bloque li {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.2) !important;
+                opacity: 1 !important;
+            }
+
+            /* Corrección para elementos con color específico */
+            [data-theme="dark"] [style*="color: #666"] {
+                color: #cbd5e1 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            [data-theme="dark"] [style*="color:#666"] {
+                color: #cbd5e1 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            [data-theme="dark"] [style*="color: #1a237e"] {
+                color: #60a5fa !important;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+            }
+
+            [data-theme="dark"] [style*="color:#1a237e"] {
+                color: #60a5fa !important;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+            }
+
+            /* Corrección para texto dentro de elementos específicos */
+            [data-theme="dark"] .stage-item * {
+                color: inherit !important;
+            }
+
+            [data-theme="dark"] .stage-item {
+                color: #e2e8f0 !important;
+            }
+
+            [data-theme="dark"] .stage-item li,
+            [data-theme="dark"] .stage-item p,
+            [data-theme="dark"] .stage-item span {
+                color: #cbd5e1 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.2) !important;
+                opacity: 1 !important;
+            }
+
+            /* Corrección para price cards y beneficios en modo oscuro */
+            [data-theme="dark"] .price-card {
+                background: linear-gradient(135deg, #1e293b, #334155) !important;
+                border: 1px solid rgba(255,255,255,0.2) !important;
+            }
+
+            [data-theme="dark"] .price-card h3 {
+                color: #f1f5f9 !important;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+            }
+
+            [data-theme="dark"] .price-card .price-features li {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            [data-theme="dark"] .price-card .price-features li strong {
+                color: #f1f5f9 !important;
+                font-weight: 600 !important;
+            }
+
+            [data-theme="dark"] .price-card .price-features li i {
+                color: #60a5fa !important;
+            }
+
+            /* Corrección para información del curso en modo oscuro */
+            [data-theme="dark"] .course-info-card {
+                background: linear-gradient(135deg, #1e293b, #334155) !important;
+                border: 1px solid rgba(255,255,255,0.2) !important;
+            }
+
+            [data-theme="dark"] .course-info-card .info-list li {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            [data-theme="dark"] .course-info-card .info-list li strong {
+                color: #f1f5f9 !important;
+                font-weight: 600 !important;
+            }
+
+            [data-theme="dark"] .course-info-card .info-list li i {
+                color: #60a5fa !important;
+            }
+
+            /* Corrección para elementos strong en modo oscuro */
+            [data-theme="dark"] strong {
+                color: #f1f5f9 !important;
+            }
+
+            [data-theme="dark"] .bloque strong {
+                color: #f1f5f9 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+            }
+
+            [data-theme="dark"] .price-card strong {
+                color: #f1f5f9 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+            }
+
+            /* Corrección para elementos específicos del curso */
+            [data-theme="dark"] .info-item {
+                background: rgba(255,255,255,0.1) !important;
+                border: 1px solid rgba(255,255,255,0.2) !important;
+            }
+
+            [data-theme="dark"] .info-item strong {
+                color: #f1f5f9 !important;
+            }
+
+            [data-theme="dark"] .info-item span:not([class]) {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.2) !important;
+            }
+
+            /* Corrección para todos los elementos li dentro de cards */
+            [data-theme="dark"] .price-features li {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            [data-theme="dark"] .info-list li {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            /* Corrección para textos específicos que no se ven */
+            [data-theme="dark"] li {
+                color: #e2e8f0 !important;
+            }
+
+            [data-theme="dark"] li strong {
+                color: #f1f5f9 !important;
+                font-weight: 600 !important;
+            }
+
+            [data-theme="dark"] .check-icon {
+                color: #60a5fa !important;
+            }
+
+            /* Corrección específica para Distribución Temporal y secciones similares */
+            [data-theme="dark"] h3:not([class]):not([style*="color"]) {
+                color: #f1f5f9 !important;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+            }
+
+            [data-theme="dark"] h3[style*="margin-top"] {
+                color: #f1f5f9 !important;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+            }
+
+            [data-theme="dark"] ul[style*="font-size"] {
+                color: #e2e8f0 !important;
+            }
+
+            [data-theme="dark"] ul[style*="line-height"] li {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            [data-theme="dark"] ul[style*="line-height"] li strong {
+                color: #f1f5f9 !important;
+                font-weight: 600 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.4) !important;
+            }
+
+            /* Corrección para cualquier ul con estilo inline */
+            [data-theme="dark"] ul:not([class]) li {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            [data-theme="dark"] ul:not([class]) li strong {
+                color: #f1f5f9 !important;
+                font-weight: 600 !important;
+            }
+
+            /* Corrección general para secciones de información */
+            [data-theme="dark"] .course-content > div > ul {
+                color: #e2e8f0 !important;
+            }
+
+            [data-theme="dark"] .course-content > div > ul li {
+                color: #e2e8f0 !important;
+                text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+                opacity: 1 !important;
+            }
+
+            [data-theme="dark"] .course-content > div > ul li strong {
+                color: #f1f5f9 !important;
+                font-weight: 600 !important;
+            }
+
+            /* Animación de partículas para cambio de tema */
+            @keyframes themeParticlePulse {
+                0% {
+                    opacity: 1;
+                    transform: translate(0, 0) scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translate(var(--endX), var(--endY)) scale(0);
+                }
+            }
+
+            /* Efectos para botón de modo oscuro */
+            .dark-mode-toggle {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .dark-mode-toggle:hover {
+                animation: darkModeGlow 2s ease-in-out infinite;
+            }
+
+            @keyframes darkModeGlow {
+                0%, 100% {
+                    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+                }
+                50% {
+                    box-shadow: 0 0 30px rgba(255,255,255,0.6);
+                }
+            }
+
+            /* Responsive para modo oscuro y móvil */
+            @media (max-width: 768px) {
+                [data-theme="dark"] .sticky-navigation {
+                    background: rgba(15, 23, 42, 0.98) !important;
+                }
+
+                [data-theme="dark"] .nav-link {
+                    font-size: 0.75rem;
+                    padding: 0.3rem 0.6rem;
+                }
+
+                [data-theme="dark"] .hero-title {
+                    font-size: 2.5rem;
+                }
+
+                [data-theme="dark"] .bloque {
+                    padding: 1.5rem;
+                }
+
+                /* Dark Mode Toggle en móvil - navegación principal */
+                .dark-mode-toggle {
+                    width: 45px !important;
+                    height: 45px !important;
+                    font-size: 16px !important;
+                    margin-left: 8px !important;
+                    background: rgba(26, 35, 126, 0.95) !important;
+                    border: 3px solid rgba(255,255,255,1) !important;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+                }
+
+                .dark-mode-toggle #darkModeIcon {
+                    filter: drop-shadow(0 0 3px rgba(255,255,255,1)) !important;
+                    text-shadow: 0 0 6px rgba(255,255,255,1) !important;
+                }
+
+                [data-theme="dark"] .dark-mode-toggle {
+                    background: rgba(15, 23, 42, 0.98) !important;
+                    border-color: rgba(96, 165, 250, 1) !important;
+                    box-shadow: 0 4px 20px rgba(96, 165, 250, 0.6) !important;
+                }
+
+                /* Navegación sticky en móvil */
+                .nav-container {
+                    padding: 0 1rem !important;
+                    gap: 0.5rem !important;
+                }
+
+                .nav-links {
+                    gap: 0.5rem !important;
+                    flex-wrap: wrap !important;
+                    justify-content: center !important;
+                }
+
+                .nav-link {
+                    font-size: 0.7rem !important;
+                    padding: 0.4rem 0.8rem !important;
+                    min-width: fit-content !important;
+                }
+
+                .quick-spots {
+                    font-size: 0.8rem !important;
+                    padding: 0.5rem 1rem !important;
+                    min-width: auto !important;
+                }
+
+                .quick-enroll {
+                    font-size: 0.75rem !important;
+                    padding: 0.5rem 1rem !important;
+                    min-width: auto !important;
+                }
+
+                /* Dark Mode Toggle sticky en móvil */
+                #darkModeToggleSticky {
+                    width: 40px !important;
+                    height: 40px !important;
+                    font-size: 14px !important;
+                    margin-left: 5px !important;
+                    background: rgba(26, 35, 126, 0.95) !important;
+                    border: 2px solid rgba(255,255,255,1) !important;
+                    flex-shrink: 0 !important;
+                }
+
+                [data-theme="dark"] #darkModeToggleSticky {
+                    background: rgba(15, 23, 42, 0.98) !important;
+                    border-color: rgba(96, 165, 250, 1) !important;
+                }
+            }
+
+            /* Extra pequeño móvil */
+            @media (max-width: 480px) {
+                .nav-container {
+                    flex-direction: column !important;
+                    padding: 1rem 0.5rem !important;
+                    height: auto !important;
+                }
+
+                .nav-links {
+                    order: 2 !important;
+                    width: 100% !important;
+                    justify-content: center !important;
+                    margin: 1rem 0 !important;
+                }
+
+                .nav-link {
+                    font-size: 0.65rem !important;
+                    padding: 0.3rem 0.6rem !important;
+                }
+
+                .quick-actions {
+                    order: 1 !important;
+                    width: 100% !important;
+                    justify-content: center !important;
+                    margin-bottom: 0.5rem !important;
+                }
+
+                .dark-mode-toggle {
+                    width: 40px !important;
+                    height: 40px !important;
+                    font-size: 14px !important;
+                }
+
+                #darkModeToggleSticky {
+                    width: 35px !important;
+                    height: 35px !important;
+                    font-size: 12px !important;
+                }
+
+                .sticky-navigation {
+                    height: auto !important;
+                    min-height: 120px !important;
+                }
+            }
+        `;
+
+        // Inicializar modo oscuro
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar tema guardado
+            initSavedTheme();
+
+            // Añadir efectos hover
+            addDarkModeHoverEffects();
+
+            // Añadir estilos de modo oscuro
+            const darkModeStyleSheet = document.createElement('style');
+            darkModeStyleSheet.textContent = darkModeStyles;
+            document.head.appendChild(darkModeStyleSheet);
+
+            // Modo claro forzado por defecto - sin detección automática del sistema
+            // Solo usar tema guardado en localStorage, sin aplicar preferencias del sistema
+        });
+
+        // =======================================
+        // BOTÓN SCROLL TO TOP (FLECHA PARA SUBIR)
+        // =======================================
+
+        // Función para inicializar el botón scroll to top
+        function initScrollToTop() {
+            // Crear el botón
+            const scrollToTopBtn = document.createElement('button');
+            scrollToTopBtn.id = 'scrollToTopBtn';
+            scrollToTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            scrollToTopBtn.title = 'Volver arriba';
+            scrollToTopBtn.setAttribute('aria-label', 'Volver arriba');
+
+            // Estilos del botón
+            scrollToTopBtn.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                left: 30px;
+                width: 50px;
+                height: 50px;
+                background: linear-gradient(135deg, #1a237e, #3949ab);
+                color: white;
+                border: 3px solid rgba(255,255,255,0.9);
+                border-radius: 50%;
+                font-size: 18px;
+                cursor: pointer;
+                z-index: 1000;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(100px) translateX(-50px);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 6px 25px rgba(26, 35, 126, 0.4);
+                backdrop-filter: blur(10px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+
+            // Añadir el botón al body
+            document.body.appendChild(scrollToTopBtn);
+
+            // Función para mostrar/ocultar el botón
+            function toggleScrollButton() {
+                const scrollY = window.pageYOffset;
+
+                if (scrollY > 300) {
+                    scrollToTopBtn.style.opacity = '1';
+                    scrollToTopBtn.style.visibility = 'visible';
+                    scrollToTopBtn.style.transform = 'translateY(0) translateX(0)';
+                } else {
+                    scrollToTopBtn.style.opacity = '0';
+                    scrollToTopBtn.style.visibility = 'hidden';
+                    scrollToTopBtn.style.transform = 'translateY(100px) translateX(-50px)';
+                }
+            }
+
+            // Event listener para scroll
+            window.addEventListener('scroll', toggleScrollButton);
+
+            // Event listener para click
+            scrollToTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+
+                // Efecto visual al hacer click
+                this.style.transform = 'scale(0.9) translateY(0)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(0) scale(1)';
+                }, 200);
+            });
+
+            // Efectos hover
+            scrollToTopBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(0) translateX(0) scale(1.1) rotate(10deg)';
+                this.style.boxShadow = '0 8px 35px rgba(26, 35, 126, 0.6)';
+                this.style.background = 'linear-gradient(135deg, #283593, #5c6bc0)';
+            });
+
+            scrollToTopBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) translateX(0) scale(1) rotate(0deg)';
+                this.style.boxShadow = '0 6px 25px rgba(26, 35, 126, 0.4)';
+                this.style.background = 'linear-gradient(135deg, #1a237e, #3949ab)';
+            });
+
+            // Inicializar estado
+            toggleScrollButton();
+        }
+
+        // Inicializar el botón cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                initScrollToTop();
+            }, 1000); // Pequeño delay para asegurar que todo esté cargado
+        });
+
+        // Añadir estilos responsive para el botón
+        const scrollToTopStyles = `
+            #scrollToTopBtn {
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+
+            #scrollToTopBtn:hover {
+                animation: scrollToTopPulse 2s ease-in-out infinite;
+            }
+
+            @keyframes scrollToTopPulse {
+                0%, 100% {
+                    box-shadow: 0 8px 35px rgba(26, 35, 126, 0.6);
+                }
+                50% {
+                    box-shadow: 0 8px 45px rgba(26, 35, 126, 0.8);
+                }
+            }
+
+            /* Responsive para móvil */
+            @media (max-width: 768px) {
+                #scrollToTopBtn {
+                    width: 45px !important;
+                    height: 45px !important;
+                    bottom: 20px !important;
+                    left: 20px !important;
+                    font-size: 16px !important;
+                }
+            }
+
+            @media (max-width: 480px) {
+                #scrollToTopBtn {
+                    width: 40px !important;
+                    height: 40px !important;
+                    bottom: 15px !important;
+                    left: 15px !important;
+                    font-size: 14px !important;
+                }
+            }
+
+            /* Estilos para modo oscuro */
+            [data-theme="dark"] #scrollToTopBtn {
+                background: linear-gradient(135deg, #0f172a, #1e293b) !important;
+                border-color: rgba(96, 165, 250, 0.9) !important;
+                box-shadow: 0 6px 25px rgba(96, 165, 250, 0.4) !important;
+            }
+
+            [data-theme="dark"] #scrollToTopBtn:hover {
+                background: linear-gradient(135deg, #1e293b, #334155) !important;
+                box-shadow: 0 8px 35px rgba(96, 165, 250, 0.6) !important;
+                border-color: #60a5fa !important;
+            }
+
+            [data-theme="dark"] #scrollToTopBtn i {
+                color: #60a5fa !important;
+                filter: drop-shadow(0 0 3px rgba(96, 165, 250, 0.8));
+            }
+        `;
+
+        // Añadir estilos
+        const scrollToTopStyleSheet = document.createElement('style');
+        scrollToTopStyleSheet.textContent = scrollToTopStyles;
+        document.head.appendChild(scrollToTopStyleSheet);
+
+        // =======================================
+        // FUNCIONES PARA MATERIALES EDUCATIVOS
+        // =======================================
+
+        function showMaterialsInfo() {
+            showNotification('📚 Los materiales completos estarán disponibles después de tu inscripción. ¡Te enviaremos un acceso exclusivo!', 'info');
+        }
+
+        function exploreLibrary() {
+            showNotification('📖 La biblioteca digital estará disponible próximamente. ¡Estamos trabajando en ella!', 'info');
+        }
+
+        function openLazarilloPresentation() {
+            // Crear una ventana modal con la presentación completa de Lazarillo de Tormes
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                animation: fadeIn 0.3s ease;
+            `;
+
+            const presentationContent = document.createElement('div');
+            presentationContent.style.cssText = `
+                background: white;
+                padding: 2rem;
+                border-radius: 20px;
+                max-width: 900px;
+                max-height: 90vh;
+                overflow-y: auto;
+                position: relative;
+                animation: slideUp 0.3s ease;
+            `;
+
+            presentationContent.innerHTML = `
+                <button onclick="this.parentElement.parentElement.remove()"
+                        style="position: absolute; top: 1rem; right: 1rem; background: #ff6b6b; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">
+                    ✕
+                </button>
+
+                <h2 style="color: #1a237e; margin: 0 0 1.5rem 0; text-align: center; border-bottom: 3px solid #ff6b6b; padding-bottom: 1rem;">
+                    📚 El Lazarillo de Tormes - Presentación Completa
+                </h2>
+
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <p style="color: #666; font-size: 1.1rem; line-height: 1.6;">
+                        <strong>Análisis Integral de la Obra Cumbre de la Novela Picaresca Española</strong><br>
+                        <span style="color: #ff6b6b; font-style: italic;">Anónimo - 1554</span>
+                    </p>
+                </div>
+
+                <div style="display: grid; gap: 1.5rem;">
+                    <!-- Diapositiva 1: Portada -->
+                    <div style="background: linear-gradient(135deg, #1a237e, #3949ab); color: white; padding: 2rem; border-radius: 15px; text-align: center;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.8rem;">📖 El Lazarillo de Tormes</h3>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 10px; margin: 1rem 0;">
+                            <p style="margin: 0; font-size: 1.1rem;">
+                                <em>"La vida de Lázaro de Tormes y de sus fortunas y adversidades"</em>
+                            </p>
+                        </div>
+                        <p style="margin: 1rem 0 0 0; opacity: 0.9;">Novela anónima española, considerada la inauguradora del género picaresco</p>
+                        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.3);">
+                            <p style="margin: 0; font-size: 0.9rem; opacity: 0.8;">Publicada anónimamente en 1554, Burgos</p>
+                        </div>
+                    </div>
+
+                    <!-- Diapositiva 2: Contexto Histórico -->
+                    <div style="background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; padding: 2rem; border-radius: 15px;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.6rem;">⏰ Contexto Histórico</h3>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 10px;">
+                            <h4 style="margin: 0 0 1rem 0;">España del Siglo de Oro (1554)</h4>
+                            <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+                                <li><strong>Reinado de Carlos V:</strong> Imperio español en su apogeo</li>
+                                <li><strong>Contrarreforma:</strong> Tensión religiosa y control inquisitorial</li>
+                                <li><strong>Crisis económica:</strong> Inflación y empobrecimiento general</li>
+                                <li><strong>Nobleza en decadencia:</strong> Pérdida de poder económico</li>
+                            </ul>
+                        </div>
+                        <p style="margin: 1rem 0 0 0; text-align: center; font-style: italic;">
+                            "Reflejo de una sociedad en transformación y crisis"
+                        </p>
+                    </div>
+
+                    <!-- Diapositiva 3: Autoría Anónima -->
+                    <div style="background: linear-gradient(135deg, #9c27b0, #7b1fa2); color: white; padding: 2rem; border-radius: 15px;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.6rem;">🎭 La Autoría Anónima</h3>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 10px;">
+                            <h4 style="margin: 0 0 1rem 0;">¿Quién escribió el Lazarillo?</h4>
+                            <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+                                <li><strong>Teoría humanista:</strong> Juan de Valdés, fray Juan de Luna</li>
+                                <li><strong>Teoría erasmista:</strong> Seguidores de Erasmo de Rotterdam</li>
+                                <li><strong>Autoconocimiento:</strong> Exfraile que narra su propia vida</li>
+                                <li><strong>Ventaja literaria:</strong> Permite crítica sin riesgos</li>
+                            </ul>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.15); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                            <p style="margin: 0; font-style: italic;">
+                                "El anonimato protege al autor de la Inquisición y permite mayor libertad crítica"
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Diapositiva 4: Estructura Narrativa -->
+                    <div style="background: linear-gradient(135deg, #00bcd4, #0097a7); color: white; padding: 2rem; border-radius: 15px;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.6rem;">📋 Estructura Narrativa</h3>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 10px;">
+                            <h4 style="margin: 0 0 1rem 0;">Tres Tratados Principales</h4>
+                            <div style="display: grid; gap: 1rem;">
+                                <div>
+                                    <strong>Primer Tratado:</strong> Infancia y ceguera (Amo: el ciego)
+                                    <ul style="margin: 0.5rem 0 0 1.5rem; padding-left: 1rem; font-size: 0.9rem;">
+                                        <li>Aprendizaje de la supervivencia</li>
+                                        <li>Iniciación en el pícaro</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <strong>Segundo Tratado:</strong> Servicios clericales (Amo: el clérigo)
+                                    <ul style="margin: 0.5rem 0 0 1.5rem; padding-left: 1rem; font-size: 0.9rem;">
+                                        <li>Crítica al clero corrupto</li>
+                                        <li>Primera experiencia de trabajo</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <strong>Tercer Tratado:</strong> Servicios nobles (Múltiples amos)
+                                    <ul style="margin: 0.5rem 0 0 1.5rem; padding-left: 1rem; font-size: 0.9rem;">
+                                        <li>Escudero, fraile, alguacil, capellán</li>
+                                        <li>Ascenso social y crítica moral</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diapositiva 5: Personajes Principales -->
+                    <div style="background: linear-gradient(135deg, #4caf50, #45a049); color: white; padding: 2rem; border-radius: 15px;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.6rem;">👥 Personajes Principales</h3>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 10px;">
+                            <div style="display: grid; gap: 1.5rem;">
+                                <div>
+                                    <h4 style="margin: 0 0 0.5rem 0; border-bottom: 2px solid white; padding-bottom: 0.5rem;">Lázaro de Tormes</h4>
+                                    <ul style="margin: 0; padding-left: 1rem; font-size: 0.9rem; line-height: 1.6;">
+                                        <li><strong>Prototipo de pícaro:</strong> Astuto, superviviente</li>
+                                        <li><strong>Evolución:</strong> De niño ciego a hombre casado</li>
+                                        <li><strong>Características:</strong> Observador, crítico, adaptativo</li>
+                                        <li><strong>Narrador:</strong> Voz autobiográfica en primera persona</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0 0 0.5rem 0; border-bottom: 2px solid white; padding-bottom: 0.5rem;">Los Amos</h4>
+                                    <ul style="margin: 0; padding-left: 1rem; font-size: 0.9rem; line-height: 1.6;">
+                                        <li><strong>El ciego:</strong> Maestro inicial, antihéroe</li>
+                                        <li><strong>El clérigo:</strong> Corrupción eclesiástica</li>
+                                        <li><strong>El escudero:</strong> Nobleza en decadencia</li>
+                                        <li><strong>El fraile:</strong> Hipocresía religiosa</li>
+                                        <li><strong>El alguacil:</strong> Poder corrupto</li>
+                                        <li><strong>El capellán:</strong> Cumbre social y burla final</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diapositiva 6: Novela Picaresca -->
+                    <div style="background: linear-gradient(135deg, #ff9800, #f57c00); color: white; padding: 2rem; border-radius: 15px;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.6rem;">🎭 Novela Picaresca</h3>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 10px;">
+                            <h4 style="margin: 0 0 1rem 0;">Características Fundamentales</h4>
+                            <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+                                <li><strong>Antihéroe:</strong> Protagonista de baja extracción social</li>
+                                <li><strong>Autobiografía ficticia:</strong> Relato en primera persona</li>
+                                <li><strong>Realismo:</strong> Descripción cruda de la realidad</li>
+                                <li><strong>Sátira social:</strong> Crítica de las instituciones</li>
+                                <li><strong>Itinerancia:</strong> Servicio a múltiples amos</li>
+                                <li><strong>Aprendizaje:</strong> Educación callejera y supervivencia</li>
+                            </ul>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                            <p style="margin: 0; font-style: italic;">
+                                "El Lazarillo es la primera novela picaresca y establece el género"
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Diapositiva 7: Crítica Social -->
+                    <div style="background: linear-gradient(135deg, #e91e63, #c2185b); color: white; padding: 2rem; border-radius: 15px;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.6rem;">🔍 Crítica Social</h3>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 10px;">
+                            <h4 style="margin: 0 0 1rem 0;">Instituciones Críticadas</h4>
+                            <div style="display: grid; gap: 1rem;">
+                                <div>
+                                    <strong>⛪ Iglesia:</strong> Clericalismo corrupto, falsa devoción
+                                </div>
+                                <div>
+                                    <strong>👑 Nobleza:</strong> Orgullo sin recursos económicos
+                                </div>
+                                <div>
+                                    <strong>⚖️ Justicia:</strong> Corrupción y abuso de poder
+                                </div>
+                                <div>
+                                    <strong>🏛️ Sociedad:</strong> Hipocresía y apariencias
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <p style="margin: 0; text-align: center; font-style: italic;">
+                                "La novela desnuda la falsedad de las apariencias sociales"
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Diapositiva 8: Lenguaje y Estilo -->
+                    <div style="background: linear-gradient(135deg, #3f51b5, #303f9f); color: white; padding: 2rem; border-radius: 15px;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.6rem;">✍️ Lenguaje y Estilo</h3>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 10px;">
+                            <h4 style="margin: 0 0 1rem 0;">Innovaciones Lingüísticas</h4>
+                            <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+                                <li><strong>Coloquialismo:</strong> Lenguaje cercano al pueblo</li>
+                                <li><strong>Realismo:</strong> Diálogos naturales y espontáneos</li>
+                                <li><strong>Simplicidad:</strong> Claridad expresiva frente a retórica</li>
+                                <li><strong>Ironía:</strong> Doble sentido y humor crítico</li>
+                                <li><strong>Directez:</strong> Sin artificios literarios</li>
+                            </ul>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                            <p style="margin: 0;">
+                                <em>"El lenguaje de Lázaro refleja su origen humilde y su experiencia directa de la vida"</em>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Diapositiva 9: Legado Literario -->
+                    <div style="background: linear-gradient(135deg, #673ab7, #512da8); color: white; padding: 2rem; border-radius: 15px;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.6rem;">📚 Legado Literario</h3>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 10px;">
+                            <h4 style="margin: 0 0 1rem 0;">Influencia en la Literatura Posterior</h4>
+                            <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+                                <li><strong>Guanaman Poma de Ayala:</strong> "Nueva corónica y buen gobierno" (Perú, 1615)</li>
+                                <li><strong>Quevedo:</strong> "La vida del Buscón" (1626)</li>
+                                <li><strong>Gracián:</strong> "El Criticón" (1651-1657)</li>
+                                <li><strong>Modernidad:</strong> Influencia en novela realista y social</li>
+                            </ul>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
+                            <div style="background: rgba(255,255,255,0.15); padding: 1rem; border-radius: 8px; text-align: center;">
+                                <strong>📖 Obras:</strong> 50+ novelas picarescas
+                            </div>
+                            <div style="background: rgba(255,255,255,0.15); padding: 1rem; border-radius: 8px; text-align: center;">
+                                <strong>🌍 Países:</strong> España, Francia, Inglaterra
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diapositiva 10: Conclusión -->
+                    <div style="background: linear-gradient(135deg, #ff5722, #d84315); color: white; padding: 2rem; border-radius: 15px;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.6rem; text-align: center;">🎯 Conclusión</h3>
+                        <div style="background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 10px; text-align: center;">
+                            <p style="margin: 0 0 1rem 0; font-size: 1.1rem; font-style: italic;">
+                                "El Lazarillo de Tormes no solo es la primera novela picaresca,<br>
+                                sino una obra maestra que inauguró una nueva forma de<br>
+                                entender la literatura y la sociedad española"
+                            </p>
+                            <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                                <h4 style="margin: 0 0 0.5rem 0;">Valor Perenne</h4>
+                                <ul style="margin: 0; padding-left: 1.5rem; text-align: left; font-size: 0.9rem;">
+                                    <li>Relevancia histórica y literaria</li>
+                                    <li>Análisis social contemporáneo</li>
+                                    <li>Innovación narrativa y estilística</li>
+                                    <li>Reflejo de la condición humana</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1.5rem; text-align: center; padding: 1rem; border-top: 2px solid rgba(255,255,255,0.3);">
+                            <p style="margin: 0; font-size: 1.2rem;">
+                                <strong>📚 Una obra para siempre en la literatura universal</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 10px; text-align: center;">
+                    <p style="margin: 0 0 1rem 0; color: #666; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> Esta presentación ha sido creada como material educativo complementario
+                    </p>
+                    <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+                        <span style="color: #888; font-size: 0.8rem;">
+                            <i class="fas fa-presentation"></i> 10 diapositivas
+                        </span>
+                        <span style="color: #888; font-size: 0.8rem;">
+                            <i class="fas fa-clock"></i> 60 minutos
+                        </span>
+                        <span style="color: #888; font-size: 0.8rem;">
+                            <i class="fas fa-graduation-cap"></i> Nivel Medio-Avanzado
+                        </span>
+                    </div>
+                </div>
+            `;
+
+            modal.appendChild(presentationContent);
+            document.body.appendChild(modal);
+
+            // Añadir animaciones CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes slideUp {
+                    from { transform: translateY(50px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Cerrar con Escape
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    modal.remove();
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+
+            // Cerrar haciendo clic fuera del contenido
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            });
+
+            showNotification('📚 Presentación de El Lazarillo de Tormes cargada correctamente', 'success');
+        }
+
+        // Añadir efectos hover para las tarjetas de materiales
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const materialCards = document.querySelectorAll('.material-card');
+
+                materialCards.forEach(card => {
+                    card.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-5px)';
+                        this.style.boxShadow = '0 15px 40px rgba(0,0,0,0.15)';
+                    });
+
+                    card.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                    });
+                });
+            }, 1500);
+        });
     </script>
 </body>
 </html>
