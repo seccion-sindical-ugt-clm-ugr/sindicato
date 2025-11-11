@@ -6,8 +6,17 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Obtener el JWT secret del entorno
-const JWT_SECRET = process.env.JWT_SECRET || 'ugt-clm-ugr-secret-key-change-in-production';
+// SECURITY: JWT_SECRET must be configured via environment variable
+if (!process.env.JWT_SECRET) {
+    throw new Error(
+        '❌ JWT_SECRET no configurada.\n' +
+        'Esta variable es REQUERIDA para producción.\n' +
+        'Genera una con: node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"\n' +
+        'Y configúrala en Vercel → Settings → Environment Variables'
+    );
+}
+
+const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
 

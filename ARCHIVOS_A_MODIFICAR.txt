@@ -1,0 +1,432 @@
+================================================================================
+    LISTA DE ARCHIVOS A MODIFICAR - REFERENCIA RÁPIDA
+================================================================================
+
+PRIORIDAD: CRÍTICA - DEBE RESOLVER ANTES DE PRODUCCIÓN
+
+================================================================================
+1. db/mongodb.js (LÍNEA 7)
+================================================================================
+Acción: REMOVER URI hardcodeada
+Estado: CRÍTICO
+
+CAMBIO:
+  Línea 7 - ANTES:
+    this.uri = process.env.MONGODB_URI || "mongodb+srv://adminblabaele:<db_password>@ugt-production.tpwafoj.mongodb.net/?appName=UGT-Production";
+  
+  DESPUÉS:
+    this.uri = process.env.MONGODB_URI;
+    if (!this.uri) {
+        throw new Error('MONGODB_URI es requerida');
+    }
+
+VERIFICACIÓN:
+  grep -n "mongodb+srv://" db/mongodb.js
+  No debe retornar nada
+
+
+================================================================================
+2. backend/src/middleware/auth.js (LÍNEA 10)
+================================================================================
+Acción: HACER JWT_SECRET OBLIGATORIO
+Estado: CRÍTICO
+
+CAMBIO:
+  Líneas 10-12 - ANTES:
+    const JWT_SECRET = process.env.JWT_SECRET || 'ugt-clm-ugr-secret-key-change-in-production';
+    const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+    const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
+  
+  DESPUÉS:
+    if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET es REQUERIDA');
+    }
+    const JWT_SECRET = process.env.JWT_SECRET;
+    const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+    const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
+
+PASO ADICIONAL:
+  node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+  Guardar en backend/.env: JWT_SECRET=<valor generado>
+
+
+================================================================================
+3. backend/src/routes/webhook.js (LÍNEAS 23-32)
+================================================================================
+Acción: FORZAR STRIPE_WEBHOOK_SECRET
+Estado: CRÍTICO
+
+CAMBIO:
+  Líneas 23-32 - ANTES:
+    if (process.env.STRIPE_WEBHOOK_SECRET) {
+        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    } else {
+        console.warn('⚠️ ADVERTENCIA: Webhook sin verificar');
+        event = JSON.parse(req.body.toString());
+    }
+  
+  DESPUÉS:
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+        throw new Error('STRIPE_WEBHOOK_SECRET es REQUERIDA');
+    }
+    const sig = req.headers['stripe-signature'];
+    try {
+        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    } catch (err) {
+        console.error('Webhook signature failed:', err.message);
+        return res.status(400).send('Webhook Error');
+    }
+
+VERIFICACIÓN:
+  No debe haber código que acepte webhooks sin STRIPE_WEBHOOK_SECRET
+
+
+================================================================================
+4. js/stripe-config.js (LÍNEA 8)
+================================================================================
+Acción: CARGAR PUBLISHABLE KEY DINÁMICAMENTE
+Estado: CRÍTICO
+
+CAMBIO:
+  Línea 8 - ANTES:
+    publishableKey: 'pk_test_5KBH6AipFVudtyqsznP9vJXo00ku526ehA',
+  
+  DESPUÉS:
+    get publishableKey() {
+        // Cargar desde backend o variable global
+        return window.STRIPE_PUBLISHABLE_KEY || 
+               process.env.REACT_APP_STRIPE_KEY || null;
+    }
+
+MEJOR PRÁCTICA:
+  Cargar desde un endpoint en el backend que retorne la clave
+
+
+================================================================================
+5. js/backend-config.js (LÍNEA 19)
+================================================================================
+Acción: REMOVER URL HARDCODEADA
+Estado: CRÍTICO
+
+CAMBIO:
+  Línea 19 - ANTES:
+    production: 'https://sindicato-mu.vercel.app',
+  
+  DESPUÉS:
+    get apiUrl() {
+        const manual = localStorage.getItem('BACKEND_API_URL');
+        if (manual) return manual;
+        if (window.BACKEND_URL) return window.BACKEND_URL;
+        if (isLocal) return this.development;
+        throw new Error('Backend URL no configurada');
+    }
+
+VERIFICACIÓN:
+  grep -n "sindicato-mu.vercel.app" js/*.js
+  No debe retornar nada
+
+
+================================================================================
+6. js/auth-api.js (LÍNEA 15)
+================================================================================
+Acción: REMOVER URL HARDCODEADA
+Estado: CRÍTICO
+
+CAMBIO:
+  Línea 15 - ANTES:
+    : 'https://sindicato-mu.vercel.app'
+  
+  DESPUÉS:
+    : null // Cargar desde backend-config.js
+
+VERIFICACIÓN:
+  grep -n "sindicato-mu.vercel.app" js/auth-api.js
+  No debe retornar nada
+
+
+================================================================================
+7. backend/src/routes/suggestions.js (LÍNEAS 102-112)
+================================================================================
+Acción: MIGRAR A JWT AUTHENTICATION
+Estado: CRÍTICA
+
+CAMBIO:
+  Líneas 102-112 - ANTES:
+    const token = authHeader.replace('Bearer ', '');
+    const adminPassword = process.env.ADMIN_PASSWORD || 'ugt2024admin';
+    if (token !== adminPassword) {
+        return res.status(401).json({ error: 'No autorizado' });
+    }
+  
+  DESPUÉS:
+    if (!process.env.ADMIN_PASSWORD) throw new Error('ADMIN_PASSWORD requerida');
+    
+    const password = req.body.password; // En nuevo endpoint /api/admin/login
+    const token = jwt.sign({ admin: true }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // Verificar en middleware usando JWT verify
+
+REFERENCIA COMPLETA:
+  Ver ACCIONES_ESPECÍFICAS.md - PROBLEMA #6
+
+
+================================================================================
+8. admin-suggestions.html y admin.html
+================================================================================
+Acción: CAMBIAR ENVÍO DE CREDENCIALES
+Estado: CRÍTICA
+
+BÚSQUEDA:
+  grep -n "authToken = password" admin*.html
+  
+CAMBIO:
+  ANTES:
+    authToken = password;
+    'Authorization': `Bearer ${password}`
+  
+  DESPUÉS:
+    const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        body: JSON.stringify({ password })
+    });
+    const { token } = await response.json();
+    'Authorization': `Bearer ${token}`
+
+VERIFICACIÓN:
+  No debe haber "Bearer ${password}" en el código
+
+
+================================================================================
+9. backend/src/server.js (LÍNEA 116)
+================================================================================
+Acción: REMOVER CORS TEMPORAL
+Estado: CRÍTICA
+
+CAMBIO:
+  Línea 116 - ANTES:
+    // TEMPORAL: Permitir todos los orígenes que empiecen con https://ugtclmgranada.org
+    if (origin && origin.startsWith('https://ugtclmgranada.org')) {
+        return callback(null, true);
+    }
+  
+  DESPUÉS:
+    // Usar lista explícita de ALLOWED_ORIGINS
+    if (!allowedOrigins.includes(origin)) {
+        return callback(new Error('CORS blocked'));
+    }
+
+VERIFICACIÓN:
+  grep -n "TEMPORAL" backend/src/server.js
+  No debe retornar nada
+
+
+================================================================================
+10. MÚLTIPLES ARCHIVOS - REMOVER DEBUG STATEMENTS
+================================================================================
+Acción: ELIMINAR console.log DE PRODUCCIÓN
+Estado: CRÍTICA
+
+ARCHIVOS CON MÁS LOGS:
+  1. backend/src/routes/stripe.js - líneas 106, 107, 112, 121
+  2. backend/src/server.js - 60+ console.log
+  3. pages/curso-ia.html - líneas 1857-1871
+  4. backend/src/routes/webhook.js - 20+ console.log
+
+OPCIÓN 1 - Remover:
+  sed -i '/console\.log/d' archivo.js
+
+OPCIÓN 2 - Condicionar:
+  if (process.env.NODE_ENV === 'development') console.log(...);
+
+OPCIÓN 3 - Usar Logger:
+  logger.debug(...) // Solo se ejecuta si LOG_LEVEL=debug
+
+BÚSQUEDA RÁPIDA:
+  find backend/src -name "*.js" | xargs grep -c "console\.log"
+
+VERIFICACIÓN:
+  En producción con NODE_ENV=production, no debe haber console.log
+
+
+================================================================================
+11. backend/src/routes/suggestions.js (LÍNEA 102)
+================================================================================
+Acción: HACER ADMIN_PASSWORD OBLIGATORIO
+Estado: CRÍTICA
+
+CAMBIO:
+  Línea 102 - ANTES:
+    const adminPassword = process.env.ADMIN_PASSWORD || 'ugt2024admin';
+  
+  DESPUÉS:
+    if (!process.env.ADMIN_PASSWORD) {
+        throw new Error('ADMIN_PASSWORD es REQUERIDA');
+    }
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+GENERAR CONTRASEÑA:
+  openssl rand -base64 32
+
+
+================================================================================
+12. js/stripe-config-loader.js
+================================================================================
+Acción: REMOVER CARGA DE SECRET KEY
+Estado: CRÍTICA
+
+CAMBIO:
+  BÚSQUEDA:
+    grep -n "secretKey\|STRIPE_SECRET_KEY" js/stripe-config-loader.js
+  
+  REMOVER:
+    Cualquier código que intente cargar secret key en frontend
+    Secret keys NUNCA deben estar en el frontend
+
+VERIFICACIÓN:
+  grep -n "sk_test_\|sk_live_" js/*.js
+  No debe retornar nada
+
+
+================================================================================
+VARIABLES DE ENTORNO A CONFIGURAR EN VERCEL
+================================================================================
+
+Ir a: https://vercel.com → Dashboard → Tu Proyecto → Settings → Environment Variables
+
+REQUERIDAS:
+☐ STRIPE_SECRET_KEY (sk_live_...)
+☐ STRIPE_PUBLISHABLE_KEY (pk_live_...)
+☐ STRIPE_WEBHOOK_SECRET (whsec_...)
+☐ JWT_SECRET (generado con: node -e "console.log(...)")
+☐ ADMIN_PASSWORD (generado con: openssl rand -base64 32)
+☐ MONGODB_URI (mongodb+srv://...)
+
+RECOMENDADAS:
+☐ NODE_ENV=production
+☐ ALLOWED_ORIGINS=https://dominio.com
+☐ SUCCESS_URL=https://dominio.com/success.html
+☐ CANCEL_URL=https://dominio.com/cancel.html
+
+
+================================================================================
+CHECKLIST DE VERIFICACIÓN POR ARCHIVO
+================================================================================
+
+☐ db/mongodb.js
+  └─ URI no es hardcodeada
+  └─ Lanza error si MONGODB_URI no existe
+
+☐ backend/src/middleware/auth.js
+  └─ JWT_SECRET es obligatorio
+  └─ No hay valor por defecto predecible
+
+☐ backend/src/routes/webhook.js
+  └─ STRIPE_WEBHOOK_SECRET es obligatorio
+  └─ Lanza error si no existe
+  └─ No hay fallback sin verificación
+
+☐ js/stripe-config.js
+  └─ publishableKey no está hardcodeada
+  └─ Se carga dinámicamente
+
+☐ js/backend-config.js
+  └─ URL de producción no está hardcodeada
+  └─ Se carga desde variable global
+
+☐ js/auth-api.js
+  └─ No hay URL hardcodeada
+  └─ Usa BACKEND_CONFIG
+
+☐ backend/src/routes/suggestions.js
+  └─ Usa JWT en lugar de contraseña
+  └─ ADMIN_PASSWORD es obligatorio
+
+☐ admin-suggestions.html y admin.html
+  └─ Envía contraseña a endpoint de login
+  └─ Almacena token JWT
+  └─ Usa token en requests posteriores
+
+☐ backend/src/server.js
+  └─ CORS restrictivo (no TEMPORAL)
+  └─ Usa lista explícita de orígenes
+
+☐ Todos los archivos .js
+  └─ Sin console.log/warn/error DEBUG
+  └─ Logs solo si NODE_ENV=development
+
+☐ backend/src/routes/suggestions.js
+  └─ ADMIN_PASSWORD es obligatorio
+  └─ No hay valor por defecto
+
+
+================================================================================
+TESTING POST-CAMBIOS
+================================================================================
+
+1. En local con NODE_ENV=development:
+   npm run dev
+   Verificar que todo funciona
+
+2. En local con NODE_ENV=production (sin las variables):
+   NODE_ENV=production npm run dev
+   Debe lanzar errores de variables requeridas
+
+3. Con todas las variables configuradas:
+   NODE_ENV=production npm run dev
+   Debe funcionar correctamente
+
+4. Health check:
+   curl http://localhost:3000/health
+   Debe retornar JSON con status
+
+5. Test de pago:
+   curl -X POST http://localhost:3000/api/create-affiliation-session \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Test","email":"test@test.com","phone":"600000000","department":"Test"}'
+
+
+================================================================================
+COMANDOS ÚTILES
+================================================================================
+
+# Generar JWT_SECRET
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+
+# Generar ADMIN_PASSWORD
+openssl rand -base64 32
+
+# Verificar variables
+npm run verify-env
+
+# Buscar URLs hardcodeadas
+grep -r "sindicato-mu.vercel.app" js/ backend/
+
+# Buscar console.log
+find backend/src -name "*.js" | xargs grep "console\.log" | wc -l
+
+# Buscar credenciales
+grep -r "mongodb+srv://" . --include="*.js" --exclude-dir=node_modules
+
+# Testing local
+NODE_ENV=production npm run dev
+
+
+================================================================================
+ORDEN RECOMENDADO DE EJECUCIÓN
+================================================================================
+
+1. db/mongodb.js - Remover URI hardcodeada
+2. backend/src/middleware/auth.js - Hacer JWT_SECRET obligatorio
+3. backend/src/routes/suggestions.js - Hacer ADMIN_PASSWORD obligatorio
+4. backend/src/routes/webhook.js - Forzar STRIPE_WEBHOOK_SECRET
+5. js/backend-config.js - Remover URL hardcodeada
+6. js/auth-api.js - Remover URL hardcodeada
+7. backend/src/server.js - Remover CORS TEMPORAL
+8. backend/src/routes/suggestions.js - Migrar auth a JWT
+9. admin-suggestions.html y admin.html - Cambiar login
+10. js/stripe-config.js - Cargar key dinámicamente
+11. js/stripe-config-loader.js - Remover secret key loading
+12. TODOS - Remover 173+ console.log statements
+13. Configurar variables en Vercel
+14. Testing completo
+
+================================================================================

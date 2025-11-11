@@ -18,22 +18,26 @@ router.post('/', async (req, res) => {
     const sig = req.headers['stripe-signature'];
     let event;
 
+    // SECURITY: STRIPE_WEBHOOK_SECRET is REQUIRED for production
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+        console.error('❌ ERROR CRÍTICO: STRIPE_WEBHOOK_SECRET no configurado');
+        console.error('Configúralo en Vercel → Settings → Environment Variables');
+        console.error('Obtén el secret desde: https://dashboard.stripe.com/webhooks');
+        return res.status(500).json({
+            error: 'Webhook configuration error'
+        });
+    }
+
     try {
         // Verificar la firma del webhook
-        if (process.env.STRIPE_WEBHOOK_SECRET) {
-            event = stripe.webhooks.constructEvent(
-                req.body,
-                sig,
-                process.env.STRIPE_WEBHOOK_SECRET
-            );
-        } else {
-            // Si no hay secret configurado, parsear el body directamente (solo desarrollo)
-            console.warn('⚠️ ADVERTENCIA: Webhook sin verificar (no hay STRIPE_WEBHOOK_SECRET)');
-            event = JSON.parse(req.body.toString());
-        }
+        event = stripe.webhooks.constructEvent(
+            req.body,
+            sig,
+            process.env.STRIPE_WEBHOOK_SECRET
+        );
 
     } catch (err) {
-        console.error('❌ Error verificando webhook:', err.message);
+        console.error('❌ Error verificando firma del webhook:', err.message);
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 

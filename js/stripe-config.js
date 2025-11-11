@@ -5,7 +5,8 @@
 
 const STRIPE_CONFIG = {
     // Clave pública de Stripe (SEGURA para el frontend)
-    publishableKey: 'pk_test_5KBH6AipFVudtyqsznP9vJXo00ku526ehA',
+    // LIVE mode - Producción
+    publishableKey: 'pk_live_Ab351oE79aSf4NakSQXEU1F700Qc8Nhx3H',
 
     // URLs de tu sitio
     successUrl: 'https://sindicato-mu.vercel.app/success.html',

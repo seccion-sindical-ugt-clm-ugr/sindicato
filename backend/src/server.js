@@ -5,6 +5,12 @@
  */
 
 require('dotenv').config();
+
+// SECURITY: Configurar logging condicional ANTES de cualquier otro código
+// En producción, deshabilita console.log/info/debug pero mantiene console.error
+const { setupConditionalLogging } = require('./utils/logger');
+setupConditionalLogging();
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -86,47 +92,59 @@ if (process.env.MONGODB_URI) {
 // Helmet: Protección de headers HTTP
 app.use(helmet());
 
-// CORS: Configurar dominios permitidos
-// En producción, priorizar variables de Vercel sobre .env local
-const allowedOrigins = (process.env.NODE_ENV === 'production' && process.env.ALLOWED_ORIGINS)
-    ? process.env.ALLOWED_ORIGINS.split(',')
-    : process.env.ALLOWED_ORIGINS
-        ? process.env.ALLOWED_ORIGINS.split(',')
-        : ['http://localhost:8000', 'http://localhost:3000', 'https://ugtclmgranada.org'];
+// CORS: Configurar dominios permitidos de forma restrictiva
+// SECURITY: Lista explícita de orígenes permitidos
+let allowedOrigins = [];
 
-// Forzar inclusión del dominio principal
-if (!allowedOrigins.includes('https://ugtclmgranada.org')) {
-    allowedOrigins.push('https://ugtclmgranada.org');
+if (process.env.ALLOWED_ORIGINS) {
+    // Limpiar y validar cada origen
+    allowedOrigins = process.env.ALLOWED_ORIGINS
+        .split(',')
+        .map(origin => origin.trim())
+        .filter(origin => {
+            try {
+                new URL(origin);
+                return true;
+            } catch (e) {
+                console.warn(`⚠️ Origen inválido ignorado: ${origin}`);
+                return false;
+            }
+        });
+} else {
+    // Defaults seguros solo para desarrollo
+    if (process.env.NODE_ENV !== 'production') {
+        allowedOrigins = ['http://localhost:8000', 'http://localhost:3000'];
+        console.log('⚠️ Usando orígenes por defecto (solo desarrollo)');
+    } else {
+        console.error('❌ ALLOWED_ORIGINS no configurado en producción');
+        throw new Error(
+            '❌ ALLOWED_ORIGINS es REQUERIDA en producción.\n' +
+            'Configúrala en Vercel → Settings → Environment Variables\n' +
+            'Ejemplo: https://ugtclmgranada.org,https://seccion-sindical-ugt-clm-ugr.github.io'
+        );
+    }
 }
 
-// CORS más permisivo temporalmente para diagnóstico
+console.log('🔒 CORS configurado con orígenes permitidos:', allowedOrigins);
+
+// CORS restrictivo con lista explícita
 app.use(cors({
     origin: function(origin, callback) {
-        // Log de debug para CORS
-        console.log('🔍 CORS check - Origin:', origin);
-        console.log('🔍 CORS check - Allowed origins:', allowedOrigins);
-        console.log('🔍 ENV ALLOWED_ORIGINS:', process.env.ALLOWED_ORIGINS);
-
-        // Permitir requests sin origin (como Postman o mismo servidor)
+        // Permitir requests sin origin (como Postman, curl, o mismo servidor)
         if (!origin) {
-            console.log('✅ CORS: Request sin origin permitido');
             return callback(null, true);
         }
 
-        // TEMPORAL: Permitir todos los orígenes que empiecen con https://ugtclmgranada.org
-        if (origin && origin.startsWith('https://ugtclmgranada.org')) {
-            console.log(`✅ CORS: Origin ${origin} permitido (match con ugtclmgranada.org)`);
+        // Verificar que el origen esté en la lista explícita
+        if (allowedOrigins.includes(origin)) {
+            console.log(`✅ CORS: Origin ${origin} permitido`);
             return callback(null, true);
         }
 
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'La política CORS no permite el acceso desde este origen.';
-            console.log(`❌ CORS BLOQUEADO: ${origin} no está en la lista de orígenes permitidos`);
-            return callback(new Error(msg), false);
-        }
-
-        console.log(`✅ CORS: Origin ${origin} permitido`);
-        return callback(null, true);
+        // Bloquear cualquier otro origen
+        console.log(`❌ CORS BLOQUEADO: ${origin} no está en la lista de orígenes permitidos`);
+        const msg = 'La política CORS no permite el acceso desde este origen.';
+        return callback(new Error(msg), false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
