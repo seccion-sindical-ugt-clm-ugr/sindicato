@@ -50,6 +50,18 @@ router.post('/create-affiliation-session', affiliationValidators, async (req, re
 
         console.log('📝 Nueva solicitud de afiliación:', { name, email, department });
 
+        // VALIDACIÓN CRÍTICA: Verificar que el email NO esté ya registrado
+        const existingUser = await User.findByEmail(email);
+        if (existingUser) {
+            console.error('🚫 PAGO BLOQUEADO: Email ya registrado:', email);
+            return res.status(409).json({
+                error: 'Este email ya está registrado. Por favor inicia sesión en lugar de registrarte nuevamente.',
+                code: 'EMAIL_ALREADY_REGISTERED'
+            });
+        }
+
+        console.log('✅ Email disponible, creando sesión de pago...');
+
         // Crear sesión de Stripe Checkout
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -121,6 +133,18 @@ router.post('/create-course-session', courseValidators, async (req, res) => {
         const { name, email, phone, department, courseType, isMember } = req.body;
 
         console.log('🔍 DEBUG - Datos extraídos:', { name, email, phone, department, courseType, isMember });
+
+        // VALIDACIÓN CRÍTICA: Si es afiliado, verificar que NO esté ya registrado
+        if (isMember) {
+            const existingUser = await User.findByEmail(email);
+            if (existingUser) {
+                console.error('🚫 PAGO BLOQUEADO: Email ya registrado:', email);
+                return res.status(409).json({
+                    error: 'Este email ya está registrado. Por favor inicia sesión en lugar de registrarte nuevamente.',
+                    code: 'EMAIL_ALREADY_REGISTERED'
+                });
+            }
+        }
 
         // Determinar precio según tipo de usuario
         const price = isMember ? 1500 : 16000; // 15€ o 160€ en centavos
