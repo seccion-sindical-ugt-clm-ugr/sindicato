@@ -112,7 +112,7 @@ async function sendSuggestionConfirmation(suggestion) {
                     <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;">
                         <h3>📞 Contacto Directo</h3>
                         <p>Si tu sugerencia es urgente, puedes contactarnos directamente:</p>
-                        <p><strong>Email:</strong> ugt.clm.ugr@ugt.org</p>
+                        <p><strong>Email:</strong> ugtclmgranada@gmail.com</p>
                         <p><strong>Teléfono:</strong> 958 XXX XXX</p>
                     </div>
                 </div>
@@ -126,7 +126,7 @@ async function sendSuggestionConfirmation(suggestion) {
         `;
 
         const mailOptions = {
-            from: `"UGT-CLM-UGR Granada" <${process.env.EMAIL_FROM || 'ugt.clm.ugr@ugt.org'}>`,
+            from: `"UGT-CLM-UGR Granada" <${process.env.EMAIL_FROM || 'ugtclmgranada@gmail.com'}>`,
             to: suggestion.email,
             subject: subject,
             html: htmlContent,
@@ -143,7 +143,7 @@ async function sendSuggestionConfirmation(suggestion) {
                 
                 Tu sugerencia será revisada y recibirás respuesta en 7 días hábiles.
                 
-                Para consultas urgentes: ugt.clm.ugr@ugt.org | 958 XXX XXX
+                Para consultas urgentes: ugtclmgranada@gmail.com | 958 XXX XXX
             `
         };
 
@@ -250,10 +250,10 @@ async function sendAdminNotification(suggestion) {
 
         const adminEmails = process.env.ADMIN_EMAILS ? 
             process.env.ADMIN_EMAILS.split(',') : 
-            ['ugt.clm.ugr@ugt.org'];
+            ['ugtclmgranada@gmail.com'];
 
         const mailOptions = {
-            from: `"Sistema UGT" <${process.env.EMAIL_FROM || 'ugt.clm.ugr@ugt.org'}>`,
+            from: `"Sistema UGT" <${process.env.EMAIL_FROM || 'ugtclmgranada@gmail.com'}>`,
             to: adminEmails,
             subject: subject,
             html: htmlContent,
@@ -337,7 +337,7 @@ async function sendStatusUpdate(suggestion, newStatus, adminNotes = '') {
                     <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;">
                         <h3>📞 ¿Necesitas algo más?</h3>
                         <p>Si tienes alguna pregunta o necesitas información adicional, no dudes en contactarnos:</p>
-                        <p><strong>Email:</strong> ugt.clm.ugr@ugt.org</p>
+                        <p><strong>Email:</strong> ugtclmgranada@gmail.com</p>
                         <p><strong>Teléfono:</strong> 958 XXX XXX</p>
                     </div>
                 </div>
@@ -351,7 +351,7 @@ async function sendStatusUpdate(suggestion, newStatus, adminNotes = '') {
         `;
 
         const mailOptions = {
-            from: `"UGT-CLM-UGR Granada" <${process.env.EMAIL_FROM || 'ugt.clm.ugr@ugt.org'}>`,
+            from: `"UGT-CLM-UGR Granada" <${process.env.EMAIL_FROM || 'ugtclmgranada@gmail.com'}>`,
             to: suggestion.email,
             subject: subject,
             html: htmlContent
@@ -448,7 +448,7 @@ async function sendPasswordResetEmail(user, resetToken) {
                             <li>Usa una contraseña única y segura</li>
                             <li>Si no solicitaste este cambio, contacta con soporte inmediatamente</li>
                         </ul>
-                        <p><strong>Contacto:</strong> ugt.clm.ugr@ugt.org</p>
+                        <p><strong>Contacto:</strong> ugtclmgranada@gmail.com</p>
                     </div>
                 </div>
 
@@ -461,7 +461,7 @@ async function sendPasswordResetEmail(user, resetToken) {
         `;
 
         const mailOptions = {
-            from: `"UGT-CLM-UGR Granada" <${process.env.EMAIL_FROM || 'ugt.clm.ugr@ugt.org'}>`,
+            from: `"UGT-CLM-UGR Granada" <${process.env.EMAIL_FROM || 'ugtclmgranada@gmail.com'}>`,
             to: user.email,
             subject: subject,
             html: htmlContent,
@@ -479,7 +479,7 @@ async function sendPasswordResetEmail(user, resetToken) {
 
                 Si no realizaste esta solicitud, ignora este email.
 
-                Contacto: ugt.clm.ugr@ugt.org
+                Contacto: ugtclmgranada@gmail.com
             `
         };
 
