@@ -14,27 +14,31 @@ const BACKEND_CONFIG = {
     // URL del backend en desarrollo (servidor local)
     development: 'http://localhost:3000',
 
-    // URL del backend en producción (Vercel)
-    // ✅ CONFIGURADO: Backend desplegado exitosamente
-    production: 'https://sindicato-mu.vercel.app',
-
     // Auto-detectar entorno actual
     get apiUrl() {
-        // Si hay una configuración manual en localStorage, usarla
+        // 1. Configuración manual en localStorage (para testing)
         const manualUrl = localStorage.getItem('BACKEND_API_URL');
         if (manualUrl) {
             console.log('📍 Usando backend configurado manualmente:', manualUrl);
             return manualUrl;
         }
 
-        // Auto-detectar según el hostname
+        // 2. Variable inyectada desde HTML (PRODUCCIÓN RECOMENDADA)
+        if (window.BACKEND_URL) {
+            console.log('📍 Usando backend desde window.BACKEND_URL:', window.BACKEND_URL);
+            return window.BACKEND_URL;
+        }
+
+        // 3. Auto-detectar según el hostname
         if (isLocal) {
             console.log('📍 Entorno detectado: DESARROLLO (localhost)');
             return this.development;
-        } else {
-            console.log('📍 Entorno detectado: PRODUCCIÓN');
-            return this.production;
         }
+
+        // 4. ERROR: En producción DEBE estar configurado window.BACKEND_URL
+        console.error('❌ BACKEND_URL no configurado');
+        console.error('Añade al HTML: <script>window.BACKEND_URL = "https://tu-backend.vercel.app";</script>');
+        throw new Error('Backend URL no configurado. Configura window.BACKEND_URL en producción.');
     },
 
     // Endpoints disponibles

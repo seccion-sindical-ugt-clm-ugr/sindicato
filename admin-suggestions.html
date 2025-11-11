@@ -505,29 +505,76 @@
             e.preventDefault();
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('login-error');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
 
-            // Guardar token (la contraseña misma es el token)
-            authToken = password;
-            localStorage.setItem('adminToken', authToken);
+            // Deshabilitar botón durante login
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Iniciando sesión...';
+            errorDiv.style.display = 'none';
 
-            // Intentar cargar sugerencias
             try {
+                // SECURITY: Llamar al endpoint de login para obtener JWT
+                const response = await fetch(`${API_URL}/api/admin/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Error al iniciar sesión');
+                }
+
+                // Guardar JWT token y tiempo de expiración
+                authToken = data.token;
+                const expiryTime = Date.now() + (data.expiresIn * 1000);
+                localStorage.setItem('adminToken', authToken);
+                localStorage.setItem('adminTokenExpiry', expiryTime.toString());
+
+                console.log('✅ Login exitoso - Token válido por', data.expiresIn / 3600, 'horas');
+
+                // Cargar panel de administración
                 await loadSuggestions();
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'block';
+
             } catch (error) {
-                errorDiv.textContent = '❌ Contraseña incorrecta';
+                console.error('❌ Error en login:', error);
+                errorDiv.textContent = '❌ ' + (error.message || 'Contraseña incorrecta');
                 errorDiv.style.display = 'block';
                 localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminTokenExpiry');
                 authToken = null;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Iniciar Sesión';
             }
         });
 
         // Logout
         function logout() {
             localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminTokenExpiry');
             authToken = null;
             location.reload();
+        }
+
+        // Verificar si el token ha expirado
+        function isTokenExpired() {
+            const expiry = localStorage.getItem('adminTokenExpiry');
+            if (!expiry) return true;
+            return Date.now() > parseInt(expiry);
+        }
+
+        // Verificar token al cargar la página
+        if (authToken && isTokenExpired()) {
+            console.log('⚠️ Token expirado, requiere nuevo login');
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminTokenExpiry');
+            authToken = null;
         }
 
         // Cargar sugerencias

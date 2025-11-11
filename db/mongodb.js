@@ -4,7 +4,17 @@ class MongoDBConnection {
     constructor() {
         this.client = null;
         this.db = null;
-        this.uri = process.env.MONGODB_URI || "mongodb+srv://adminblabaele:<db_password>@ugt-production.tpwafoj.mongodb.net/?appName=UGT-Production";
+
+        // SECURITY: MongoDB URI must be configured via environment variable
+        if (!process.env.MONGODB_URI) {
+            throw new Error(
+                '❌ MONGODB_URI no configurada.\n' +
+                'Esta variable es REQUERIDA para producción.\n' +
+                'Configúrala en Vercel → Settings → Environment Variables'
+            );
+        }
+
+        this.uri = process.env.MONGODB_URI;
         this.dbName = "ugt_sindical";
     }
 

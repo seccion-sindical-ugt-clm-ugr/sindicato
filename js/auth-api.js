@@ -5,15 +5,16 @@
 
 // Configuración de la API
 const getBackendConfig = () => {
-    if (typeof window.getBackendConfig === 'function') {
-        return window.getBackendConfig();
+    // Usar BACKEND_CONFIG si está disponible
+    if (window.BACKEND_CONFIG) {
+        return { API_URL: window.BACKEND_CONFIG.apiUrl };
     }
-    // Fallback si backend-config.js no está cargado
-    return {
-        API_URL: window.location.hostname === 'localhost'
-            ? 'http://localhost:3000'
-            : 'https://sindicato-mu.vercel.app'
-    };
+
+    // SECURITY: No usar fallback hardcodeado en producción
+    throw new Error(
+        '❌ BACKEND_CONFIG no está cargado.\n' +
+        'Asegúrate de cargar backend-config.js ANTES de auth-api.js'
+    );
 };
 
 const API_URL = () => getBackendConfig().API_URL;
