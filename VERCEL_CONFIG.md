@@ -9,13 +9,15 @@ Añade estas variables:
 ### 1. EMAIL (Para recuperación de contraseña)
 
 ```
-EMAIL_USER = tu-email@gmail.com
+EMAIL_USER = ugtclmgranada@gmail.com
 EMAIL_PASS = tu-contraseña-de-aplicacion-google
-EMAIL_FROM = ugt.clm.ugr@ugt.org
+EMAIL_FROM = ugtclmgranada@gmail.com
 EMAIL_HOST = smtp.gmail.com
 EMAIL_PORT = 587
 EMAIL_SECURE = false
 ```
+
+**IMPORTANTE:** `EMAIL_FROM` debe ser el mismo que `EMAIL_USER`. Gmail no permite enviar desde un email diferente al autenticado.
 
 **¿Cómo obtener EMAIL_PASS de Gmail?**
 
