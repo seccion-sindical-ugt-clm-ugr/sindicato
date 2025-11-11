@@ -1038,8 +1038,9 @@ loginForm.addEventListener('submit', async (e) => {
 
             console.log('✅ Login exitoso:', currentUser);
 
-            // Close modal and show dashboard
+            // Update header and close modal to show dashboard
             setTimeout(() => {
+                updateLoginState(); // Actualizar header con nombre de usuario
                 loginModal.style.display = 'none';
                 showMemberDashboard();
                 loginForm.reset();
