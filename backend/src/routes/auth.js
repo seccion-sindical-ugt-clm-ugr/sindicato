@@ -7,6 +7,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const rateLimit = require('express-rate-limit');
+const crypto = require('crypto');
 const User = require('../models/User');
 const {
     generateAccessToken,
@@ -15,6 +16,7 @@ const {
     authenticate,
     JWT_REFRESH_EXPIRES_IN
 } = require('../middleware/auth');
+const { sendPasswordResetEmail } = require('../services/emailService');
 
 // Rate limiting para prevenir ataques de fuerza bruta
 const authLimiter = rateLimit({
@@ -53,7 +55,16 @@ router.post('/register',
         body('telefono')
             .optional()
             .trim()
-            .matches(/^[0-9]{9,15}$/).withMessage('Teléfono inválido'),
+            .custom((value) => {
+                if (!value) return true; // Es opcional
+                // Permitir espacios, guiones, paréntesis, puntos y +
+                // Extraer solo dígitos
+                const digitsOnly = value.replace(/[\s\-().+]/g, '');
+                if (!/^[0-9]{9,15}$/.test(digitsOnly)) {
+                    throw new Error('Teléfono inválido (debe tener entre 9 y 15 dígitos)');
+                }
+                return true;
+            }),
         body('departamento')
             .optional()
             .trim()
@@ -450,6 +461,208 @@ router.post('/verify-token',
             res.status(500).json({
                 success: false,
                 error: 'Error al verificar token'
+            });
+        }
+    }
+);
+
+/**
+ * GET /api/auth/check-email
+ * Verificar si un email ya está registrado (antes del pago)
+ */
+router.get('/check-email',
+    async (req, res) => {
+        try {
+            const { email } = req.query;
+
+            if (!email) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'El email es obligatorio'
+                });
+            }
+
+            const existingUser = await User.findByEmail(email);
+
+            res.status(200).json({
+                success: true,
+                data: {
+                    exists: !!existingUser,
+                    email: email.toLowerCase()
+                }
+            });
+
+        } catch (error) {
+            console.error('❌ Error en check-email:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Error al verificar email'
+            });
+        }
+    }
+);
+
+/**
+ * POST /api/auth/forgot-password
+ * Solicitar recuperación de contraseña
+ */
+router.post('/forgot-password',
+    authLimiter,
+    [
+        body('email')
+            .trim()
+            .notEmpty().withMessage('El email es obligatorio')
+            .isEmail().withMessage('Email inválido')
+            .normalizeEmail()
+    ],
+    async (req, res) => {
+        try {
+            // 1. Validar entrada
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    success: false,
+                    errors: errors.array().map(err => ({
+                        field: err.path,
+                        message: err.msg
+                    }))
+                });
+            }
+
+            const { email } = req.body;
+
+            // 2. Buscar usuario
+            const user = await User.findByEmail(email);
+
+            // Por seguridad, SIEMPRE devolver el mismo mensaje
+            // (no revelar si el email existe o no)
+            const securityMessage = 'Si el email está registrado, recibirás instrucciones para recuperar tu contraseña';
+
+            if (!user) {
+                console.log(`⚠️ Intento de recuperación para email no registrado: ${email}`);
+                return res.status(200).json({
+                    success: true,
+                    message: securityMessage
+                });
+            }
+
+            // 3. Generar token de reseteo
+            const resetToken = crypto.randomBytes(32).toString('hex');
+
+            // 4. Guardar token hasheado en la base de datos
+            const resetTokenHash = crypto
+                .createHash('sha256')
+                .update(resetToken)
+                .digest('hex');
+
+            user.resetPasswordToken = resetTokenHash;
+            user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+            await user.save();
+
+            // 5. Enviar email con el token sin hashear
+            try {
+                await sendPasswordResetEmail(user, resetToken);
+                console.log(`✅ Email de recuperación enviado a: ${email}`);
+            } catch (emailError) {
+                console.error('❌ Error enviando email:', emailError);
+                // Limpiar token si el email falla
+                user.resetPasswordToken = null;
+                user.resetPasswordExpires = null;
+                await user.save();
+
+                return res.status(500).json({
+                    success: false,
+                    error: 'Error al enviar el email. Inténtalo de nuevo más tarde.'
+                });
+            }
+
+            // 6. Respuesta
+            res.status(200).json({
+                success: true,
+                message: securityMessage
+            });
+
+        } catch (error) {
+            console.error('❌ Error en forgot-password:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Error al procesar la solicitud'
+            });
+        }
+    }
+);
+
+/**
+ * POST /api/auth/reset-password
+ * Restablecer contraseña usando el token
+ */
+router.post('/reset-password',
+    [
+        body('token')
+            .notEmpty().withMessage('El token es obligatorio'),
+        body('newPassword')
+            .notEmpty().withMessage('La nueva contraseña es obligatoria')
+            .isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres')
+    ],
+    async (req, res) => {
+        try {
+            // 1. Validar entrada
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({
+                    success: false,
+                    errors: errors.array().map(err => ({
+                        field: err.path,
+                        message: err.msg
+                    }))
+                });
+            }
+
+            const { token, newPassword } = req.body;
+
+            // 2. Hashear token para comparar con la BD
+            const resetTokenHash = crypto
+                .createHash('sha256')
+                .update(token)
+                .digest('hex');
+
+            // 3. Buscar usuario con token válido
+            const user = await User.findOne({
+                resetPasswordToken: resetTokenHash,
+                resetPasswordExpires: { $gt: Date.now() }
+            });
+
+            if (!user) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Token inválido o expirado'
+                });
+            }
+
+            // 4. Actualizar contraseña
+            user.password = newPassword; // Se hasheará automáticamente
+            user.resetPasswordToken = null;
+            user.resetPasswordExpires = null;
+
+            // 5. Invalidar todos los refresh tokens por seguridad
+            user.refreshTokens = [];
+
+            await user.save();
+
+            console.log(`✅ Contraseña restablecida para: ${user.email}`);
+
+            // 6. Respuesta
+            res.status(200).json({
+                success: true,
+                message: 'Contraseña restablecida exitosamente. Ya puedes iniciar sesión.'
+            });
+
+        } catch (error) {
+            console.error('❌ Error en reset-password:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Error al restablecer contraseña'
             });
         }
     }

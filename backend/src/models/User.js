@@ -200,6 +200,18 @@ userSchema.pre('save', function(next) {
         this.departamento = this.departamento.replace(/\s+/g, ' ').trim();
     }
 
+    // Sanitizar teléfono: quitar espacios, guiones, paréntesis, puntos
+    if (this.telefono) {
+        // Quitar caracteres no numéricos (excepto el + al inicio)
+        const hasPlus = this.telefono.trim().startsWith('+');
+        this.telefono = this.telefono.replace(/[\s\-().]/g, '');
+
+        // Si tenía +, quitarlo también (la validación es solo números)
+        if (hasPlus) {
+            this.telefono = this.telefono.replace(/^\+/, '');
+        }
+    }
+
     next();
 });
 
