@@ -134,5 +134,10 @@ window.checkBackendConnection = checkBackendConnection;
 
 // Log de configuración inicial
 console.log('%c🔧 Backend API Configuration', 'background: #4CAF50; color: white; padding: 5px; font-weight: bold;');
-console.log('Backend URL:', BACKEND_CONFIG.apiUrl);
+// Solo mostrar URL si está configurada (evitar error en carga inicial)
+try {
+    console.log('Backend URL:', BACKEND_CONFIG.apiUrl);
+} catch (e) {
+    console.warn('Backend URL no configurada aún');
+}
 console.log('Usa showBackendConfig() para ver detalles');
