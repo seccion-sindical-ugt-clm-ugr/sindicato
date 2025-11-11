@@ -68,11 +68,24 @@ async function createAffiliationCheckout(userData) {
         }
 
         const backendUrl = window.BACKEND_CONFIG.apiUrl;
+
+        console.log('🔍 Verificando email antes de procesar pago...');
+
+        // 1. PRIMERO: Verificar que el email no esté ya registrado
+        const checkResponse = await fetch(`${backendUrl}/api/auth/check-email?email=${encodeURIComponent(userData.email)}`);
+        const checkResult = await checkResponse.json();
+
+        if (checkResult.success && checkResult.data.exists) {
+            throw new Error('Este email ya está registrado. Por favor inicia sesión en lugar de registrarte nuevamente.');
+        }
+
+        console.log('✅ Email disponible, procediendo con el pago...');
+
         const endpoint = window.BACKEND_CONFIG.endpoints.createAffiliation;
 
         console.log('📤 Enviando solicitud de afiliación al backend...');
 
-        // Llamar al endpoint del backend
+        // 2. Llamar al endpoint del backend para crear sesión de Stripe
         const response = await fetch(`${backendUrl}${endpoint}`, {
             method: 'POST',
             headers: {
