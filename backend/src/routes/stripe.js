@@ -66,6 +66,8 @@ router.post('/create-affiliation-session', affiliationValidators, async (req, re
                 quantity: 1
             }],
             mode: 'payment',
+            // TESTING: Habilitar cupones de descuento en checkout
+            allow_promotion_codes: true,
             success_url: process.env.SUCCESS_URL + '?session_id={CHECKOUT_SESSION_ID}',
             cancel_url: process.env.CANCEL_URL,
             customer_email: email,
@@ -148,6 +150,8 @@ router.post('/create-course-session', courseValidators, async (req, res) => {
                 quantity: 1
             }],
             mode: 'payment',
+            // TESTING: Habilitar cupones de descuento en checkout
+            allow_promotion_codes: true,
             success_url: process.env.SUCCESS_URL + `?session_id={CHECKOUT_SESSION_ID}&course=${courseType}`,
             cancel_url: process.env.CANCEL_URL,
             customer_email: email,
