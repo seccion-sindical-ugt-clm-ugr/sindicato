@@ -73,13 +73,25 @@ async function createAffiliationCheckout(userData) {
 
         // 1. PRIMERO: Verificar que el email no esté ya registrado
         const checkResponse = await fetch(`${backendUrl}/api/auth/check-email?email=${encodeURIComponent(userData.email)}`);
-        const checkResult = await checkResponse.json();
 
-        if (checkResult.success && checkResult.data.exists) {
-            throw new Error('Este email ya está registrado. Por favor inicia sesión en lugar de registrarte nuevamente.');
+        if (!checkResponse.ok) {
+            console.error('❌ Error al verificar email:', checkResponse.status);
+            // Continuar con el pago si no se puede verificar (no bloquear por error de red)
+            console.log('⚠️ No se pudo verificar el email, continuando con el pago...');
+        } else {
+            const checkResult = await checkResponse.json();
+            console.log('📧 Resultado verificación email:', checkResult);
+
+            if (checkResult.success && checkResult.data.exists) {
+                console.error('🚫 Email ya registrado:', userData.email);
+                const errorMsg = 'Este email ya está registrado. Por favor inicia sesión en lugar de registrarte nuevamente.';
+                // Mostrar alert para asegurar visibilidad
+                alert('⚠️ ' + errorMsg);
+                throw new Error(errorMsg);
+            }
+
+            console.log('✅ Email disponible, procediendo con el pago...');
         }
-
-        console.log('✅ Email disponible, procediendo con el pago...');
 
         const endpoint = window.BACKEND_CONFIG.endpoints.createAffiliation;
 
