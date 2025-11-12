@@ -694,13 +694,17 @@ if (backToProfile) {
 }
 
 // Edit Profile Modal handlers
-closeEditProfile.addEventListener('click', () => {
-    editProfileModal.style.display = 'none';
-});
+if (closeEditProfile) {
+    closeEditProfile.addEventListener('click', () => {
+        editProfileModal.style.display = 'none';
+    });
+}
 
-cancelEditBtn.addEventListener('click', () => {
-    editProfileModal.style.display = 'none';
-});
+if (cancelEditBtn) {
+    cancelEditBtn.addEventListener('click', () => {
+        editProfileModal.style.display = 'none';
+    });
+}
 
 // Profile Photo functionality
 if (changePhotoBtn && profilePhotoInput) {
@@ -784,17 +788,23 @@ async function removeProfilePhoto() {
 }
 
 // Dashboard modals close handlers
-closeMyCourses.addEventListener('click', () => {
-    myCoursesModal.style.display = 'none';
-});
+if (closeMyCourses) {
+    closeMyCourses.addEventListener('click', () => {
+        myCoursesModal.style.display = 'none';
+    });
+}
 
-closeMyDocuments.addEventListener('click', () => {
-    myDocumentsModal.style.display = 'none';
-});
+if (closeMyDocuments) {
+    closeMyDocuments.addEventListener('click', () => {
+        myDocumentsModal.style.display = 'none';
+    });
+}
 
-closeMyEvents.addEventListener('click', () => {
-    myEventsModal.style.display = 'none';
-});
+if (closeMyEvents) {
+    closeMyEvents.addEventListener('click', () => {
+        myEventsModal.style.display = 'none';
+    });
+}
 
 window.addEventListener('click', (e) => {
     if (e.target === editProfileModal) {
@@ -900,7 +910,9 @@ logoutBtn.addEventListener('click', async () => {
         showMessage('success', 'Sesión cerrada correctamente');
 
         // Hide dashboard and show main site
-        memberDashboard.style.display = 'none';
+        if (memberDashboard) {
+            memberDashboard.style.display = 'none';
+        }
         document.querySelectorAll('.section').forEach(section => {
             if (section.id !== 'memberDashboard') {
                 section.style.display = 'block';
@@ -1274,9 +1286,18 @@ recoveryForm.addEventListener('submit', async (e) => {
 // MOSTRAR DASHBOARD CON DATOS REALES
 // ============================================
 function showMemberDashboard() {
+    // Verificar que el dashboard existe (puede que aún no se haya inyectado)
+    if (!memberDashboard) {
+        console.error('❌ Dashboard no encontrado en el DOM. Asegúrate de que user-dashboard-inject.js se haya ejecutado.');
+        return;
+    }
+
     // Usar currentUser de la API real
     const userName = currentUser ? currentUser.nombre : 'Afiliado';
-    document.getElementById('userName').textContent = userName;
+    const userNameElement = document.getElementById('userName');
+    if (userNameElement) {
+        userNameElement.textContent = userName;
+    }
 
     // Hide all main content sections except dashboard, but keep header visible
     document.querySelectorAll('.section:not(#memberDashboard)').forEach(section => {
@@ -1337,6 +1358,13 @@ function initDashboardButtons() {
 // MOSTRAR MODAL DE PERFIL CON DATOS REALES
 // ============================================
 function showEditProfileModal() {
+    // Re-seleccionar el modal (puede que no existiera cuando se declaró la constante)
+    const modal = document.querySelector('#editProfileModal');
+    if (!modal) {
+        console.error('❌ Modal de perfil no encontrado');
+        return;
+    }
+
     // Usar currentUser de la API real
     if (!currentUser) {
         showMessage('error', 'No se encontraron los datos del usuario');
@@ -1344,46 +1372,70 @@ function showEditProfileModal() {
     }
 
     // Populate form with current data
-    document.getElementById('profileName').value = currentUser.nombre || '';
-    document.getElementById('profileEmail').value = currentUser.email || '';
-    document.getElementById('profilePhone').value = currentUser.telefono || '';
-    document.getElementById('profileDepartment').value = currentUser.departamento || '';
+    const profileName = document.getElementById('profileName');
+    const profileEmail = document.getElementById('profileEmail');
+    const profilePhone = document.getElementById('profilePhone');
+    const profileDepartment = document.getElementById('profileDepartment');
+
+    if (profileName) profileName.value = currentUser.nombre || '';
+    if (profileEmail) profileEmail.value = currentUser.email || '';
+    if (profilePhone) profilePhone.value = currentUser.telefono || '';
+    if (profileDepartment) profileDepartment.value = currentUser.departamento || '';
 
     // Load profile photo if exists
     console.log('🔍 Verificando foto de perfil para:', currentUser.email);
     console.log('📸 Foto guardada:', currentUser.profilePhoto ? 'Sí' : 'No');
 
+    const imgPreview = document.querySelector('#profileImagePreview');
+    const defAvatar = document.querySelector('#defaultAvatar');
+    const removeBtn = document.querySelector('#removePhotoBtn');
+    const changeBtn = document.querySelector('#changePhotoBtn');
+
     if (currentUser.profilePhoto && currentUser.profilePhoto.trim() !== '') {
-        profileImagePreview.src = currentUser.profilePhoto;
-        profileImagePreview.style.display = 'block';
-        defaultAvatar.style.display = 'none';
-        removePhotoBtn.style.display = 'inline-flex';
-        changePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
+        if (imgPreview) {
+            imgPreview.src = currentUser.profilePhoto;
+            imgPreview.style.display = 'block';
+        }
+        if (defAvatar) defAvatar.style.display = 'none';
+        if (removeBtn) removeBtn.style.display = 'inline-flex';
+        if (changeBtn) changeBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
         console.log('✅ Foto de perfil cargada correctamente');
     } else {
         // Show default avatar
-        profileImagePreview.style.display = 'none';
-        profileImagePreview.src = '';
-        defaultAvatar.style.display = 'flex';
-        removePhotoBtn.style.display = 'none';
-        changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
+        if (imgPreview) {
+            imgPreview.style.display = 'none';
+            imgPreview.src = '';
+        }
+        if (defAvatar) defAvatar.style.display = 'flex';
+        if (removeBtn) removeBtn.style.display = 'none';
+        if (changeBtn) changeBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
         console.log('👤 Mostrando avatar predeterminado');
     }
 
     // Show modal
-    editProfileModal.style.display = 'block';
+    modal.style.display = 'block';
     console.log('📝 Modal de edición de perfil abierto para:', currentUser.nombre);
 }
 
 // Show my courses modal
 function showMyCoursesModal() {
-    myCoursesModal.style.display = 'block';
+    const modal = document.querySelector('#myCoursesModal');
+    if (!modal) {
+        console.error('❌ Modal de cursos no encontrado');
+        return;
+    }
+    modal.style.display = 'block';
     console.log('📚 Modal de "Mis Cursos" abierto');
 }
 
 // Show my documents modal
 async function showMyDocumentsModal() {
-    myDocumentsModal.style.display = 'block';
+    const modal = document.querySelector('#myDocumentsModal');
+    if (!modal) {
+        console.error('❌ Modal de documentos no encontrado');
+        return;
+    }
+    modal.style.display = 'block';
     console.log('📁 Modal de "Mis Documentos" abierto');
 
     // Cargar documentos del usuario
@@ -1704,7 +1756,12 @@ function displayUserEvents(events) {
 
 // Show my events modal
 async function showMyEventsModal() {
-    myEventsModal.style.display = 'block';
+    const modal = document.querySelector('#myEventsModal');
+    if (!modal) {
+        console.error('❌ Modal de eventos no encontrado');
+        return;
+    }
+    modal.style.display = 'block';
     console.log('📅 Modal de "Mis Eventos" abierto');
 
     // Load events from backend
@@ -1713,7 +1770,10 @@ async function showMyEventsModal() {
 
 // Close modal and navigate to courses section
 function closeModalAndNavigateToCourses() {
-    myCoursesModal.style.display = 'none';
+    const modal = document.querySelector('#myCoursesModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
     // Exit dashboard mode and show main site
     exitDashboardMode();
 
@@ -1731,7 +1791,9 @@ function closeModalAndNavigateToCourses() {
 // Exit dashboard mode and return to normal site navigation
 function exitDashboardMode() {
     // Hide dashboard
-    memberDashboard.style.display = 'none';
+    if (memberDashboard) {
+        memberDashboard.style.display = 'none';
+    }
 
     // Show all sections
     document.querySelectorAll('.section').forEach(section => {
@@ -2848,14 +2910,18 @@ if (changePasswordForm) {
 
                     // El backend invalida todos los tokens, así que hacemos logout
                     currentUser = null;
-                    memberDashboard.style.display = 'none';
+                    if (memberDashboard) {
+                        memberDashboard.style.display = 'none';
+                    }
                     document.querySelectorAll('.section').forEach(section => {
                         if (section.id !== 'memberDashboard') {
                             section.style.display = 'block';
                         }
                     });
                     updateLoginState();
-                    loginModal.style.display = 'block';
+                    if (loginModal) {
+                        loginModal.style.display = 'block';
+                    }
                 }, 2000);
             } else {
                 showMessage('error', result.error || 'Error al cambiar contraseña');
