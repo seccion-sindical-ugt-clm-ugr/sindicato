@@ -1369,6 +1369,10 @@ async function loadUserDocuments() {
         const documents = response.data.documents || [];
         const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
 
+        // Verificar si falta la ficha de afiliación
+        const hasFicha = documents.some(doc => doc.type === 'ficha-afiliacion');
+        const hasCertificado = documents.some(doc => doc.type === 'certificado-afiliado');
+
         if (documents.length === 0) {
             // Mostrar estado vacío
             documentsContent.innerHTML = `
@@ -1382,7 +1386,34 @@ async function loadUserDocuments() {
             `;
         } else {
             // Mostrar lista de documentos
-            documentsContent.innerHTML = `
+            let html = '';
+
+            // Botones para generar documentos faltantes
+            if (!hasFicha || !hasCertificado) {
+                html += '<div class="documents-actions" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">';
+                html += '<p style="margin: 0 0 10px 0; font-weight: 500;"><i class="fas fa-info-circle"></i> Documentos disponibles para generar:</p>';
+                html += '<div style="display: flex; gap: 10px; flex-wrap: wrap;">';
+
+                if (!hasFicha) {
+                    html += `
+                        <button class="btn btn-sm btn-primary" onclick="generateMissingDocument('ficha-afiliacion', 'Ficha de Afiliación')">
+                            <i class="fas fa-plus"></i> Generar Ficha de Afiliación
+                        </button>
+                    `;
+                }
+
+                if (!hasCertificado) {
+                    html += `
+                        <button class="btn btn-sm btn-primary" onclick="generateMissingDocument('certificado-afiliado', 'Certificado de Afiliación')">
+                            <i class="fas fa-plus"></i> Generar Certificado de Afiliación
+                        </button>
+                    `;
+                }
+
+                html += '</div></div>';
+            }
+
+            html += `
                 <div class="documents-list">
                     ${documents.map(doc => `
                         <div class="document-card" data-document-id="${doc._id}">
@@ -1406,6 +1437,8 @@ async function loadUserDocuments() {
                     `).join('')}
                 </div>
             `;
+
+            documentsContent.innerHTML = html;
         }
 
     } catch (error) {
@@ -1423,6 +1456,28 @@ async function loadUserDocuments() {
                 </button>
             </div>
         `;
+    }
+}
+
+// Generar documento faltante
+async function generateMissingDocument(type, title) {
+    try {
+        showMessage('info', `Generando ${title}...`);
+
+        const response = await authAPI.generateDocument(type);
+
+        if (!response.success) {
+            throw new Error(response.error || 'Error al generar documento');
+        }
+
+        showMessage('success', `${title} generado correctamente`);
+
+        // Recargar lista de documentos
+        await loadUserDocuments();
+
+    } catch (error) {
+        console.error(`❌ Error generando ${title}:`, error);
+        showMessage('error', `Error al generar ${title}: ${error.message}`);
     }
 }
 
