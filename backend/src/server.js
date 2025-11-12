@@ -248,6 +248,9 @@ app.get('/', (req, res) => {
             refresh: 'POST /api/auth/refresh',
             logout: 'POST /api/auth/logout',
             me: 'GET /api/auth/me',
+            checkEmail: 'GET /api/auth/check-email',
+            forgotPassword: 'POST /api/auth/forgot-password',
+            resetPassword: 'POST /api/auth/reset-password',
             // Usuario
             profile: 'GET /api/user/profile',
             updateProfile: 'PUT /api/user/profile',
