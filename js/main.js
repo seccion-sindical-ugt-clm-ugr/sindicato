@@ -1044,10 +1044,25 @@ loginForm.addEventListener('submit', async (e) => {
 
     try {
         // Login usando API real
+        console.log('🔐 Iniciando login con authAPI...');
+        console.log('📧 Email:', email);
+        console.log('🔐 authAPI disponible:', typeof authAPI);
+
         const result = await authAPI.login(email, password);
+        console.log('📥 Respuesta authAPI.login():', result);
 
         if (result.success) {
             currentUser = result.data.user;
+            console.log('✅ Login exitoso, usuario:', currentUser);
+
+            // Verificar si authAPI tiene token después del login
+            setTimeout(() => {
+                console.log('🔍 authAPI.isAuthenticated() después de login:', authAPI.isAuthenticated());
+                if (typeof authAPI.storeToken === 'function') {
+                    console.log('🔐 authAPI.storeToken disponible');
+                }
+            }, 100);
+
             showMessage('success', `¡Bienvenido de nuevo, ${currentUser.nombre}!`);
 
             console.log('✅ Login exitoso:', currentUser);
