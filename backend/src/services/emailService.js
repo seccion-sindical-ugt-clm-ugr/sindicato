@@ -374,6 +374,18 @@ async function sendStatusUpdate(suggestion, newStatus, adminNotes = '') {
  */
 async function sendPasswordResetEmail(user, resetToken) {
     try {
+        // Verificar que el transporter está inicializado
+        if (!transporter) {
+            const error = new Error(
+                'Servicio de email no configurado. ' +
+                'Variables requeridas: EMAIL_USER, EMAIL_PASS, EMAIL_HOST, EMAIL_PORT. ' +
+                `Configuradas: EMAIL_USER=${!!process.env.EMAIL_USER}, EMAIL_PASS=${!!process.env.EMAIL_PASS}, ` +
+                `EMAIL_HOST=${!!process.env.EMAIL_HOST}, EMAIL_PORT=${!!process.env.EMAIL_PORT}`
+            );
+            console.error('❌', error.message);
+            throw error;
+        }
+
         const resetUrl = `${process.env.FRONTEND_URL || 'https://ugtclmgranada.org'}/reset-password.html?token=${resetToken}`;
 
         const subject = '🔐 Recuperación de contraseña - UGT-CLM-UGR Granada';
