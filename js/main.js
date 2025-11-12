@@ -23,16 +23,20 @@ const usersDatabase = [
 ];
 
 // Toggle Mobile Menu
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
-});
+if (hamburger && navMenu) {
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+    });
+}
 
 // Close mobile menu when clicking on a link
 document.querySelectorAll('.nav-menu a').forEach(link => {
     link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
+        if (hamburger && navMenu) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        }
     });
 });
 
@@ -412,6 +416,8 @@ function smoothScrollTo(targetElement, offset = 0) {
 
 // Login Modal - Will be updated in updateLoginState function
 function initLoginBtn() {
+    if (!loginBtn) return;
+
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
     if (isLoggedIn) {
@@ -425,14 +431,20 @@ function initLoginBtn() {
         loginBtn.innerHTML = '<i class="fas fa-user"></i> Acceso Afiliados';
         loginBtn.onclick = (e) => {
             e.preventDefault();
-            loginModal.style.display = 'block';
+            if (loginModal) {
+                loginModal.style.display = 'block';
+            }
         };
     }
 }
 
-closeModal.addEventListener('click', () => {
-    loginModal.style.display = 'none';
-});
+if (closeModal) {
+    closeModal.addEventListener('click', () => {
+        if (loginModal) {
+            loginModal.style.display = 'none';
+        }
+    });
+}
 
 window.addEventListener('click', (e) => {
     if (e.target === loginModal) {
@@ -444,39 +456,55 @@ window.addEventListener('click', (e) => {
 });
 
 // Recovery Modal handlers
-forgotPasswordLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    loginModal.style.display = 'none';
-    recoveryModal.style.display = 'block';
-});
-
-closeRecoveryBtn.addEventListener('click', () => {
-    recoveryModal.style.display = 'none';
-});
-
-backToLoginBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    recoveryModal.style.display = 'none';
-    loginModal.style.display = 'block';
-});
-
-// Logout handler
-logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userName');
-    showMessage('success', 'Sesión cerrada correctamente');
-
-    // Hide dashboard and show main site
-    memberDashboard.style.display = 'none';
-    document.querySelectorAll('.section').forEach(section => {
-        if (section.id !== 'memberDashboard') {
-            section.style.display = 'block';
+if (forgotPasswordLink) {
+    forgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (loginModal && recoveryModal) {
+            loginModal.style.display = 'none';
+            recoveryModal.style.display = 'block';
         }
     });
+}
 
-    updateLoginState();
-});
+if (closeRecoveryBtn) {
+    closeRecoveryBtn.addEventListener('click', () => {
+        if (recoveryModal) {
+            recoveryModal.style.display = 'none';
+        }
+    });
+}
+
+if (backToLoginBtn) {
+    backToLoginBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (recoveryModal && loginModal) {
+            recoveryModal.style.display = 'none';
+            loginModal.style.display = 'block';
+        }
+    });
+}
+
+// Logout handler
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userName');
+        showMessage('success', 'Sesión cerrada correctamente');
+
+        // Hide dashboard and show main site
+        if (memberDashboard) {
+            memberDashboard.style.display = 'none';
+        }
+        document.querySelectorAll('.section').forEach(section => {
+            if (section.id !== 'memberDashboard') {
+                section.style.display = 'block';
+            }
+        });
+
+        updateLoginState();
+    });
+}
 
 // Smooth scrolling for navigation links - Mejorado para hero buttons
 function initSmoothScroll() {
@@ -581,8 +609,9 @@ function clearErrors() {
 }
 
 // Enhanced login handler
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
     clearErrors();
 
     const emailInput = loginForm.querySelector('input[name="email"]');
@@ -654,9 +683,11 @@ loginForm.addEventListener('submit', async (e) => {
         submitBtn.disabled = false;
     }
 });
+}
 
-affiliateForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+if (affiliateForm) {
+    affiliateForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
 // Extraer datos del formulario
     const nameInput = affiliateForm.querySelector('input[name="name"]');
@@ -698,6 +729,7 @@ affiliateForm.addEventListener('submit', async (e) => {
         submitBtn.disabled = false;
     }
 });
+}
 
 // SISTEMA DE CONTACTO WHATSAPP Y EMAIL
 document.addEventListener('DOMContentLoaded', () => {
@@ -770,8 +802,9 @@ function logCourseInquiry() {
 }
 
 // Password recovery handler
-recoveryForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+if (recoveryForm) {
+    recoveryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
     clearErrors();
 
     const emailInput = recoveryForm.querySelector('input[name="recoveryEmail"]');
@@ -824,11 +857,15 @@ recoveryForm.addEventListener('submit', async (e) => {
         submitBtn.disabled = false;
     }
 });
+}
 
 // Show member dashboard
 function showMemberDashboard() {
     const userName = localStorage.getItem('userName') || 'Afiliado';
-    document.getElementById('userName').textContent = userName;
+    const userNameElement = document.getElementById('userName');
+    if (userNameElement) {
+        userNameElement.textContent = userName;
+    }
 
     // Hide all sections except dashboard
     document.querySelectorAll('.section').forEach(section => {
@@ -910,7 +947,10 @@ function checkLoginStatus() {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     if (isLoggedIn) {
         const userName = localStorage.getItem('userName') || 'Afiliado';
-        document.getElementById('userName').textContent = userName;
+        const userNameElement = document.getElementById('userName');
+        if (userNameElement) {
+            userNameElement.textContent = userName;
+        }
         showMemberDashboard();
     }
     initLoginBtn();
