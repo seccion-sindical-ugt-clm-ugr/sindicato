@@ -3,7 +3,17 @@
  * UGT-CLM-UGR Granada
  */
 
-const nodemailer = require('nodemailer');
+let nodemailer;
+try {
+    nodemailer = require('nodemailer');
+    if (!nodemailer || !nodemailer.createTransport) {
+        throw new Error('nodemailer.createTransport no está disponible');
+    }
+} catch (error) {
+    console.error('❌ Error cargando nodemailer:', error.message);
+    console.error('📦 Verifica que nodemailer esté instalado: npm install nodemailer');
+    nodemailer = null;
+}
 
 // Configuración del transporter
 let transporter = null;
@@ -13,6 +23,28 @@ let transporter = null;
  */
 function initializeEmailService() {
     try {
+        // CRITICAL: Verificar que nodemailer esté disponible
+        if (!nodemailer || typeof nodemailer.createTransport !== 'function') {
+            console.error('❌ CRITICAL: nodemailer no disponible o createTransport no es una función');
+            console.error('📦 Estado nodemailer:', {
+                exists: !!nodemailer,
+                hasCreateTransport: nodemailer && typeof nodemailer.createTransport === 'function',
+                type: typeof nodemailer
+            });
+
+            // Modo fallback: mock transporter para desarrollo
+            transporter = {
+                sendMail: async (options) => {
+                    console.log('📧 EMAIL MOCK (nodemailer no disponible):', {
+                        to: options.to,
+                        subject: options.subject
+                    });
+                    return { messageId: 'mock-' + Date.now() };
+                }
+            };
+            return;
+        }
+
         // Configurar transporter basado en variables de entorno
         const emailConfig = {
             host: process.env.EMAIL_HOST || 'smtp.gmail.com',
@@ -40,7 +72,7 @@ function initializeEmailService() {
             return;
         }
 
-        transporter = nodemailer.createTransporter(emailConfig);
+        transporter = nodemailer.createTransport(emailConfig);
         
         // Verificar conexión
         transporter.verify((error, success) => {
@@ -374,16 +406,21 @@ async function sendStatusUpdate(suggestion, newStatus, adminNotes = '') {
  */
 async function sendPasswordResetEmail(user, resetToken) {
     try {
-        // Verificar que el transporter está inicializado
+        // CRITICAL FIX: En Vercel serverless, reinicializar si es necesario
         if (!transporter) {
-            const error = new Error(
-                'Servicio de email no configurado. ' +
-                'Variables requeridas: EMAIL_USER, EMAIL_PASS, EMAIL_HOST, EMAIL_PORT. ' +
-                `Configuradas: EMAIL_USER=${!!process.env.EMAIL_USER}, EMAIL_PASS=${!!process.env.EMAIL_PASS}, ` +
-                `EMAIL_HOST=${!!process.env.EMAIL_HOST}, EMAIL_PORT=${!!process.env.EMAIL_PORT}`
-            );
-            console.error('❌', error.message);
-            throw error;
+            console.log('🔄 Transporter null, reinicializando servicio de email...');
+            initializeEmailService();
+
+            // Verificar de nuevo después de inicializar
+            if (!transporter) {
+                const error = new Error(
+                    'Error: No se pudo inicializar el servicio de email. ' +
+                    `EMAIL_USER=${!!process.env.EMAIL_USER}, EMAIL_PASS=${!!process.env.EMAIL_PASS}, ` +
+                    `EMAIL_HOST=${!!process.env.EMAIL_HOST}, EMAIL_PORT=${!!process.env.EMAIL_PORT}`
+                );
+                console.error('❌', error.message);
+                throw error;
+            }
         }
 
         const resetUrl = `${process.env.FRONTEND_URL || 'https://ugtclmgranada.org'}/reset-password.html?token=${resetToken}`;
