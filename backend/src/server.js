@@ -157,16 +157,7 @@ const limiter = rateLimit({
     max: 100, // Límite de 100 requests por ventana
     message: 'Demasiadas solicitudes desde esta IP, intenta de nuevo más tarde.',
     standardHeaders: true,
-    legacyHeaders: false,
-    // Configuración para Vercel/proxies - usar X-Forwarded-For
-    keyGenerator: (req) => {
-        return req.headers['x-forwarded-for']?.split(',')[0] ||
-               req.headers['x-real-ip'] ||
-               req.ip ||
-               'unknown';
-    },
-    // Deshabilitar validación de trust proxy para evitar warning
-    validate: { trustProxy: false }
+    legacyHeaders: false
 });
 
 app.use('/api/', limiter);
@@ -248,6 +239,9 @@ app.get('/', (req, res) => {
             refresh: 'POST /api/auth/refresh',
             logout: 'POST /api/auth/logout',
             me: 'GET /api/auth/me',
+            checkEmail: 'GET /api/auth/check-email',
+            forgotPassword: 'POST /api/auth/forgot-password',
+            resetPassword: 'POST /api/auth/reset-password',
             // Usuario
             profile: 'GET /api/user/profile',
             updateProfile: 'PUT /api/user/profile',

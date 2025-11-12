@@ -1203,25 +1203,34 @@ recoveryForm.addEventListener('submit', async (e) => {
     submitBtn.disabled = true;
 
     try {
-        // TODO: Implementar endpoint de recovery en el backend
-        // Por ahora, mostrar mensaje genérico de seguridad
+        // Llamar al endpoint de recuperación de contraseña
+        const API_URL = window.BACKEND_CONFIG ? window.BACKEND_CONFIG.apiUrl : 'https://sindicato-mu.vercel.app';
 
-        // Simular delay de procesamiento
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        });
 
-        // Por seguridad, siempre mostrar el mismo mensaje
-        // (no revelar si el email existe o no)
-        showMessage('info', 'Si el email está registrado, recibirás instrucciones para recuperar tu contraseña');
+        const result = await response.json();
 
-        setTimeout(() => {
-            recoveryModal.style.display = 'none';
-            loginModal.style.display = 'block';
-            recoveryForm.reset();
-        }, 2000);
+        if (result.success) {
+            showMessage('info', result.message);
+
+            setTimeout(() => {
+                recoveryModal.style.display = 'none';
+                loginModal.style.display = 'block';
+                recoveryForm.reset();
+            }, 2000);
+        } else {
+            showMessage('error', result.error || 'Error al enviar el email');
+        }
 
     } catch (error) {
-        showMessage('error', 'Error al enviar el email. Inténtalo de nuevo.');
-        console.error('Recovery error:', error);
+        showMessage('error', 'Error de conexión. Inténtalo de nuevo.');
+        console.error('❌ Recovery error:', error);
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;

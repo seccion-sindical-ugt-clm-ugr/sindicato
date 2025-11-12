@@ -68,11 +68,81 @@ async function createAffiliationCheckout(userData) {
         }
 
         const backendUrl = window.BACKEND_CONFIG.apiUrl;
+
+        console.log('🔍 Verificando email antes de procesar pago...');
+
+        // 1. PRIMERO: Verificar que el email no esté ya registrado
+        const checkResponse = await fetch(`${backendUrl}/api/auth/check-email?email=${encodeURIComponent(userData.email)}`);
+
+        if (!checkResponse.ok) {
+            console.error('❌ Error al verificar email:', checkResponse.status);
+            // Continuar con el pago si no se puede verificar (no bloquear por error de red)
+            console.log('⚠️ No se pudo verificar el email, continuando con el pago...');
+        } else {
+            const checkResult = await checkResponse.json();
+            console.log('📧 Resultado verificación email:', checkResult);
+
+            if (checkResult.success && checkResult.data.exists) {
+                console.error('🚫 Email ya registrado:', userData.email);
+
+                // MOSTRAR MODAL VISUAL GRANDE QUE NO SE PUEDE IGNORAR
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.8);
+                    z-index: 999999;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                `;
+
+                modal.innerHTML = `
+                    <div style="
+                        background: white;
+                        padding: 40px;
+                        border-radius: 10px;
+                        max-width: 500px;
+                        text-align: center;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                    ">
+                        <div style="font-size: 60px; margin-bottom: 20px;">⚠️</div>
+                        <h2 style="color: #E30613; margin-bottom: 20px;">Email Ya Registrado</h2>
+                        <p style="font-size: 18px; margin-bottom: 30px; color: #333;">
+                            Este email ya está registrado en nuestro sistema.
+                        </p>
+                        <p style="font-size: 16px; margin-bottom: 30px; color: #666;">
+                            Por favor inicia sesión en lugar de registrarte nuevamente.
+                        </p>
+                        <button onclick="this.parentElement.parentElement.remove()" style="
+                            background: #E30613;
+                            color: white;
+                            border: none;
+                            padding: 15px 40px;
+                            font-size: 18px;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-weight: bold;
+                        ">Entendido</button>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                throw new Error('Email ya registrado');
+            }
+
+            console.log('✅ Email disponible, procediendo con el pago...');
+        }
+
         const endpoint = window.BACKEND_CONFIG.endpoints.createAffiliation;
 
         console.log('📤 Enviando solicitud de afiliación al backend...');
 
-        // Llamar al endpoint del backend
+        // 2. Llamar al endpoint del backend para crear sesión de Stripe
         const response = await fetch(`${backendUrl}${endpoint}`, {
             method: 'POST',
             headers: {
@@ -85,7 +155,60 @@ async function createAffiliationCheckout(userData) {
         // Verificar respuesta
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `Error del servidor: ${response.status}`);
+
+            // Si es error 409 (email duplicado), mostrar modal grande
+            if (response.status === 409 || errorData.code === 'EMAIL_ALREADY_REGISTERED') {
+                console.error('🚫 Email ya registrado (desde backend)');
+
+                // MOSTRAR MODAL VISUAL GRANDE
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.8);
+                    z-index: 999999;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                `;
+
+                modal.innerHTML = `
+                    <div style="
+                        background: white;
+                        padding: 40px;
+                        border-radius: 10px;
+                        max-width: 500px;
+                        text-align: center;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                    ">
+                        <div style="font-size: 60px; margin-bottom: 20px;">⚠️</div>
+                        <h2 style="color: #E30613; margin-bottom: 20px;">Email Ya Registrado</h2>
+                        <p style="font-size: 18px; margin-bottom: 30px; color: #333;">
+                            Este email ya está registrado en nuestro sistema.
+                        </p>
+                        <p style="font-size: 16px; margin-bottom: 30px; color: #666;">
+                            Por favor inicia sesión en lugar de registrarte nuevamente.
+                        </p>
+                        <button onclick="this.parentElement.parentElement.remove()" style="
+                            background: #E30613;
+                            color: white;
+                            border: none;
+                            padding: 15px 40px;
+                            font-size: 18px;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-weight: bold;
+                        ">Entendido</button>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+            }
+
+            throw new Error(errorData.error || errorData.message || `Error del servidor: ${response.status}`);
         }
 
         const session = await response.json();
@@ -159,7 +282,60 @@ async function createCourseCheckout(courseType, userData, isMember = false) {
         // Verificar respuesta
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `Error del servidor: ${response.status}`);
+
+            // Si es error 409 (email duplicado), mostrar modal grande
+            if (response.status === 409 || errorData.code === 'EMAIL_ALREADY_REGISTERED') {
+                console.error('🚫 Email ya registrado (desde backend)');
+
+                // MOSTRAR MODAL VISUAL GRANDE
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.8);
+                    z-index: 999999;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                `;
+
+                modal.innerHTML = `
+                    <div style="
+                        background: white;
+                        padding: 40px;
+                        border-radius: 10px;
+                        max-width: 500px;
+                        text-align: center;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                    ">
+                        <div style="font-size: 60px; margin-bottom: 20px;">⚠️</div>
+                        <h2 style="color: #E30613; margin-bottom: 20px;">Email Ya Registrado</h2>
+                        <p style="font-size: 18px; margin-bottom: 30px; color: #333;">
+                            Este email ya está registrado en nuestro sistema.
+                        </p>
+                        <p style="font-size: 16px; margin-bottom: 30px; color: #666;">
+                            Por favor inicia sesión en lugar de registrarte nuevamente.
+                        </p>
+                        <button onclick="this.parentElement.parentElement.remove()" style="
+                            background: #E30613;
+                            color: white;
+                            border: none;
+                            padding: 15px 40px;
+                            font-size: 18px;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-weight: bold;
+                        ">Entendido</button>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+            }
+
+            throw new Error(errorData.error || errorData.message || `Error del servidor: ${response.status}`);
         }
 
         const session = await response.json();

@@ -112,7 +112,7 @@ async function sendSuggestionConfirmation(suggestion) {
                     <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;">
                         <h3>📞 Contacto Directo</h3>
                         <p>Si tu sugerencia es urgente, puedes contactarnos directamente:</p>
-                        <p><strong>Email:</strong> ugt.clm.ugr@ugt.org</p>
+                        <p><strong>Email:</strong> ugtclmgranada@gmail.com</p>
                         <p><strong>Teléfono:</strong> 958 XXX XXX</p>
                     </div>
                 </div>
@@ -126,7 +126,7 @@ async function sendSuggestionConfirmation(suggestion) {
         `;
 
         const mailOptions = {
-            from: `"UGT-CLM-UGR Granada" <${process.env.EMAIL_FROM || 'ugt.clm.ugr@ugt.org'}>`,
+            from: `"UGT-CLM-UGR Granada" <${process.env.EMAIL_FROM || 'ugtclmgranada@gmail.com'}>`,
             to: suggestion.email,
             subject: subject,
             html: htmlContent,
@@ -143,7 +143,7 @@ async function sendSuggestionConfirmation(suggestion) {
                 
                 Tu sugerencia será revisada y recibirás respuesta en 7 días hábiles.
                 
-                Para consultas urgentes: ugt.clm.ugr@ugt.org | 958 XXX XXX
+                Para consultas urgentes: ugtclmgranada@gmail.com | 958 XXX XXX
             `
         };
 
@@ -250,10 +250,10 @@ async function sendAdminNotification(suggestion) {
 
         const adminEmails = process.env.ADMIN_EMAILS ? 
             process.env.ADMIN_EMAILS.split(',') : 
-            ['ugt.clm.ugr@ugt.org'];
+            ['ugtclmgranada@gmail.com'];
 
         const mailOptions = {
-            from: `"Sistema UGT" <${process.env.EMAIL_FROM || 'ugt.clm.ugr@ugt.org'}>`,
+            from: `"Sistema UGT" <${process.env.EMAIL_FROM || 'ugtclmgranada@gmail.com'}>`,
             to: adminEmails,
             subject: subject,
             html: htmlContent,
@@ -337,7 +337,7 @@ async function sendStatusUpdate(suggestion, newStatus, adminNotes = '') {
                     <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;">
                         <h3>📞 ¿Necesitas algo más?</h3>
                         <p>Si tienes alguna pregunta o necesitas información adicional, no dudes en contactarnos:</p>
-                        <p><strong>Email:</strong> ugt.clm.ugr@ugt.org</p>
+                        <p><strong>Email:</strong> ugtclmgranada@gmail.com</p>
                         <p><strong>Teléfono:</strong> 958 XXX XXX</p>
                     </div>
                 </div>
@@ -351,7 +351,7 @@ async function sendStatusUpdate(suggestion, newStatus, adminNotes = '') {
         `;
 
         const mailOptions = {
-            from: `"UGT-CLM-UGR Granada" <${process.env.EMAIL_FROM || 'ugt.clm.ugr@ugt.org'}>`,
+            from: `"UGT-CLM-UGR Granada" <${process.env.EMAIL_FROM || 'ugtclmgranada@gmail.com'}>`,
             to: suggestion.email,
             subject: subject,
             html: htmlContent
@@ -369,9 +369,135 @@ async function sendStatusUpdate(suggestion, newStatus, adminNotes = '') {
     }
 }
 
+/**
+ * Enviar email de recuperación de contraseña
+ */
+async function sendPasswordResetEmail(user, resetToken) {
+    try {
+        const resetUrl = `${process.env.FRONTEND_URL || 'https://ugtclmgranada.org'}/reset-password.html?token=${resetToken}`;
+
+        const subject = '🔐 Recuperación de contraseña - UGT-CLM-UGR Granada';
+
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .header { background: #E30613; color: white; padding: 20px; text-align: center; }
+                    .content { padding: 20px; background: #f9f9f9; }
+                    .footer { background: #333; color: white; padding: 15px; text-align: center; font-size: 12px; }
+                    .button {
+                        background: #E30613;
+                        color: white;
+                        padding: 12px 24px;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        display: inline-block;
+                        margin: 20px 0;
+                    }
+                    .alert {
+                        background: #fff3e0;
+                        color: #f57c00;
+                        padding: 15px;
+                        border-radius: 5px;
+                        margin: 20px 0;
+                        border-left: 4px solid #f57c00;
+                    }
+                    .code-box {
+                        background: #f5f5f5;
+                        padding: 15px;
+                        border-radius: 5px;
+                        font-family: monospace;
+                        font-size: 16px;
+                        text-align: center;
+                        margin: 20px 0;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>🏛️ UGT-CLM-UGR Granada</h1>
+                    <h2>Recuperación de Contraseña</h2>
+                </div>
+
+                <div class="content">
+                    <h2>Hola ${user.nombre},</h2>
+                    <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta.</p>
+
+                    <p>Si no realizaste esta solicitud, puedes ignorar este email. Tu contraseña no será cambiada.</p>
+
+                    <div class="alert">
+                        <strong>⚠️ Importante:</strong> Este enlace expirará en 1 hora por seguridad.
+                    </div>
+
+                    <p>Para restablecer tu contraseña, haz clic en el siguiente botón:</p>
+
+                    <div style="text-align: center;">
+                        <a href="${resetUrl}" class="button">🔐 Restablecer mi contraseña</a>
+                    </div>
+
+                    <p>O copia y pega este enlace en tu navegador:</p>
+                    <div class="code-box">${resetUrl}</div>
+
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                        <h3>🔒 Consejos de seguridad:</h3>
+                        <ul>
+                            <li>Nunca compartas tu contraseña con nadie</li>
+                            <li>Usa una contraseña única y segura</li>
+                            <li>Si no solicitaste este cambio, contacta con soporte inmediatamente</li>
+                        </ul>
+                        <p><strong>Contacto:</strong> ugtclmgranada@gmail.com</p>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <p>© 2024 UGT-CLM-UGR Granada | Todos los derechos reservados</p>
+                    <p>Este es un mensaje automático, por favor no responder a este email</p>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const mailOptions = {
+            from: `"UGT-CLM-UGR Granada" <${process.env.EMAIL_FROM || 'ugtclmgranada@gmail.com'}>`,
+            to: user.email,
+            subject: subject,
+            html: htmlContent,
+            text: `
+                UGT-CLM-UGR Granada - Recuperación de Contraseña
+
+                Hola ${user.nombre},
+
+                Hemos recibido una solicitud para restablecer tu contraseña.
+
+                Para restablecer tu contraseña, visita el siguiente enlace:
+                ${resetUrl}
+
+                Este enlace expirará en 1 hora.
+
+                Si no realizaste esta solicitud, ignora este email.
+
+                Contacto: ugtclmgranada@gmail.com
+            `
+        };
+
+        const result = await transporter.sendMail(mailOptions);
+        console.log('📧 Email de recuperación enviado:', result.messageId);
+
+        return result;
+
+    } catch (error) {
+        console.error('❌ Error enviando email de recuperación:', error);
+        throw error; // Propagar error para que el endpoint maneje la respuesta
+    }
+}
+
 module.exports = {
     initializeEmailService,
     sendSuggestionConfirmation,
     sendAdminNotification,
-    sendStatusUpdate
+    sendStatusUpdate,
+    sendPasswordResetEmail
 };
