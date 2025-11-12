@@ -1,3 +1,17 @@
+// ============================================
+// VERIFICACIÓN INICIAL DE DEPENDENCIAS
+// ============================================
+console.log('🚀 main.js cargado');
+console.log('🔗 authAPI disponible al cargar:', typeof authAPI);
+
+// Verificar si authAPI está disponible después de cargar todos los scripts
+setTimeout(() => {
+    console.log('⏰ authAPI disponible después de 2s:', typeof authAPI);
+    if (typeof authAPI !== 'undefined') {
+        console.log('✅ authAPI.métodos disponibles:', Object.getOwnPropertyNames(authAPI));
+    }
+}, 2000);
+
 // DOM Elements
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
@@ -1359,19 +1373,35 @@ async function showMyDocumentsModal() {
 
 // Cargar documentos del usuario
 async function loadUserDocuments() {
+    console.log('🔍 loadUserDocuments() llamado');
+    console.log('🔗 authAPI disponible:', typeof authAPI);
+    console.log('🌐 authAPI.getDocuments disponible:', typeof authAPI.getDocuments);
+
     try {
+        console.log('🚀 Llamando a authAPI.getDocuments()...');
         const response = await authAPI.getDocuments();
+        console.log('📥 Respuesta getDocuments:', response);
 
         if (!response.success) {
+            console.error('❌ Error en respuesta getDocuments:', response);
             throw new Error(response.error || 'Error al cargar documentos');
         }
 
         const documents = response.data.documents || [];
+        console.log('📄 Documentos recibidos:', documents.length);
+        console.log('📋 Lista de documentos:', documents);
+
         const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
+        console.log('🎯 Contenedor de documentos encontrado:', !!documentsContent);
 
         // Verificar si falta la ficha de afiliación
         const hasFicha = documents.some(doc => doc.type === 'ficha-afiliacion');
         const hasCertificado = documents.some(doc => doc.type === 'certificado-afiliado');
+
+        console.log('🔍 Estado de documentos:');
+        console.log('  - Tiene ficha de afiliación:', hasFicha);
+        console.log('  - Tiene certificado afiliado:', hasCertificado);
+        console.log('  - Documentos disponibles:', documents.map(d => `${d.type}: ${d.title}`));
 
         if (documents.length === 0) {
             // Mostrar estado vacío
@@ -1443,6 +1473,9 @@ async function loadUserDocuments() {
 
     } catch (error) {
         console.error('❌ Error cargando documentos:', error);
+        console.error('📋 Error completo loadUserDocuments:', error.message);
+        console.error('📍 Stack trace:', error.stack);
+        console.error('🌐 authAPI status:', typeof authAPI);
         const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
         documentsContent.innerHTML = `
             <div class="empty-state">
@@ -1461,22 +1494,35 @@ async function loadUserDocuments() {
 
 // Generar documento faltante
 async function generateMissingDocument(type, title) {
+    console.log('🔧 generateMissingDocument() llamado');
+    console.log('📄 Tipo:', type);
+    console.log('📋 Título:', title);
+    console.log('🔗 authAPI disponible:', typeof authAPI);
+    console.log('🌐 authAPI.generateDocument disponible:', typeof authAPI.generateDocument);
+
     try {
         showMessage('info', `Generando ${title}...`);
 
+        console.log('🚀 Llamando a authAPI.generateDocument()...');
         const response = await authAPI.generateDocument(type);
+        console.log('📥 Respuesta del servidor:', response);
 
         if (!response.success) {
+            console.error('❌ Error en respuesta del servidor:', response);
             throw new Error(response.error || 'Error al generar documento');
         }
 
+        console.log('✅ Documento generado exitosamente');
         showMessage('success', `${title} generado correctamente`);
 
         // Recargar lista de documentos
+        console.log('🔄 Recargando lista de documentos...');
         await loadUserDocuments();
 
     } catch (error) {
         console.error(`❌ Error generando ${title}:`, error);
+        console.error('📋 Error completo:', error.message);
+        console.error('📍 Stack trace:', error.stack);
         showMessage('error', `Error al generar ${title}: ${error.message}`);
     }
 }
