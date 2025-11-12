@@ -70,12 +70,45 @@ if (hamburger && navMenu) {
     // Close mobile menu when clicking on a link (except login button)
     document.querySelectorAll('.nav-menu a').forEach(link => {
         link.addEventListener('click', (e) => {
-            // No cerrar el menú si es el botón de login
+            // No cerrar el menú si es el botón de login (se maneja abajo)
             if (!link.classList.contains('btn-login')) {
                 hamburger.classList.remove('active');
                 navMenu.classList.remove('active');
             }
         });
+    });
+}
+
+// MANEJADOR GLOBAL DEL BOTÓN DE LOGIN (funciona en móvil y escritorio)
+if (loginBtn) {
+    loginBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Cerrar menú móvil si está abierto
+        if (hamburger && navMenu) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        }
+
+        // Verificar si el usuario está logueado
+        const isLoggedIn = (typeof authAPI !== 'undefined' && authAPI.isAuthenticated) ?
+                            authAPI.isAuthenticated() : false;
+
+        if (isLoggedIn) {
+            // Si está logueado, mostrar dashboard
+            if (typeof showMemberDashboard === 'function') {
+                showMemberDashboard();
+            }
+        } else {
+            // Si no está logueado, abrir modal de login
+            const modal = document.querySelector('#loginModal');
+            if (modal) {
+                modal.style.display = 'block';
+            } else {
+                console.error('Login modal not found');
+            }
+        }
     });
 }
 
@@ -559,37 +592,10 @@ function initLoginBtn() {
     if (isLoggedIn && currentUser) {
         const userName = currentUser.nombre || localStorage.getItem('userName') || 'Afiliado';
         loginBtn.innerHTML = `<i class="fas fa-user"></i> ${userName.split(' ')[0]}`;
-        loginBtn.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            // Cerrar menú móvil si está abierto
-            if (hamburger && navMenu) {
-                hamburger.classList.remove('active');
-                navMenu.classList.remove('active');
-            }
-
-            showMemberDashboard();
-        };
+        // Nota: El comportamiento del clic para usuarios logueados se maneja en el event listener del menú móvil (líneas 71-106)
     } else {
         loginBtn.innerHTML = '<i class="fas fa-user"></i> Acceso Afiliados';
-        loginBtn.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            // Cerrar menú móvil si está abierto
-            if (hamburger && navMenu) {
-                hamburger.classList.remove('active');
-                navMenu.classList.remove('active');
-            }
-
-            // Abrir modal de login
-            if (loginModal) {
-                loginModal.style.display = 'block';
-            } else {
-                console.error('Login modal not found');
-            }
-        };
+        // Nota: El comportamiento del clic para usuarios no logueados se maneja en el event listener del menú móvil (líneas 71-106)
     }
 }
 
