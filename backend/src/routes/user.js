@@ -7,6 +7,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const Event = require('../models/Event');
 const {
     authenticate,
     requireAdmin
@@ -653,5 +654,103 @@ router.delete('/:userId',
         }
     }
 );
+
+/**
+ * GET /api/user/events
+ * Obtener eventos visibles para el usuario autenticado
+ */
+router.get('/events', authenticate, async (req, res) => {
+    try {
+        const user = req.user;
+        const limit = parseInt(req.query.limit) || 50;
+        const skip = parseInt(req.query.skip) || 0;
+
+        // Obtener eventos visibles para este usuario
+        const events = await Event.getVisibleEvents(user, { limit, skip });
+
+        res.json({
+            success: true,
+            data: {
+                events,
+                total: events.length
+            }
+        });
+
+    } catch (error) {
+        console.error('Error obteniendo eventos del usuario:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error al obtener eventos'
+        });
+    }
+});
+
+/**
+ * GET /api/user/events/upcoming
+ * Obtener eventos próximos para el usuario
+ */
+router.get('/events/upcoming', authenticate, async (req, res) => {
+    try {
+        const user = req.user;
+        const daysAhead = parseInt(req.query.days) || 30;
+
+        const events = await Event.getUpcomingEvents(user, daysAhead);
+
+        res.json({
+            success: true,
+            data: {
+                events,
+                total: events.length
+            }
+        });
+
+    } catch (error) {
+        console.error('Error obteniendo eventos próximos:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error al obtener eventos próximos'
+        });
+    }
+});
+
+/**
+ * POST /api/user/events/:id/read
+ * Marcar un evento como leído
+ */
+router.post('/events/:id/read', authenticate, async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).json({
+                success: false,
+                error: 'Evento no encontrado'
+            });
+        }
+
+        // Verificar que el evento es visible para el usuario
+        if (!event.isVisibleFor(req.user)) {
+            return res.status(403).json({
+                success: false,
+                error: 'No tienes permiso para ver este evento'
+            });
+        }
+
+        // Marcar como leído
+        await event.markAsReadBy(req.user._id);
+
+        res.json({
+            success: true,
+            message: 'Evento marcado como leído'
+        });
+
+    } catch (error) {
+        console.error('Error marcando evento como leído:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error al marcar evento como leído'
+        });
+    }
+});
 
 module.exports = router;
