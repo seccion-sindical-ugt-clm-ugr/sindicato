@@ -548,10 +548,11 @@ function initLoginBtn() {
         return;
     }
 
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    // CRITICAL FIX: Verificar tokens reales en lugar de isLoggedIn
+    const isLoggedIn = authAPI.isAuthenticated();
 
-    if (isLoggedIn) {
-        const userName = localStorage.getItem('userName') || 'Afiliado';
+    if (isLoggedIn && currentUser) {
+        const userName = currentUser.nombre || localStorage.getItem('userName') || 'Afiliado';
         loginBtn.innerHTML = `<i class="fas fa-user"></i> ${userName.split(' ')[0]}`;
         loginBtn.onclick = (e) => {
             e.preventDefault();
