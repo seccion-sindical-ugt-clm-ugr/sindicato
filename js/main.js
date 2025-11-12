@@ -80,12 +80,20 @@ if (hamburger && navMenu) {
 }
 
 // MANEJADOR GLOBAL DEL BOTÓN DE LOGIN (funciona en móvil y escritorio)
-if (loginBtn) {
-    loginBtn.addEventListener('click', (e) => {
+// Usar delegación de eventos para garantizar que funcione incluso si el DOM no está completamente cargado
+document.addEventListener('click', (e) => {
+    // Buscar si el clic fue en el botón de login o en un elemento dentro de él
+    const loginButton = e.target.closest('.btn-login');
+
+    if (loginButton) {
         e.preventDefault();
         e.stopPropagation();
 
+        console.log('🔐 Botón de login clicado');
+
         // Cerrar menú móvil si está abierto
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
         if (hamburger && navMenu) {
             hamburger.classList.remove('active');
             navMenu.classList.remove('active');
@@ -105,12 +113,13 @@ if (loginBtn) {
             const modal = document.querySelector('#loginModal');
             if (modal) {
                 modal.style.display = 'block';
+                console.log('✅ Modal de login abierto');
             } else {
-                console.error('Login modal not found');
+                console.error('❌ Login modal not found');
             }
         }
-    });
-}
+    }
+});
 
 // SISTEMA DE NAVEGACIÓN INTELIGENTE
 let isSingleSectionMode = false;
@@ -599,74 +608,67 @@ function initLoginBtn() {
     }
 }
 
-if (closeModal && loginModal) {
-    closeModal.addEventListener('click', () => {
-        loginModal.style.display = 'none';
-    });
-}
+// Cierre de modales con delegación de eventos
+document.addEventListener('click', (e) => {
+    // Cerrar modal con botón X
+    if (e.target.classList.contains('close')) {
+        const modal = e.target.closest('.modal');
+        if (modal) {
+            modal.style.display = 'none';
+            console.log('✅ Modal cerrado con botón X');
+        }
+    }
 
-window.addEventListener('click', (e) => {
-    if (loginModal && e.target === loginModal) {
-        loginModal.style.display = 'none';
-    }
-    if (recoveryModal && e.target === recoveryModal) {
-        recoveryModal.style.display = 'none';
-    }
-    if (registerModal && e.target === registerModal) {
-        registerModal.style.display = 'none';
-    }
-    if (changePasswordModal && e.target === changePasswordModal) {
-        changePasswordModal.style.display = 'none';
+    // Cerrar modal al hacer clic fuera del contenido
+    if (e.target.classList.contains('modal')) {
+        e.target.style.display = 'none';
+        console.log('✅ Modal cerrado al hacer clic fuera');
     }
 });
 
-// Recovery Modal handlers
-if (forgotPasswordLink && loginModal && recoveryModal) {
-    forgotPasswordLink.addEventListener('click', (e) => {
+// Recovery Modal handlers con delegación de eventos
+document.addEventListener('click', (e) => {
+    // Forgot password link
+    if (e.target.id === 'forgotPasswordLink' || e.target.closest('#forgotPasswordLink')) {
         e.preventDefault();
-        loginModal.style.display = 'none';
-        recoveryModal.style.display = 'block';
-    });
-}
+        const loginModal = document.querySelector('#loginModal');
+        const recoveryModal = document.querySelector('#recoveryModal');
+        if (loginModal && recoveryModal) {
+            loginModal.style.display = 'none';
+            recoveryModal.style.display = 'block';
+        }
+    }
 
-if (closeRecoveryBtn && recoveryModal) {
-    closeRecoveryBtn.addEventListener('click', () => {
-        recoveryModal.style.display = 'none';
-    });
-}
-
-if (backToLoginBtn && recoveryModal && loginModal) {
-    backToLoginBtn.addEventListener('click', (e) => {
+    // Back to login from recovery
+    if (e.target.id === 'backToLogin' || e.target.closest('#backToLogin')) {
         e.preventDefault();
-        recoveryModal.style.display = 'none';
-        loginModal.style.display = 'block';
-    });
-}
+        const recoveryModal = document.querySelector('#recoveryModal');
+        const loginModal = document.querySelector('#loginModal');
+        if (recoveryModal && loginModal) {
+            recoveryModal.style.display = 'none';
+            loginModal.style.display = 'block';
+        }
+    }
 
-// ============================================
-// REGISTER MODAL HANDLERS (Solo para admins)
-// ============================================
-if (showRegisterLink) {
-    showRegisterLink.addEventListener('click', (e) => {
+    // Back to login from register
+    if (e.target.id === 'backToLoginFromRegister' || e.target.closest('#backToLoginFromRegister')) {
         e.preventDefault();
-        loginModal.style.display = 'none';
-        registerModal.style.display = 'block';
-    });
-}
+        const registerModal = document.querySelector('#registerModal');
+        const loginModal = document.querySelector('#loginModal');
+        if (registerModal && loginModal) {
+            registerModal.style.display = 'none';
+            loginModal.style.display = 'block';
+        }
+    }
 
-if (closeRegister) {
-    closeRegister.addEventListener('click', () => {
-        registerModal.style.display = 'none';
-    });
-}
-
-if (backToLoginFromRegister) {
-    backToLoginFromRegister.addEventListener('click', (e) => {
-        e.preventDefault();
-        registerModal.style.display = 'none';
-        loginModal.style.display = 'block';
-    });
-}
+    // Go to affiliate from login
+    if (e.target.id === 'goToAffiliateLink' || e.target.closest('#goToAffiliateLink')) {
+        const loginModal = document.querySelector('#loginModal');
+        if (loginModal) {
+            loginModal.style.display = 'none';
+        }
+    }
+});
 
 // ============================================
 // CHANGE PASSWORD MODAL HANDLERS
