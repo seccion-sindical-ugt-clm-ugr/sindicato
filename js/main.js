@@ -67,11 +67,14 @@ if (hamburger && navMenu) {
         navMenu.classList.toggle('active');
     });
 
-    // Close mobile menu when clicking on a link
+    // Close mobile menu when clicking on a link (except login button)
     document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
+        link.addEventListener('click', (e) => {
+            // No cerrar el menú si es el botón de login
+            if (!link.classList.contains('btn-login')) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
         });
     });
 }
@@ -543,26 +546,49 @@ function smoothScrollTo(targetElement, offset = 0) {
 
 // Login Modal - Will be updated in updateLoginState function
 function initLoginBtn() {
-    if (!loginBtn || !loginModal) {
-        console.warn('Login button or modal not found');
+    if (!loginBtn) {
+        console.warn('Login button not found');
         return;
     }
 
     // CRITICAL FIX: Verificar tokens reales en lugar de isLoggedIn
-    const isLoggedIn = authAPI.isAuthenticated();
+    // Verificar que authAPI existe antes de usarlo
+    const isLoggedIn = (typeof authAPI !== 'undefined' && authAPI.isAuthenticated) ?
+                        authAPI.isAuthenticated() : false;
 
     if (isLoggedIn && currentUser) {
         const userName = currentUser.nombre || localStorage.getItem('userName') || 'Afiliado';
         loginBtn.innerHTML = `<i class="fas fa-user"></i> ${userName.split(' ')[0]}`;
         loginBtn.onclick = (e) => {
             e.preventDefault();
+            e.stopPropagation();
+
+            // Cerrar menú móvil si está abierto
+            if (hamburger && navMenu) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
+
             showMemberDashboard();
         };
     } else {
         loginBtn.innerHTML = '<i class="fas fa-user"></i> Acceso Afiliados';
         loginBtn.onclick = (e) => {
             e.preventDefault();
-            loginModal.style.display = 'block';
+            e.stopPropagation();
+
+            // Cerrar menú móvil si está abierto
+            if (hamburger && navMenu) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
+
+            // Abrir modal de login
+            if (loginModal) {
+                loginModal.style.display = 'block';
+            } else {
+                console.error('Login modal not found');
+            }
         };
     }
 }

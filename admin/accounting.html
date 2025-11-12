@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contabilidad - Panel Admin UGT-CLM-UGR</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-menu a i {
+            margin-right: 0.75rem;
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: #2c3e50;
+        }
+
+        .tab.active {
+            color: #e74c3c;
+            border-bottom-color: #e74c3c;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-card-icon.green { background: #e8f5e9; color: #4caf50; }
+        .stat-card-icon.red { background: #ffebee; color: #f44336; }
+        .stat-card-icon.blue { background: #e3f2fd; color: #2196f3; }
+        .stat-card-icon.orange { background: #fff3e0; color: #ff9800; }
+
+        .stat-card-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-card-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .stat-card-change {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-card-change.positive {
+            color: #4caf50;
+        }
+
+        .stat-card-change.negative {
+            color: #f44336;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f5f5f5;
+            color: #666;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        /* Status Badge */
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge.success { background: #e8f5e9; color: #4caf50; }
+        .badge.danger { background: #ffebee; color: #f44336; }
+        .badge.warning { background: #fff3e0; color: #ff9800; }
+        .badge.info { background: #e3f2fd; color: #2196f3; }
+        .badge.secondary { background: #e0e0e0; color: #666; }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.85rem;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: #2c3e50;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Panel Administrativo</h2>
+                <p>UGT-CLM-UGR Granada</p>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="dashboard.html">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="accounting.html" class="active">
+                    <i class="fas fa-calculator"></i>
+                    <span>Contabilidad</span>
+                </a>
+                <a href="../index.html">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Volver al Sitio</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1><i class="fas fa-calculator"></i> Contabilidad</h1>
+                <p>Gestión financiera y contable del sindicato</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" data-tab="dashboard">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </button>
+                <button class="tab" data-tab="transactions">
+                    <i class="fas fa-exchange-alt"></i> Transacciones
+                </button>
+                <button class="tab" data-tab="invoices">
+                    <i class="fas fa-file-invoice"></i> Facturas
+                </button>
+                <button class="tab" data-tab="fees">
+                    <i class="fas fa-money-bill-wave"></i> Cuotas Afiliados
+                </button>
+                <button class="tab" data-tab="reports">
+                    <i class="fas fa-file-alt"></i> Reportes
+                </button>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div class="tab-content active" id="dashboard-tab">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Balance Total</div>
+                                <div class="stat-card-value" id="totalBalance">€0</div>
+                            </div>
+                            <div class="stat-card-icon blue">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-change" id="balanceChange">
+                            <i class="fas fa-arrow-up"></i> +0% este año
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Ingresos</div>
+                                <div class="stat-card-value" id="totalIncome">€0</div>
+                            </div>
+                            <div class="stat-card-icon green">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Gastos</div>
+                                <div class="stat-card-value" id="totalExpense">€0</div>
+                            </div>
+                            <div class="stat-card-icon red">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-label">Cuotas Pendientes</div>
+                                <div class="stat-card-value" id="pendingFees">0</div>
+                            </div>
+                            <div class="stat-card-icon orange">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Transacciones Recientes</h3>
+                    </div>
+                    <div id="recentTransactions">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Cargando...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Tab -->
+            <div class="tab-content" id="transactions-tab">
+                <div class="filters">
+                    <div class="filters-grid">
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select id="filterTransactionType">
+                                <option value="">Todos</option>
+                                <option value="income">Ingresos</option>
+                                <option value="expense">Gastos</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Año</label>
+                            <select id="filterTransactionYear">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-primary" onclick="filterTransactions()">
+                                <i class="fas fa-filter"></i> Filtrar
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-success" onclick="showNewTransactionModal()">
+                                <i class="fas fa-plus"></i> Nueva Transacción
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div id="transactionsList">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Cargando transacciones...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoices Tab -->
+            <div class="tab-content" id="invoices-tab">
+                <p>Gestión de facturas (próximamente)</p>
+            </div>
+
+            <!-- Fees Tab -->
+            <div class="tab-content" id="fees-tab">
+                <div style="margin-bottom: 1.5rem;">
+                    <button class="btn btn-success" onclick="showGenerateFeesModal()">
+                        <i class="fas fa-magic"></i> Generar Cuotas del Mes
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <div id="feesList">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Cargando cuotas...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div class="tab-content" id="reports-tab">
+                <p>Reportes financieros (próximamente)</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- New Transaction Modal -->
+    <div class="modal" id="newTransactionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nueva Transacción</h3>
+                <button class="modal-close" onclick="closeNewTransactionModal()">×</button>
+            </div>
+            <form id="newTransactionForm" onsubmit="createTransaction(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Tipo *</label>
+                        <select name="type" required>
+                            <option value="income">Ingreso</option>
+                            <option value="expense">Gasto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría *</label>
+                        <select name="category" required>
+                            <option value="">Seleccionar...</option>
+                            <optgroup label="Ingresos">
+                                <option value="membership_fee">Cuota de afiliado</option>
+                                <option value="course_payment">Pago por curso</option>
+                                <option value="donation">Donación</option>
+                                <option value="subsidy">Subvención</option>
+                                <option value="other_income">Otros ingresos</option>
+                            </optgroup>
+                            <optgroup label="Gastos">
+                                <option value="office_supplies">Material de oficina</option>
+                                <option value="services">Servicios</option>
+                                <option value="salaries">Salarios</option>
+                                <option value="training">Formación</option>
+                                <option value="travel">Viajes y dietas</option>
+                                <option value="legal">Gastos legales</option>
+                                <option value="communication">Comunicación</option>
+                                <option value="maintenance">Mantenimiento</option>
+                                <option value="other_expense">Otros gastos</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Monto (€) *</label>
+                        <input type="number" name="amount" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción *</label>
+                        <textarea name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" name="transactionDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Método de Pago</label>
+                        <select name="paymentMethod">
+                            <option value="bank_transfer">Transferencia bancaria</option>
+                            <option value="cash">Efectivo</option>
+                            <option value="card">Tarjeta</option>
+                            <option value="stripe">Stripe</option>
+                            <option value="paypal">PayPal</option>
+                            <option value="check">Cheque</option>
+                            <option value="other">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Referencia de Pago</label>
+                        <input type="text" name="paymentReference">
+                    </div>
+                    <div class="form-group">
+                        <label>Notas</label>
+                        <textarea name="notes" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeNewTransactionModal()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Generate Fees Modal -->
+    <div class="modal" id="generateFeesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Generar Cuotas de Afiliados</h3>
+                <button class="modal-close" onclick="closeGenerateFeesModal()">×</button>
+            </div>
+            <form id="generateFeesForm" onsubmit="generateFees(event)">
+                <div class="modal-body">
+                    <p>Esto generará cuotas automáticamente para todos los afiliados activos.</p>
+                    <div class="form-group">
+                        <label>Año *</label>
+                        <input type="number" name="year" min="2020" max="2030" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mes *</label>
+                        <select name="month" required>
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Monto de la Cuota (€) *</label>
+                        <input type="number" name="amount" step="0.01" min="0" required value="10">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeGenerateFeesModal()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-magic"></i> Generar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/backend-config.js"></script>
+    <script src="../js/auth-api.js"></script>
+    <script>
+        // Check admin authentication
+        async function checkAdminAuth() {
+            if (!authAPI.isAuthenticated()) {
+                alert('Debes iniciar sesión');
+                window.location.href = '../index.html';
+                return false;
+            }
+
+            try {
+                const result = await authAPI.me();
+                if (!result.success || result.data.user.role !== 'admin') {
+                    alert('No tienes permisos de administrador');
+                    window.location.href = '../index.html';
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error verificando auth:', error);
+                window.location.href = '../index.html';
+                return false;
+            }
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+
+                // Update tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Update content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+
+                // Load data for the tab
+                if (tabName === 'transactions') {
+                    loadTransactions();
+                } else if (tabName === 'fees') {
+                    loadFees();
+                }
+            });
+        });
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${window.BACKEND_URL}/api/accounting/dashboard`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    updateDashboard(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function updateDashboard(data) {
+            // Update balance
+            const balance = data.balance.total;
+            document.getElementById('totalBalance').textContent = formatCurrency(balance.balance);
+            document.getElementById('totalIncome').textContent = formatCurrency(balance.income);
+            document.getElementById('totalExpense').textContent = formatCurrency(balance.expense);
+
+            // Update pending fees
+            const overdueFees = data.alerts.overdueFees || 0;
+            document.getElementById('pendingFees').textContent = overdueFees;
+
+            // Update recent transactions
+            const container = document.getElementById('recentTransactions');
+            if (data.recentTransactions && data.recentTransactions.length > 0) {
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Categoría</th>
+                                <th>Tipo</th>
+                                <th>Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.recentTransactions.map(t => `
+                                <tr>
+                                    <td>${formatDate(t.transactionDate)}</td>
+                                    <td>${t.description}</td>
+                                    <td>${formatCategory(t.category)}</td>
+                                    <td><span class="badge ${t.type === 'income' ? 'success' : 'danger'}">${t.type === 'income' ? 'Ingreso' : 'Gasto'}</span></td>
+                                    <td><strong>${formatCurrency(t.amount)}</strong></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No hay transacciones recientes</p></div>';
+            }
+        }
+
+        // Load transactions
+        async function loadTransactions() {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${window.BACKEND_URL}/api/accounting/transactions`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    displayTransactions(result.data.transactions);
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+            }
+        }
+
+        function displayTransactions(transactions) {
+            const container = document.getElementById('transactionsList');
+            if (transactions && transactions.length > 0) {
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Categoría</th>
+                                <th>Tipo</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${transactions.map(t => `
+                                <tr>
+                                    <td>${formatDate(t.transactionDate)}</td>
+                                    <td>${t.description}</td>
+                                    <td>${formatCategory(t.category)}</td>
+                                    <td><span class="badge ${t.type === 'income' ? 'success' : 'danger'}">${t.type === 'income' ? 'Ingreso' : 'Gasto'}</span></td>
+                                    <td><strong>${formatCurrency(t.amount)}</strong></td>
+                                    <td><span class="badge info">${t.status}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No hay transacciones</p></div>';
+            }
+        }
+
+        // Load fees
+        async function loadFees() {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${window.BACKEND_URL}/api/accounting/membership-fees`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    displayFees(result.data.fees);
+                }
+            } catch (error) {
+                console.error('Error loading fees:', error);
+            }
+        }
+
+        function displayFees(fees) {
+            const container = document.getElementById('feesList');
+            if (fees && fees.length > 0) {
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Afiliado</th>
+                                <th>Período</th>
+                                <th>Monto</th>
+                                <th>Vencimiento</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${fees.map(f => `
+                                <tr>
+                                    <td>${f.user?.nombre || 'N/A'}</td>
+                                    <td>${f.period.month}/${f.period.year}</td>
+                                    <td>${formatCurrency(f.amount)}</td>
+                                    <td>${formatDate(f.dueDate)}</td>
+                                    <td><span class="badge ${getStatusClass(f.status)}">${f.status}</span></td>
+                                    <td>
+                                        ${f.status === 'pending' || f.status === 'overdue' ?
+                                            `<button class="btn btn-sm btn-success" onclick="markFeePaid('${f._id}')">Marcar Pagada</button>` :
+                                            ''}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No hay cuotas registradas</p></div>';
+            }
+        }
+
+        // Modals
+        function showNewTransactionModal() {
+            document.getElementById('newTransactionModal').classList.add('active');
+        }
+
+        function closeNewTransactionModal() {
+            document.getElementById('newTransactionModal').classList.remove('active');
+            document.getElementById('newTransactionForm').reset();
+        }
+
+        function showGenerateFeesModal() {
+            const now = new Date();
+            document.querySelector('#generateFeesForm input[name="year"]').value = now.getFullYear();
+            document.querySelector('#generateFeesForm select[name="month"]').value = now.getMonth() + 1;
+            document.getElementById('generateFeesModal').classList.add('active');
+        }
+
+        function closeGenerateFeesModal() {
+            document.getElementById('generateFeesModal').classList.remove('active');
+        }
+
+        // Create transaction
+        async function createTransaction(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${window.BACKEND_URL}/api/accounting/transactions`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Transacción creada correctamente');
+                    closeNewTransactionModal();
+                    loadTransactions();
+                    loadDashboard();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error creating transaction:', error);
+                alert('Error al crear transacción');
+            }
+        }
+
+        // Generate fees
+        async function generateFees(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${window.BACKEND_URL}/api/accounting/membership-fees/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(`Se generaron ${result.data.created} cuotas correctamente`);
+                    closeGenerateFeesModal();
+                    loadFees();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error generating fees:', error);
+                alert('Error al generar cuotas');
+            }
+        }
+
+        // Mark fee as paid
+        async function markFeePaid(feeId) {
+            if (!confirm('¿Marcar esta cuota como pagada?')) return;
+
+            try {
+                const token = localStorage.getItem('accessToken');
+                const response = await fetch(`${window.BACKEND_URL}/api/accounting/membership-fees/${feeId}/mark-paid`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        date: new Date().toISOString(),
+                        method: 'bank_transfer'
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Cuota marcada como pagada');
+                    loadFees();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error marking fee as paid:', error);
+                alert('Error al marcar cuota como pagada');
+            }
+        }
+
+        // Utility functions
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(amount);
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('es-ES');
+        }
+
+        function formatCategory(category) {
+            const categories = {
+                'membership_fee': 'Cuota afiliado',
+                'course_payment': 'Pago curso',
+                'donation': 'Donación',
+                'subsidy': 'Subvención',
+                'other_income': 'Otros ingresos',
+                'office_supplies': 'Material oficina',
+                'services': 'Servicios',
+                'salaries': 'Salarios',
+                'training': 'Formación',
+                'travel': 'Viajes',
+                'legal': 'Legal',
+                'communication': 'Comunicación',
+                'maintenance': 'Mantenimiento',
+                'other_expense': 'Otros gastos'
+            };
+            return categories[category] || category;
+        }
+
+        function getStatusClass(status) {
+            const classes = {
+                'paid': 'success',
+                'pending': 'warning',
+                'overdue': 'danger',
+                'waived': 'secondary',
+                'cancelled': 'secondary'
+            };
+            return classes[status] || 'info';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            const hasAuth = await checkAdminAuth();
+            if (!hasAuth) return;
+
+            // Fill year selector
+            const yearSelect = document.getElementById('filterTransactionYear');
+            const currentYear = new Date().getFullYear();
+            for (let year = currentYear; year >= currentYear - 5; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+
+            // Load initial data
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>

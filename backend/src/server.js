@@ -29,6 +29,7 @@ const documentsRoutes = require('./routes/documents');
 const cursoIAPdfRoutes = require('./routes/curso-ia-pdf');
 const certificatesRoutes = require('./routes/certificates');
 const adminRoutes = require('./routes/admin');
+const accountingRoutes = require('./routes/accounting');
 
 // Importar middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -220,6 +221,9 @@ app.use('/api/certificates', certificatesRoutes);
 // Rutas de Administración
 app.use('/api/admin', adminRoutes);
 
+// Rutas de Contabilidad
+app.use('/api/accounting', accountingRoutes);
+
 // Ruta raíz
 app.get('/', (req, res) => {
     const mongoState = mongoose.connection.readyState;
@@ -280,7 +284,15 @@ app.get('/', (req, res) => {
             adminUsers: 'GET /api/admin/users',
             adminUserDetails: 'GET /api/admin/users/:id',
             adminEnrollments: 'GET /api/admin/enrollments',
-            adminRecent: 'GET /api/admin/recent'
+            adminRecent: 'GET /api/admin/recent',
+            adminEvents: 'POST /api/admin/events',
+            // Contabilidad (requiere auth + rol admin)
+            accountingDashboard: 'GET /api/accounting/dashboard',
+            transactions: 'GET/POST /api/accounting/transactions',
+            invoices: 'GET/POST /api/accounting/invoices',
+            membershipFees: 'GET /api/accounting/membership-fees',
+            generateFees: 'POST /api/accounting/membership-fees/generate',
+            annualReport: 'GET /api/accounting/reports/annual'
         },
         documentation: 'Ver README.md para más información'
     };
