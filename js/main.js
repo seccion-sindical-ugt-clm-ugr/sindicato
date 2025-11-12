@@ -1644,9 +1644,19 @@ async function checkLoginStatus() {
 
             if (result.success) {
                 currentUser = result.data.user;
-                document.getElementById('userName').textContent = currentUser.nombre;
-                showMemberDashboard();
                 console.log('✅ Sesión válida:', currentUser.email);
+
+                // Solo mostrar dashboard si estamos en la página principal (index.html)
+                // En otras páginas (como curso-ia.html), solo actualizar el botón de login
+                if (memberDashboard) {
+                    const userNameElement = document.getElementById('userName');
+                    if (userNameElement) {
+                        userNameElement.textContent = currentUser.nombre;
+                    }
+                    showMemberDashboard();
+                } else {
+                    console.log('ℹ️ Dashboard no disponible en esta página, solo actualizando botón de login');
+                }
             } else {
                 // Token inválido, limpiar
                 authAPI.clearTokens();

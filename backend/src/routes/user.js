@@ -378,6 +378,7 @@ router.get('/membership',
             res.status(200).json({
                 success: true,
                 data: {
+                    role: user.role,
                     status: user.membershipStatus,
                     isActive: user.isMembershipActive(),
                     startDate: user.membershipStartDate,
