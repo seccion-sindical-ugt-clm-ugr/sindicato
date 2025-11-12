@@ -80,14 +80,16 @@ if (hamburger && navMenu) {
 }
 
 // MANEJADOR GLOBAL DEL BOTÓN DE LOGIN (funciona en móvil y escritorio)
-// Usar delegación de eventos para garantizar que funcione incluso si el DOM no está completamente cargado
+// Usar delegación de eventos con capture phase para interceptar antes que el navegador procese el href
 document.addEventListener('click', (e) => {
     // Buscar si el clic fue en el botón de login o en un elemento dentro de él
     const loginButton = e.target.closest('.btn-login');
 
     if (loginButton) {
+        // Prevenir INMEDIATAMENTE cualquier comportamiento por defecto
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
 
         console.log('🔐 Botón de login clicado');
 
@@ -118,8 +120,10 @@ document.addEventListener('click', (e) => {
                 console.error('❌ Login modal not found');
             }
         }
+
+        return false;
     }
-});
+}, true); // Usar capture phase (true) para interceptar ANTES que otros event listeners
 
 // SISTEMA DE NAVEGACIÓN INTELIGENTE
 let isSingleSectionMode = false;
@@ -950,9 +954,15 @@ function initSmoothScroll() {
             const href = this.getAttribute('href');
             console.log(`🖱️ Click detectado en: ${href}`);
 
-            // Ignorar enlaces que son solo "#" (modales, etc.)
-            if (href === '#' || href === '#!' || !href) {
-                console.log(`⏭️ Ignorando enlace: ${href}`);
+            // Ignorar enlaces especiales (modales, login, etc.)
+            if (href === '#' || href === '#!' || href === '#login' || !href) {
+                console.log(`⏭️ Ignorando enlace especial: ${href}`);
+                return;
+            }
+
+            // Ignorar botones con clases especiales que tienen sus propios handlers
+            if (this.classList.contains('btn-login')) {
+                console.log(`⏭️ Ignorando botón de login - tiene handler dedicado`);
                 return;
             }
 
