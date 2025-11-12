@@ -33,6 +33,10 @@ const certificatesRoutes = require('./routes/certificates');
 const errorHandler = require('./middleware/errorHandler');
 const logger = require('./middleware/logger');
 
+// Importar y inicializar servicios
+const { initializeEmailService } = require('./services/emailService');
+initializeEmailService();
+
 // Inicializar Express
 const app = express();
 const PORT = process.env.PORT || 3000;
