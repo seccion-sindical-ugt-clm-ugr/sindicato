@@ -2958,4 +2958,28 @@ highlightStyle.textContent = `
 `;
 document.head.appendChild(highlightStyle);
 
+// ============================================
+// SCROLL TO TOP FUNCTIONALITY
+// ============================================
+const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+if (scrollToTopBtn) {
+    // Show/hide button based on scroll position
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            scrollToTopBtn.classList.add('show');
+        } else {
+            scrollToTopBtn.classList.remove('show');
+        }
+    });
+
+    // Smooth scroll to top when button is clicked
+    scrollToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
 // Última actualización: sábado,  8 de noviembre de 2025, 01:31:50 CET
