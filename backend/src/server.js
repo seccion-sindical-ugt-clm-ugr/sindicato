@@ -161,7 +161,9 @@ const limiter = rateLimit({
     max: 100, // Límite de 100 requests por ventana
     message: 'Demasiadas solicitudes desde esta IP, intenta de nuevo más tarde.',
     standardHeaders: true,
-    legacyHeaders: false
+    legacyHeaders: false,
+    // CRITICAL: Configurar trust proxy explícitamente para Vercel
+    trust: true
 });
 
 app.use('/api/', limiter);
