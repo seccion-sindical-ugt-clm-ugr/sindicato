@@ -477,6 +477,38 @@
                 .progress-bar {
                     width: 80px;
                 }
+
+                /* Fix nav sticky en móvil */
+                .nav-container {
+                    flex-direction: column !important;
+                    gap: 0.5rem !important;
+                    overflow-x: visible !important;
+                }
+
+                .nav-links {
+                    flex-wrap: wrap !important;
+                    gap: 0.5rem !important;
+                    justify-content: center !important;
+                    font-size: 0.75rem !important;
+                }
+
+                .nav-link {
+                    padding: 0.4rem 0.8rem !important;
+                    font-size: 0.75rem !important;
+                }
+
+                .quick-spots {
+                    font-size: 0.75rem !important;
+                    padding: 0.4rem 0.8rem !important;
+                }
+
+                .quick-enroll {
+                    width: 100% !important;
+                    max-width: 300px !important;
+                    text-align: center !important;
+                    padding: 0.8rem 1rem !important;
+                    font-size: 0.85rem !important;
+                }
             }
         }
     </style>
@@ -1731,19 +1763,34 @@
         async function verifyAffiliate() {
             try {
                 const token = localStorage.getItem('accessToken');
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-
-                // Verificar role
-                if (user.role !== 'afiliado') {
+                if (!token) {
                     return false;
                 }
 
-                // Verificar que la membresía esté activa
-                if (user.membershipStatus !== 'activo') {
+                // Verificar contra el backend para obtener estado actualizado
+                const backendUrl = window.BACKEND_URL || 'https://sindicato-mu.vercel.app';
+                const response = await fetch(`${backendUrl}/api/user/membership`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error('Error verificando membresía:', response.status);
                     return false;
                 }
 
-                return true;
+                const data = await response.json();
+
+                // Verificar que sea afiliado activo
+                if (data.success && data.data) {
+                    const membership = data.data;
+                    return membership.status === 'activo' && membership.role === 'afiliado';
+                }
+
+                return false;
             } catch (error) {
                 console.error('Error verificando afiliado:', error);
                 return false;
