@@ -477,6 +477,38 @@
                 .progress-bar {
                     width: 80px;
                 }
+
+                /* Fix nav sticky en móvil */
+                .nav-container {
+                    flex-direction: column !important;
+                    gap: 0.5rem !important;
+                    overflow-x: visible !important;
+                }
+
+                .nav-links {
+                    flex-wrap: wrap !important;
+                    gap: 0.5rem !important;
+                    justify-content: center !important;
+                    font-size: 0.75rem !important;
+                }
+
+                .nav-link {
+                    padding: 0.4rem 0.8rem !important;
+                    font-size: 0.75rem !important;
+                }
+
+                .quick-spots {
+                    font-size: 0.75rem !important;
+                    padding: 0.4rem 0.8rem !important;
+                }
+
+                .quick-enroll {
+                    width: 100% !important;
+                    max-width: 300px !important;
+                    text-align: center !important;
+                    padding: 0.8rem 1rem !important;
+                    font-size: 0.85rem !important;
+                }
             }
         }
     </style>
@@ -520,26 +552,26 @@
             <div class="spots-counter" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3); border-radius: 15px; padding: 1.5rem; margin: 2rem 0; text-align: center;">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap;">
                     <div style="flex: 1; min-width: 200px;">
-                        <div style="color: #ff6b6b; font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">
-                            <span id="availableSpots">8</span><span style="font-size: 1.5rem;">/15</span>
+                        <div style="color: #4caf50; font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem;">
+                            <span id="availableSpots">12</span><span style="font-size: 1.5rem;">/15</span>
                         </div>
                         <div style="color: white; font-size: 1.1rem; font-weight: 500;">PLAZAS DISPONIBLES</div>
                         <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 0.5rem;">
-                            <i class="fas fa-fire"></i> Últimas plazas disponibles
+                            <i class="fas fa-check-circle"></i> ¡Plazas disponibles!
                         </div>
                     </div>
                     <div style="flex: 1; min-width: 200px;">
                         <div style="background: rgba(255,255,255,0.2); border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
                             <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden;">
-                                <div id="spotsProgress" style="width: 53%; height: 100%; background: linear-gradient(90deg, #ff6b6b, #ff8e8e); border-radius: 4px; transition: width 0.5s ease;"></div>
+                                <div id="spotsProgress" style="width: 20%; height: 100%; background: linear-gradient(90deg, #4caf50, #66bb6a); border-radius: 4px; transition: width 0.5s ease;"></div>
                             </div>
                             <div style="color: white; font-size: 0.85rem; margin-top: 0.5rem;">
-                                <span id="spotsPercentage">53%</span> de las plazas ya reservadas
+                                <span id="spotsPercentage">20%</span> de las plazas ya reservadas
                             </div>
                         </div>
                         <div style="color: rgba(255,255,255,0.9); font-size: 0.85rem; line-height: 1.4;">
                             <i class="fas fa-clock"></i> Inicio: Viernes <span id="nextFriday">Próximo</span><br>
-                            <i class="fas fa-users"></i> <span id="enrolledCount">7</span> personas ya inscritas
+                            <i class="fas fa-users"></i> <span id="enrolledCount">3</span> personas ya inscritas
                         </div>
                     </div>
                 </div>
@@ -1731,19 +1763,34 @@
         async function verifyAffiliate() {
             try {
                 const token = localStorage.getItem('accessToken');
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
-
-                // Verificar role
-                if (user.role !== 'afiliado') {
+                if (!token) {
                     return false;
                 }
 
-                // Verificar que la membresía esté activa
-                if (user.membershipStatus !== 'activo') {
+                // Verificar contra el backend para obtener estado actualizado
+                const backendUrl = window.BACKEND_URL || 'https://sindicato-mu.vercel.app';
+                const response = await fetch(`${backendUrl}/api/user/membership`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error('Error verificando membresía:', response.status);
                     return false;
                 }
 
-                return true;
+                const data = await response.json();
+
+                // Verificar que sea afiliado activo
+                if (data.success && data.data) {
+                    const membership = data.data;
+                    return membership.status === 'activo' && membership.role === 'afiliado';
+                }
+
+                return false;
             } catch (error) {
                 console.error('Error verificando afiliado:', error);
                 return false;
@@ -2745,24 +2792,9 @@
             }
         }
 
-        // Función para simular inscripciones en tiempo real
-        function simulateRandomEnrollment() {
-            // Simulación aleatoria de nueva inscripción (15% de probabilidad cada 30s)
-            if (Math.random() < 0.15 && spotsConfig.currentEnrolled < spotsConfig.totalSpots - 1) {
-                spotsConfig.currentEnrolled++;
-                updateSpotsCounter();
-
-                // Mostrar notificación de nueva inscripción
-                showNotification('🔥 ¡Alguien se acaba de inscribir! Quedan ' + (spotsConfig.totalSpots - spotsConfig.currentEnrolled) + ' plazas', 'info');
-            }
-        }
-
         // Inicializar el contador
         document.addEventListener('DOMContentLoaded', function() {
             updateSpotsCounter();
-
-            // Actualizar cada 30 segundos
-            setInterval(simulateRandomEnrollment, spotsConfig.updateInterval);
 
             // Efecto parpadeo inicial para llamar la atención
             setTimeout(() => {
