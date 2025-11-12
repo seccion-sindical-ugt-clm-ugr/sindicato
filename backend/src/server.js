@@ -28,6 +28,7 @@ const completeRegistrationRoutes = require('./routes/complete-registration');
 const documentsRoutes = require('./routes/documents');
 const cursoIAPdfRoutes = require('./routes/curso-ia-pdf');
 const certificatesRoutes = require('./routes/certificates');
+const adminRoutes = require('./routes/admin');
 
 // Importar middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -216,6 +217,9 @@ app.use('/api/curso-ia', cursoIAPdfRoutes);
 // Rutas de Certificados
 app.use('/api/certificates', certificatesRoutes);
 
+// Rutas de Administración
+app.use('/api/admin', adminRoutes);
+
 // Ruta raíz
 app.get('/', (req, res) => {
     const mongoState = mongoose.connection.readyState;
@@ -270,7 +274,13 @@ app.get('/', (req, res) => {
             suggestionsStats: 'GET /api/suggestions/stats',
             // Certificados
             generateCertificate: 'POST /api/certificates/generate (requiere auth)',
-            checkEligibility: 'GET /api/certificates/check-eligibility/:courseType (requiere auth)'
+            checkEligibility: 'GET /api/certificates/check-eligibility/:courseType (requiere auth)',
+            // Administración (requiere auth + rol admin)
+            adminStats: 'GET /api/admin/stats',
+            adminUsers: 'GET /api/admin/users',
+            adminUserDetails: 'GET /api/admin/users/:id',
+            adminEnrollments: 'GET /api/admin/enrollments',
+            adminRecent: 'GET /api/admin/recent'
         },
         documentation: 'Ver README.md para más información'
     };

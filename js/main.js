@@ -1522,10 +1522,161 @@ function formatFileSize(bytes) {
     return (bytes / 1048576).toFixed(1) + ' MB';
 }
 
+// Load user events from backend
+async function loadUserEvents() {
+    try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            console.error('No hay token de autenticación');
+            return;
+        }
+
+        const backendUrl = window.BACKEND_URL || 'https://sindicato-mu.vercel.app';
+        const response = await fetch(`${backendUrl}/api/user/events`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (result.success) {
+            displayUserEvents(result.data.events);
+        } else {
+            console.error('Error cargando eventos:', result.error);
+        }
+    } catch (error) {
+        console.error('Error cargando eventos del usuario:', error);
+    }
+}
+
+// Display user events in the modal
+function displayUserEvents(events) {
+    const eventsContainer = document.getElementById('eventsContainer');
+    if (!eventsContainer) {
+        console.error('Contenedor de eventos no encontrado');
+        return;
+    }
+
+    if (!events || events.length === 0) {
+        eventsContainer.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-calendar-times fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                <p style="color: #666;">No tienes eventos en este momento</p>
+            </div>
+        `;
+        return;
+    }
+
+    eventsContainer.innerHTML = events.map(event => {
+        const date = event.eventDate ? new Date(event.eventDate).toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }) : '';
+
+        const time = event.eventDate ? new Date(event.eventDate).toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit'
+        }) : '';
+
+        const priorityColors = {
+            urgent: '#f44336',
+            high: '#ff9800',
+            normal: '#2196f3',
+            low: '#4caf50'
+        };
+
+        const typeIcons = {
+            announcement: 'fa-bullhorn',
+            meeting: 'fa-users',
+            course: 'fa-graduation-cap',
+            reminder: 'fa-bell',
+            notification: 'fa-info-circle'
+        };
+
+        const icon = event.metadata?.icon || typeIcons[event.type] || 'fa-bell';
+        const color = event.metadata?.color || priorityColors[event.priority] || '#2196f3';
+
+        return `
+            <div class="event-card" style="
+                border-left: 4px solid ${color};
+                background: white;
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'"
+               onmouseout="this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">
+                <div style="display: flex; align-items: start; gap: 1rem;">
+                    <div style="
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        background: ${color}22;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-shrink: 0;
+                    ">
+                        <i class="fas ${icon}" style="color: ${color}; font-size: 1.5rem;"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 0.5rem 0; color: ${color};">${event.title}</h4>
+                        <p style="margin: 0 0 0.5rem 0; color: #666; line-height: 1.5;">${event.description}</p>
+                        ${date ? `
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; color: #888; font-size: 0.9rem;">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>${date}</span>
+                                ${time ? `<i class="fas fa-clock" style="margin-left: 1rem;"></i><span>${time}</span>` : ''}
+                            </div>
+                        ` : ''}
+                        ${event.location ? `
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; color: #888; font-size: 0.9rem;">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${event.location}</span>
+                            </div>
+                        ` : ''}
+                        ${event.link ? `
+                            <div style="margin-top: 0.75rem;">
+                                <a href="${event.link}" target="_blank" style="
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 0.5rem;
+                                    padding: 0.5rem 1rem;
+                                    background: ${color};
+                                    color: white;
+                                    text-decoration: none;
+                                    border-radius: 5px;
+                                    font-size: 0.9rem;
+                                    transition: opacity 0.3s;
+                                " onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>Más información</span>
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 // Show my events modal
-function showMyEventsModal() {
+async function showMyEventsModal() {
     myEventsModal.style.display = 'block';
     console.log('📅 Modal de "Mis Eventos" abierto');
+
+    // Load events from backend
+    await loadUserEvents();
 }
 
 // Close modal and navigate to courses section
@@ -1644,9 +1795,19 @@ async function checkLoginStatus() {
 
             if (result.success) {
                 currentUser = result.data.user;
-                document.getElementById('userName').textContent = currentUser.nombre;
-                showMemberDashboard();
                 console.log('✅ Sesión válida:', currentUser.email);
+
+                // Solo mostrar dashboard si estamos en la página principal (index.html)
+                // En otras páginas (como curso-ia.html), solo actualizar el botón de login
+                if (memberDashboard) {
+                    const userNameElement = document.getElementById('userName');
+                    if (userNameElement) {
+                        userNameElement.textContent = currentUser.nombre;
+                    }
+                    showMemberDashboard();
+                } else {
+                    console.log('ℹ️ Dashboard no disponible en esta página, solo actualizando botón de login');
+                }
             } else {
                 // Token inválido, limpiar
                 authAPI.clearTokens();
