@@ -1,0 +1,102 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 🔒 REGLAS DE SEGURIDAD PARA UGT-CLM GRANADA - PRODUCCIÓN
+
+    // Funciones auxiliares
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        request.auth.token.role == 'admin' ||
+        request.auth.token.email == 'ugtclmgranada@gmail.com';
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Colección de usuarios - Solo lectura y escritura por el propio usuario o admin
+    match /users/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() &&
+        request.auth.uid == userId &&
+        request.resource.data.keys().hasAll(['email', 'name']) &&
+        request.resource.data.email == request.auth.token.email;
+    }
+
+    // Perfiles públicos - Lectura para todos, escritura solo para el propietario
+    match /publicProfiles/{userId} {
+      allow read: if true; // Perfiles públicos visibles para todos
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // Cursos - Lectura pública, escritura solo para admin
+    match /courses/{courseId} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll(['title', 'description', 'status']);
+    }
+
+    // Eventos - Lectura pública, escritura solo para admin
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll(['title', 'date', 'status']);
+    }
+
+    // Documentos - Lectura para miembros autenticados, escritura solo para admin
+    match /documents/{documentId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Preinscripciones a cursos - Solo usuarios autenticados
+    match /course_preinscriptions/{preinscriptionId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Solicitudes de afiliación - Privado, solo admin y propietario
+    match /affiliationRequests/{requestId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Pagos - Alta seguridad, solo admin
+    match /payments/{paymentId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Solicitudes de contacto - Solo admin puede leer
+    match /contactRequests/{requestId} {
+      allow read: if isAdmin();
+      allow create: if request.resource.data.keys().hasAll(['name', 'email', 'message']);
+    }
+
+    // Estadísticas y logs - Solo admin
+    match /statistics/{statId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /logs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Denegar todo lo demás
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
