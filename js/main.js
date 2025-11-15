@@ -81,14 +81,63 @@ if (hamburger && navMenu) {
         navMenu.classList.toggle('active');
     });
 
-    // Close mobile menu when clicking on a link
+    // Close mobile menu when clicking on a link (except login button)
     document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
+        link.addEventListener('click', (e) => {
+            // No cerrar el menú si es el botón de login (se maneja abajo)
+            if (!link.classList.contains('btn-login')) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
         });
     });
 }
+
+// MANEJADOR GLOBAL DEL BOTÓN DE LOGIN (funciona en móvil y escritorio)
+// Usar delegación de eventos con capture phase para interceptar antes que el navegador procese el href
+document.addEventListener('click', (e) => {
+    // Buscar si el clic fue en el botón de login o en un elemento dentro de él
+    const loginButton = e.target.closest('.btn-login');
+
+    if (loginButton) {
+        // Prevenir INMEDIATAMENTE cualquier comportamiento por defecto
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+
+        console.log('🔐 Botón de login clicado');
+
+        // Cerrar menú móvil si está abierto
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        if (hamburger && navMenu) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+        }
+
+        // Verificar si el usuario está logueado
+        const isLoggedIn = (typeof authAPI !== 'undefined' && authAPI.isAuthenticated) ?
+                            authAPI.isAuthenticated() : false;
+
+        if (isLoggedIn) {
+            // Si está logueado, mostrar dashboard
+            if (typeof showMemberDashboard === 'function') {
+                showMemberDashboard();
+            }
+        } else {
+            // Si no está logueado, abrir modal de login
+            const modal = document.querySelector('#loginModal');
+            if (modal) {
+                modal.style.display = 'block';
+                console.log('✅ Modal de login abierto');
+            } else {
+                console.error('❌ Login modal not found');
+            }
+        }
+
+        return false;
+    }
+}, true); // Usar capture phase (true) para interceptar ANTES que otros event listeners
 
 // SISTEMA DE NAVEGACIÓN INTELIGENTE
 let isSingleSectionMode = false;
@@ -557,97 +606,87 @@ function smoothScrollTo(targetElement, offset = 0) {
 
 // Login Modal - Will be updated in updateLoginState function
 function initLoginBtn() {
-    if (!loginBtn || !loginModal) {
-        console.warn('Login button or modal not found');
+    if (!loginBtn) {
+        console.warn('Login button not found');
         return;
     }
 
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    // CRITICAL FIX: Verificar tokens reales en lugar de isLoggedIn
+    // Verificar que authAPI existe antes de usarlo
+    const isLoggedIn = (typeof authAPI !== 'undefined' && authAPI.isAuthenticated) ?
+                        authAPI.isAuthenticated() : false;
 
-    if (isLoggedIn) {
-        const userName = localStorage.getItem('userName') || 'Afiliado';
+    if (isLoggedIn && currentUser) {
+        const userName = currentUser.nombre || localStorage.getItem('userName') || 'Afiliado';
         loginBtn.innerHTML = `<i class="fas fa-user"></i> ${userName.split(' ')[0]}`;
-        loginBtn.onclick = (e) => {
-            e.preventDefault();
-            showMemberDashboard();
-        };
+        // Nota: El comportamiento del clic para usuarios logueados se maneja en el event listener del menú móvil (líneas 71-106)
     } else {
         loginBtn.innerHTML = '<i class="fas fa-user"></i> Acceso Afiliados';
-        loginBtn.onclick = (e) => {
-            e.preventDefault();
-            loginModal.style.display = 'block';
-        };
+        // Nota: El comportamiento del clic para usuarios no logueados se maneja en el event listener del menú móvil (líneas 71-106)
     }
 }
 
-if (closeModal && loginModal) {
-    closeModal.addEventListener('click', () => {
-        loginModal.style.display = 'none';
-    });
-}
+// Cierre de modales con delegación de eventos
+document.addEventListener('click', (e) => {
+    // Cerrar modal con botón X
+    if (e.target.classList.contains('close')) {
+        const modal = e.target.closest('.modal');
+        if (modal) {
+            modal.style.display = 'none';
+            console.log('✅ Modal cerrado con botón X');
+        }
+    }
 
-window.addEventListener('click', (e) => {
-    if (loginModal && e.target === loginModal) {
-        loginModal.style.display = 'none';
-    }
-    if (recoveryModal && e.target === recoveryModal) {
-        recoveryModal.style.display = 'none';
-    }
-    if (registerModal && e.target === registerModal) {
-        registerModal.style.display = 'none';
-    }
-    if (changePasswordModal && e.target === changePasswordModal) {
-        changePasswordModal.style.display = 'none';
+    // Cerrar modal al hacer clic fuera del contenido
+    if (e.target.classList.contains('modal')) {
+        e.target.style.display = 'none';
+        console.log('✅ Modal cerrado al hacer clic fuera');
     }
 });
 
-// Recovery Modal handlers
-if (forgotPasswordLink && loginModal && recoveryModal) {
-    forgotPasswordLink.addEventListener('click', (e) => {
+// Recovery Modal handlers con delegación de eventos
+document.addEventListener('click', (e) => {
+    // Forgot password link
+    if (e.target.id === 'forgotPasswordLink' || e.target.closest('#forgotPasswordLink')) {
         e.preventDefault();
-        loginModal.style.display = 'none';
-        recoveryModal.style.display = 'block';
-    });
-}
+        const loginModal = document.querySelector('#loginModal');
+        const recoveryModal = document.querySelector('#recoveryModal');
+        if (loginModal && recoveryModal) {
+            loginModal.style.display = 'none';
+            recoveryModal.style.display = 'block';
+        }
+    }
 
-if (closeRecoveryBtn && recoveryModal) {
-    closeRecoveryBtn.addEventListener('click', () => {
-        recoveryModal.style.display = 'none';
-    });
-}
-
-if (backToLoginBtn && recoveryModal && loginModal) {
-    backToLoginBtn.addEventListener('click', (e) => {
+    // Back to login from recovery
+    if (e.target.id === 'backToLogin' || e.target.closest('#backToLogin')) {
         e.preventDefault();
-        recoveryModal.style.display = 'none';
-        loginModal.style.display = 'block';
-    });
-}
+        const recoveryModal = document.querySelector('#recoveryModal');
+        const loginModal = document.querySelector('#loginModal');
+        if (recoveryModal && loginModal) {
+            recoveryModal.style.display = 'none';
+            loginModal.style.display = 'block';
+        }
+    }
 
-// ============================================
-// REGISTER MODAL HANDLERS (Solo para admins)
-// ============================================
-if (showRegisterLink) {
-    showRegisterLink.addEventListener('click', (e) => {
+    // Back to login from register
+    if (e.target.id === 'backToLoginFromRegister' || e.target.closest('#backToLoginFromRegister')) {
         e.preventDefault();
-        loginModal.style.display = 'none';
-        registerModal.style.display = 'block';
-    });
-}
+        const registerModal = document.querySelector('#registerModal');
+        const loginModal = document.querySelector('#loginModal');
+        if (registerModal && loginModal) {
+            registerModal.style.display = 'none';
+            loginModal.style.display = 'block';
+        }
+    }
 
-if (closeRegister) {
-    closeRegister.addEventListener('click', () => {
-        registerModal.style.display = 'none';
-    });
-}
-
-if (backToLoginFromRegister) {
-    backToLoginFromRegister.addEventListener('click', (e) => {
-        e.preventDefault();
-        registerModal.style.display = 'none';
-        loginModal.style.display = 'block';
-    });
-}
+    // Go to affiliate from login
+    if (e.target.id === 'goToAffiliateLink' || e.target.closest('#goToAffiliateLink')) {
+        const loginModal = document.querySelector('#loginModal');
+        if (loginModal) {
+            loginModal.style.display = 'none';
+        }
+    }
+});
 
 // ============================================
 // CHANGE PASSWORD MODAL HANDLERS
@@ -675,13 +714,17 @@ if (backToProfile) {
 }
 
 // Edit Profile Modal handlers
-closeEditProfile.addEventListener('click', () => {
-    editProfileModal.style.display = 'none';
-});
+if (closeEditProfile) {
+    closeEditProfile.addEventListener('click', () => {
+        editProfileModal.style.display = 'none';
+    });
+}
 
-cancelEditBtn.addEventListener('click', () => {
-    editProfileModal.style.display = 'none';
-});
+if (cancelEditBtn) {
+    cancelEditBtn.addEventListener('click', () => {
+        editProfileModal.style.display = 'none';
+    });
+}
 
 // Profile Photo functionality
 if (changePhotoBtn && profilePhotoInput) {
@@ -765,17 +808,23 @@ async function removeProfilePhoto() {
 }
 
 // Dashboard modals close handlers
-closeMyCourses.addEventListener('click', () => {
-    myCoursesModal.style.display = 'none';
-});
+if (closeMyCourses) {
+    closeMyCourses.addEventListener('click', () => {
+        myCoursesModal.style.display = 'none';
+    });
+}
 
-closeMyDocuments.addEventListener('click', () => {
-    myDocumentsModal.style.display = 'none';
-});
+if (closeMyDocuments) {
+    closeMyDocuments.addEventListener('click', () => {
+        myDocumentsModal.style.display = 'none';
+    });
+}
 
-closeMyEvents.addEventListener('click', () => {
-    myEventsModal.style.display = 'none';
-});
+if (closeMyEvents) {
+    closeMyEvents.addEventListener('click', () => {
+        myEventsModal.style.display = 'none';
+    });
+}
 
 window.addEventListener('click', (e) => {
     if (e.target === editProfileModal) {
@@ -881,7 +930,9 @@ logoutBtn.addEventListener('click', async () => {
         showMessage('success', 'Sesión cerrada correctamente');
 
         // Hide dashboard and show main site
-        memberDashboard.style.display = 'none';
+        if (memberDashboard) {
+            memberDashboard.style.display = 'none';
+        }
         document.querySelectorAll('.section').forEach(section => {
             if (section.id !== 'memberDashboard') {
                 section.style.display = 'block';
@@ -917,9 +968,15 @@ function initSmoothScroll() {
             const href = this.getAttribute('href');
             console.log(`🖱️ Click detectado en: ${href}`);
 
-            // Ignorar enlaces que son solo "#" (modales, etc.)
-            if (href === '#' || href === '#!' || !href) {
-                console.log(`⏭️ Ignorando enlace: ${href}`);
+            // Ignorar enlaces especiales (modales, login, etc.)
+            if (href === '#' || href === '#!' || href === '#login' || !href) {
+                console.log(`⏭️ Ignorando enlace especial: ${href}`);
+                return;
+            }
+
+            // Ignorar botones con clases especiales que tienen sus propios handlers
+            if (this.classList.contains('btn-login')) {
+                console.log(`⏭️ Ignorando botón de login - tiene handler dedicado`);
                 return;
             }
 
@@ -1270,9 +1327,18 @@ recoveryForm.addEventListener('submit', async (e) => {
 // MOSTRAR DASHBOARD CON DATOS REALES
 // ============================================
 function showMemberDashboard() {
+    // Verificar que el dashboard existe (puede que aún no se haya inyectado)
+    if (!memberDashboard) {
+        console.error('❌ Dashboard no encontrado en el DOM. Asegúrate de que user-dashboard-inject.js se haya ejecutado.');
+        return;
+    }
+
     // Usar currentUser de la API real
     const userName = currentUser ? currentUser.nombre : 'Afiliado';
-    document.getElementById('userName').textContent = userName;
+    const userNameElement = document.getElementById('userName');
+    if (userNameElement) {
+        userNameElement.textContent = userName;
+    }
 
     // Hide all main content sections except dashboard, but keep header visible
     document.querySelectorAll('.section:not(#memberDashboard)').forEach(section => {
@@ -1333,6 +1399,13 @@ function initDashboardButtons() {
 // MOSTRAR MODAL DE PERFIL CON DATOS REALES
 // ============================================
 function showEditProfileModal() {
+    // Re-seleccionar el modal (puede que no existiera cuando se declaró la constante)
+    const modal = document.querySelector('#editProfileModal');
+    if (!modal) {
+        console.error('❌ Modal de perfil no encontrado');
+        return;
+    }
+
     // Usar currentUser de la API real
     if (!currentUser) {
         showMessage('error', 'No se encontraron los datos del usuario');
@@ -1340,46 +1413,70 @@ function showEditProfileModal() {
     }
 
     // Populate form with current data
-    document.getElementById('profileName').value = currentUser.nombre || '';
-    document.getElementById('profileEmail').value = currentUser.email || '';
-    document.getElementById('profilePhone').value = currentUser.telefono || '';
-    document.getElementById('profileDepartment').value = currentUser.departamento || '';
+    const profileName = document.getElementById('profileName');
+    const profileEmail = document.getElementById('profileEmail');
+    const profilePhone = document.getElementById('profilePhone');
+    const profileDepartment = document.getElementById('profileDepartment');
+
+    if (profileName) profileName.value = currentUser.nombre || '';
+    if (profileEmail) profileEmail.value = currentUser.email || '';
+    if (profilePhone) profilePhone.value = currentUser.telefono || '';
+    if (profileDepartment) profileDepartment.value = currentUser.departamento || '';
 
     // Load profile photo if exists
     console.log('🔍 Verificando foto de perfil para:', currentUser.email);
     console.log('📸 Foto guardada:', currentUser.profilePhoto ? 'Sí' : 'No');
 
+    const imgPreview = document.querySelector('#profileImagePreview');
+    const defAvatar = document.querySelector('#defaultAvatar');
+    const removeBtn = document.querySelector('#removePhotoBtn');
+    const changeBtn = document.querySelector('#changePhotoBtn');
+
     if (currentUser.profilePhoto && currentUser.profilePhoto.trim() !== '') {
-        profileImagePreview.src = currentUser.profilePhoto;
-        profileImagePreview.style.display = 'block';
-        defaultAvatar.style.display = 'none';
-        removePhotoBtn.style.display = 'inline-flex';
-        changePhotoBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
+        if (imgPreview) {
+            imgPreview.src = currentUser.profilePhoto;
+            imgPreview.style.display = 'block';
+        }
+        if (defAvatar) defAvatar.style.display = 'none';
+        if (removeBtn) removeBtn.style.display = 'inline-flex';
+        if (changeBtn) changeBtn.innerHTML = '<i class="fas fa-camera"></i> Cambiar Foto';
         console.log('✅ Foto de perfil cargada correctamente');
     } else {
         // Show default avatar
-        profileImagePreview.style.display = 'none';
-        profileImagePreview.src = '';
-        defaultAvatar.style.display = 'flex';
-        removePhotoBtn.style.display = 'none';
-        changePhotoBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
+        if (imgPreview) {
+            imgPreview.style.display = 'none';
+            imgPreview.src = '';
+        }
+        if (defAvatar) defAvatar.style.display = 'flex';
+        if (removeBtn) removeBtn.style.display = 'none';
+        if (changeBtn) changeBtn.innerHTML = '<i class="fas fa-upload"></i> Subir Foto';
         console.log('👤 Mostrando avatar predeterminado');
     }
 
     // Show modal
-    editProfileModal.style.display = 'block';
+    modal.style.display = 'block';
     console.log('📝 Modal de edición de perfil abierto para:', currentUser.nombre);
 }
 
 // Show my courses modal
 function showMyCoursesModal() {
-    myCoursesModal.style.display = 'block';
+    const modal = document.querySelector('#myCoursesModal');
+    if (!modal) {
+        console.error('❌ Modal de cursos no encontrado');
+        return;
+    }
+    modal.style.display = 'block';
     console.log('📚 Modal de "Mis Cursos" abierto');
 }
 
 // Show my documents modal
 async function showMyDocumentsModal() {
-    myDocumentsModal.style.display = 'block';
+    const modal = document.querySelector('#myDocumentsModal');
+    if (!modal) {
+        console.error('❌ Modal de documentos no encontrado');
+        return;
+    }
+    modal.style.display = 'block';
     console.log('📁 Modal de "Mis Documentos" abierto');
 
     // Cargar documentos del usuario
@@ -1387,27 +1484,56 @@ async function showMyDocumentsModal() {
 }
 
 // Cargar documentos del usuario
+// Cargar documentos del usuario
 async function loadUserDocuments() {
     console.log('🔍 loadUserDocuments() llamado');
     console.log('🔗 authAPI disponible:', typeof authAPI);
     console.log('🌐 authAPI.getDocuments disponible:', typeof authAPI.getDocuments);
 
+    const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
+    console.log('🎯 Contenedor de documentos encontrado:', !!documentsContent);
+
+    if (!documentsContent) {
+        console.error('❌ Contenedor de documentos no encontrado');
+        return;
+    }
+
     try {
+        // Mostrar loading
+        documentsContent.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <h4>Cargando documentos...</h4>
+            </div>
+        `;
+
         console.log('🚀 Llamando a authAPI.getDocuments()...');
         const response = await authAPI.getDocuments();
         console.log('📥 Respuesta getDocuments:', response);
 
-        if (!response.success) {
-            console.error('❌ Error en respuesta getDocuments:', response);
-            throw new Error(response.error || 'Error al cargar documentos');
+        if (!response || !response.success) {
+            // Si la API no está disponible o devuelve error, mostrar mensaje amigable
+            console.warn('⚠️ Error cargando documentos:', response?.error);
+            documentsContent.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h4>Documentos</h4>
+                    <p>Los documentos sindicales estarán disponibles próximamente.</p>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                        <i class="fas fa-info-circle"></i> Estamos trabajando para traerte esta funcionalidad pronto.
+                    </p>
+                </div>
+            `;
+            return;
         }
 
-        const documents = response.data.documents || [];
+        const documents = response.data?.documents || [];
         console.log('📄 Documentos recibidos:', documents.length);
         console.log('📋 Lista de documentos:', documents);
-
-        const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
-        console.log('🎯 Contenedor de documentos encontrado:', !!documentsContent);
 
         // Verificar si falta la ficha de afiliación
         const hasFicha = documents.some(doc => doc.type === 'ficha-afiliacion');
@@ -1491,17 +1617,18 @@ async function loadUserDocuments() {
         console.error('📋 Error completo loadUserDocuments:', error.message);
         console.error('📍 Stack trace:', error.stack);
         console.error('🌐 authAPI status:', typeof authAPI);
-        const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
+
+        // Mostrar mensaje amigable sin romper la UI
         documentsContent.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-file-alt"></i>
                 </div>
-                <h4>Error al cargar documentos</h4>
-                <p>${error.message}</p>
-                <button class="btn btn-primary" onclick="loadUserDocuments()">
-                    <i class="fas fa-sync"></i> Reintentar
-                </button>
+                <h4>Documentos</h4>
+                <p>Los documentos sindicales estarán disponibles próximamente.</p>
+                <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                    <i class="fas fa-info-circle"></i> Estamos trabajando para traerte esta funcionalidad pronto.
+                </p>
             </div>
         `;
     }
@@ -1582,15 +1709,215 @@ function formatFileSize(bytes) {
     return (bytes / 1048576).toFixed(1) + ' MB';
 }
 
+// Load user events from backend
+async function loadUserEvents() {
+    const eventsContainer = document.getElementById('eventsContainer');
+
+    if (!eventsContainer) {
+        console.error('❌ Contenedor de eventos no encontrado');
+        return;
+    }
+
+    try {
+        // Mostrar loading
+        eventsContainer.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-spinner fa-spin fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                <p style="color: #666;">Cargando eventos...</p>
+            </div>
+        `;
+
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            console.warn('⚠️ No hay token de autenticación');
+            eventsContainer.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-calendar fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                    <p style="color: #666;">Los eventos sindicales estarán disponibles próximamente</p>
+                </div>
+            `;
+            return;
+        }
+
+        const backendUrl = window.BACKEND_URL || 'https://sindicato-mu.vercel.app';
+        const response = await fetch(`${backendUrl}/api/user/events`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            console.warn('⚠️ Error al cargar eventos:', response.status);
+            eventsContainer.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-calendar fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                    <p style="color: #666;">Los eventos sindicales estarán disponibles próximamente</p>
+                </div>
+            `;
+            return;
+        }
+
+        const result = await response.json();
+        if (result.success) {
+            displayUserEvents(result.data.events);
+        } else {
+            console.warn('⚠️ Error en respuesta de eventos:', result.error);
+            eventsContainer.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-calendar fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                    <p style="color: #666;">Los eventos sindicales estarán disponibles próximamente</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('❌ Error cargando eventos del usuario:', error);
+        // Mostrar mensaje amigable en lugar de romper
+        eventsContainer.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-calendar fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                <p style="color: #666;">Los eventos sindicales estarán disponibles próximamente</p>
+            </div>
+        `;
+    }
+}
+
+// Display user events in the modal
+function displayUserEvents(events) {
+    const eventsContainer = document.getElementById('eventsContainer');
+    if (!eventsContainer) {
+        console.error('Contenedor de eventos no encontrado');
+        return;
+    }
+
+    if (!events || events.length === 0) {
+        eventsContainer.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-calendar-times fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                <p style="color: #666;">No tienes eventos en este momento</p>
+            </div>
+        `;
+        return;
+    }
+
+    eventsContainer.innerHTML = events.map(event => {
+        const date = event.eventDate ? new Date(event.eventDate).toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }) : '';
+
+        const time = event.eventDate ? new Date(event.eventDate).toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit'
+        }) : '';
+
+        const priorityColors = {
+            urgent: '#f44336',
+            high: '#ff9800',
+            normal: '#2196f3',
+            low: '#4caf50'
+        };
+
+        const typeIcons = {
+            announcement: 'fa-bullhorn',
+            meeting: 'fa-users',
+            course: 'fa-graduation-cap',
+            reminder: 'fa-bell',
+            notification: 'fa-info-circle'
+        };
+
+        const icon = event.metadata?.icon || typeIcons[event.type] || 'fa-bell';
+        const color = event.metadata?.color || priorityColors[event.priority] || '#2196f3';
+
+        return `
+            <div class="event-card" style="
+                border-left: 4px solid ${color};
+                background: white;
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'"
+               onmouseout="this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">
+                <div style="display: flex; align-items: start; gap: 1rem;">
+                    <div style="
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        background: ${color}22;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-shrink: 0;
+                    ">
+                        <i class="fas ${icon}" style="color: ${color}; font-size: 1.5rem;"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 0.5rem 0; color: ${color};">${event.title}</h4>
+                        <p style="margin: 0 0 0.5rem 0; color: #666; line-height: 1.5;">${event.description}</p>
+                        ${date ? `
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; color: #888; font-size: 0.9rem;">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>${date}</span>
+                                ${time ? `<i class="fas fa-clock" style="margin-left: 1rem;"></i><span>${time}</span>` : ''}
+                            </div>
+                        ` : ''}
+                        ${event.location ? `
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; color: #888; font-size: 0.9rem;">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${event.location}</span>
+                            </div>
+                        ` : ''}
+                        ${event.link ? `
+                            <div style="margin-top: 0.75rem;">
+                                <a href="${event.link}" target="_blank" style="
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 0.5rem;
+                                    padding: 0.5rem 1rem;
+                                    background: ${color};
+                                    color: white;
+                                    text-decoration: none;
+                                    border-radius: 5px;
+                                    font-size: 0.9rem;
+                                    transition: opacity 0.3s;
+                                " onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>Más información</span>
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
 // Show my events modal
-function showMyEventsModal() {
-    myEventsModal.style.display = 'block';
+async function showMyEventsModal() {
+    const modal = document.querySelector('#myEventsModal');
+    if (!modal) {
+        console.error('❌ Modal de eventos no encontrado');
+        return;
+    }
+    modal.style.display = 'block';
     console.log('📅 Modal de "Mis Eventos" abierto');
+
+    // Load events from backend
+    await loadUserEvents();
 }
 
 // Close modal and navigate to courses section
 function closeModalAndNavigateToCourses() {
-    myCoursesModal.style.display = 'none';
+    const modal = document.querySelector('#myCoursesModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
     // Exit dashboard mode and show main site
     exitDashboardMode();
 
@@ -1608,7 +1935,9 @@ function closeModalAndNavigateToCourses() {
 // Exit dashboard mode and return to normal site navigation
 function exitDashboardMode() {
     // Hide dashboard
-    memberDashboard.style.display = 'none';
+    if (memberDashboard) {
+        memberDashboard.style.display = 'none';
+    }
 
     // Show all sections
     document.querySelectorAll('.section').forEach(section => {
@@ -1704,9 +2033,19 @@ async function checkLoginStatus() {
 
             if (result.success) {
                 currentUser = result.data.user;
-                document.getElementById('userName').textContent = currentUser.nombre;
-                showMemberDashboard();
                 console.log('✅ Sesión válida:', currentUser.email);
+
+                // Solo mostrar dashboard si estamos en la página principal (index.html)
+                // En otras páginas (como curso-ia.html), solo actualizar el botón de login
+                if (memberDashboard) {
+                    const userNameElement = document.getElementById('userName');
+                    if (userNameElement) {
+                        userNameElement.textContent = currentUser.nombre;
+                    }
+                    showMemberDashboard();
+                } else {
+                    console.log('ℹ️ Dashboard no disponible en esta página, solo actualizando botón de login');
+                }
             } else {
                 // Token inválido, limpiar
                 authAPI.clearTokens();
@@ -2715,14 +3054,18 @@ if (changePasswordForm) {
 
                     // El backend invalida todos los tokens, así que hacemos logout
                     currentUser = null;
-                    memberDashboard.style.display = 'none';
+                    if (memberDashboard) {
+                        memberDashboard.style.display = 'none';
+                    }
                     document.querySelectorAll('.section').forEach(section => {
                         if (section.id !== 'memberDashboard') {
                             section.style.display = 'block';
                         }
                     });
                     updateLoginState();
-                    loginModal.style.display = 'block';
+                    if (loginModal) {
+                        loginModal.style.display = 'block';
+                    }
                 }, 2000);
             } else {
                 showMessage('error', result.error || 'Error al cambiar contraseña');
@@ -2758,5 +3101,29 @@ highlightStyle.textContent = `
     }
 `;
 document.head.appendChild(highlightStyle);
+
+// ============================================
+// SCROLL TO TOP FUNCTIONALITY
+// ============================================
+const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+if (scrollToTopBtn) {
+    // Show/hide button based on scroll position
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            scrollToTopBtn.classList.add('show');
+        } else {
+            scrollToTopBtn.classList.remove('show');
+        }
+    });
+
+    // Smooth scroll to top when button is clicked
+    scrollToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
 
 // Última actualización: sábado,  8 de noviembre de 2025, 01:31:50 CET

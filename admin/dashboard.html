@@ -250,6 +250,7 @@
                 <li><a href="#" class="active"><i class="fas fa-dashboard"></i> Dashboard</a></li>
                 <li><a href="#members"><i class="fas fa-users"></i> Afiliados</a></li>
                 <li><a href="#courses"><i class="fas fa-graduation-cap"></i> Cursos</a></li>
+                <li><a href="accounting.html"><i class="fas fa-calculator"></i> Contabilidad</a></li>
                 <li><a href="#payments"><i class="fas fa-credit-card"></i> Pagos</a></li>
                 <li><a href="#content"><i class="fas fa-file-text"></i> Contenido</a></li>
                 <li><a href="#analytics"><i class="fas fa-chart-bar"></i> Analíticas</a></li>
@@ -430,6 +431,8 @@
         </main>
     </div>
 
+    <script src="../js/backend-config.js"></script>
+    <script src="../js/auth-api.js"></script>
     <script src="../js/main.js"></script>
     <script>
         // Sidebar toggle for mobile
@@ -448,27 +451,183 @@
             });
         });
 
-        // Data management functions
-        function loadMembers() {
-            // Simulate loading members from database
-            console.log('Cargando afiliados...');
+        // Check authentication and admin role
+        async function checkAdminAccess() {
+            if (!authAPI.isAuthenticated()) {
+                alert('Debes iniciar sesión para acceder al panel de administración');
+                window.location.href = '../index.html';
+                return false;
+            }
+
+            try {
+                const result = await authAPI.me();
+                if (!result.success || result.data.user.role !== 'admin') {
+                    alert('No tienes permisos de administrador');
+                    window.location.href = '../index.html';
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error verificando acceso admin:', error);
+                window.location.href = '../index.html';
+                return false;
+            }
         }
 
-        function loadCourses() {
-            // Simulate loading courses from database
-            console.log('Cargando cursos...');
+        // Fetch admin statistics from backend
+        async function loadAdminStats() {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const backendUrl = window.BACKEND_URL || 'https://sindicato-mu.vercel.app';
+
+                const response = await fetch(`${backendUrl}/api/admin/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.success) {
+                    updateStatCards(result.data);
+                }
+            } catch (error) {
+                console.error('Error cargando estadísticas admin:', error);
+            }
         }
 
-        function loadAnalytics() {
-            // Simulate loading analytics data
-            console.log('Cargando analíticas...');
+        // Update stat cards with real data
+        function updateStatCards(data) {
+            // Update Afiliados Activos
+            document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = data.users.activeMembers || 0;
+
+            // Update Cursos Activos
+            const totalCourses = data.courses.byType ? data.courses.byType.length : 0;
+            document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = totalCourses;
+
+            // Update Ingresos Mensuales
+            const monthlyRevenue = data.revenue.monthly || 0;
+            document.querySelector('.stat-card:nth-child(3) .stat-value').textContent =
+                `€${monthlyRevenue.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+
+            // Update Crecimiento Mensual
+            const growth = data.growth.percentage || 0;
+            const growthSign = growth >= 0 ? '+' : '';
+            document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = `${growthSign}${growth}%`;
+        }
+
+        // Load recent members
+        async function loadRecentMembers() {
+            try {
+                const token = localStorage.getItem('accessToken');
+                const backendUrl = window.BACKEND_URL || 'https://sindicato-mu.vercel.app';
+
+                const response = await fetch(`${backendUrl}/api/admin/recent?days=30`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.success) {
+                    displayRecentMembers(result.data.users);
+                    displayRecentEnrollments(result.data.enrollments);
+                }
+            } catch (error) {
+                console.error('Error cargando afiliados recientes:', error);
+            }
+        }
+
+        // Display recent members in table
+        function displayRecentMembers(users) {
+            const tbody = document.querySelector('.admin-table:nth-of-type(1) tbody');
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay afiliados recientes</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.slice(0, 4).map(user => {
+                const statusClass = user.membershipStatus === 'activo' ? 'active' :
+                                   user.membershipStatus === 'pendiente' ? 'pending' : 'inactive';
+                const statusText = user.membershipStatus.charAt(0).toUpperCase() + user.membershipStatus.slice(1);
+                const date = new Date(user.createdAt).toLocaleDateString('es-ES');
+
+                return `
+                    <tr>
+                        <td>${user.nombre}</td>
+                        <td>${user.email}</td>
+                        <td>${user.departamento || 'N/A'}</td>
+                        <td>${date}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary btn-sm" onclick="viewUser('${user._id}')">Ver</button>
+                                <button class="btn btn-secondary btn-sm">Editar</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Display recent enrollments in table
+        function displayRecentEnrollments(enrollments) {
+            const tbody = document.querySelector('.admin-table:nth-of-type(2) tbody');
+            if (!enrollments || enrollments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay inscripciones recientes</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = enrollments.slice(0, 2).map(enrollment => {
+                const date = new Date(enrollment.course.enrollmentDate).toLocaleDateString('es-ES');
+                const type = enrollment.user.department ? 'Afiliado' : 'Externo';
+                const amount = enrollment.payment ? `€${enrollment.payment.amount}` : 'N/A';
+
+                return `
+                    <tr>
+                        <td>${enrollment.user.name}</td>
+                        <td>${enrollment.course.name}</td>
+                        <td>${type}</td>
+                        <td>${date}</td>
+                        <td>${amount}</td>
+                        <td><span class="status-badge active">Pagado</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary btn-sm">Ver</button>
+                                <button class="btn btn-secondary btn-sm">Certificado</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // View user details
+        function viewUser(userId) {
+            // TODO: Implement user details modal
+            console.log('Ver detalles de usuario:', userId);
         }
 
         // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            loadMembers();
-            loadCourses();
-            loadAnalytics();
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check admin access first
+            const hasAccess = await checkAdminAccess();
+            if (!hasAccess) return;
+
+            // Load all data
+            await loadAdminStats();
+            await loadRecentMembers();
+
+            console.log('✅ Panel de administración cargado');
         });
     </script>
 </body>
