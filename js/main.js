@@ -1,3 +1,17 @@
+// ============================================
+// VERIFICACIÓN INICIAL DE DEPENDENCIAS
+// ============================================
+console.log('🚀 main.js cargado');
+console.log('🔗 authAPI disponible al cargar:', typeof authAPI);
+
+// Verificar si authAPI está disponible después de cargar todos los scripts
+setTimeout(() => {
+    console.log('⏰ authAPI disponible después de 2s:', typeof authAPI);
+    if (typeof authAPI !== 'undefined') {
+        console.log('✅ authAPI.métodos disponibles:', Object.getOwnPropertyNames(authAPI));
+    }
+}, 2000);
+
 // DOM Elements
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
@@ -1087,10 +1101,25 @@ loginForm.addEventListener('submit', async (e) => {
 
     try {
         // Login usando API real
+        console.log('🔐 Iniciando login con authAPI...');
+        console.log('📧 Email:', email);
+        console.log('🔐 authAPI disponible:', typeof authAPI);
+
         const result = await authAPI.login(email, password);
+        console.log('📥 Respuesta authAPI.login():', result);
 
         if (result.success) {
             currentUser = result.data.user;
+            console.log('✅ Login exitoso, usuario:', currentUser);
+
+            // Verificar si authAPI tiene token después del login
+            setTimeout(() => {
+                console.log('🔍 authAPI.isAuthenticated() después de login:', authAPI.isAuthenticated());
+                if (typeof authAPI.storeToken === 'function') {
+                    console.log('🔐 authAPI.storeToken disponible');
+                }
+            }, 100);
+
             showMessage('success', `¡Bienvenido de nuevo, ${currentUser.nombre}!`);
 
             console.log('✅ Login exitoso:', currentUser);
@@ -1455,8 +1484,14 @@ async function showMyDocumentsModal() {
 }
 
 // Cargar documentos del usuario
+// Cargar documentos del usuario
 async function loadUserDocuments() {
+    console.log('🔍 loadUserDocuments() llamado');
+    console.log('🔗 authAPI disponible:', typeof authAPI);
+    console.log('🌐 authAPI.getDocuments disponible:', typeof authAPI.getDocuments);
+
     const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
+    console.log('🎯 Contenedor de documentos encontrado:', !!documentsContent);
 
     if (!documentsContent) {
         console.error('❌ Contenedor de documentos no encontrado');
@@ -1474,7 +1509,9 @@ async function loadUserDocuments() {
             </div>
         `;
 
+        console.log('🚀 Llamando a authAPI.getDocuments()...');
         const response = await authAPI.getDocuments();
+        console.log('📥 Respuesta getDocuments:', response);
 
         if (!response || !response.success) {
             // Si la API no está disponible o devuelve error, mostrar mensaje amigable
@@ -1495,10 +1532,17 @@ async function loadUserDocuments() {
         }
 
         const documents = response.data?.documents || [];
+        console.log('📄 Documentos recibidos:', documents.length);
+        console.log('📋 Lista de documentos:', documents);
 
         // Verificar si falta la ficha de afiliación
         const hasFicha = documents.some(doc => doc.type === 'ficha-afiliacion');
         const hasCertificado = documents.some(doc => doc.type === 'certificado-afiliado');
+
+        console.log('🔍 Estado de documentos:');
+        console.log('  - Tiene ficha de afiliación:', hasFicha);
+        console.log('  - Tiene certificado afiliado:', hasCertificado);
+        console.log('  - Documentos disponibles:', documents.map(d => `${d.type}: ${d.title}`));
 
         if (documents.length === 0) {
             // Mostrar estado vacío
@@ -1570,6 +1614,9 @@ async function loadUserDocuments() {
 
     } catch (error) {
         console.error('❌ Error cargando documentos:', error);
+        console.error('📋 Error completo loadUserDocuments:', error.message);
+        console.error('📍 Stack trace:', error.stack);
+        console.error('🌐 authAPI status:', typeof authAPI);
 
         // Mostrar mensaje amigable sin romper la UI
         documentsContent.innerHTML = `
@@ -1589,22 +1636,35 @@ async function loadUserDocuments() {
 
 // Generar documento faltante
 async function generateMissingDocument(type, title) {
+    console.log('🔧 generateMissingDocument() llamado');
+    console.log('📄 Tipo:', type);
+    console.log('📋 Título:', title);
+    console.log('🔗 authAPI disponible:', typeof authAPI);
+    console.log('🌐 authAPI.generateDocument disponible:', typeof authAPI.generateDocument);
+
     try {
         showMessage('info', `Generando ${title}...`);
 
+        console.log('🚀 Llamando a authAPI.generateDocument()...');
         const response = await authAPI.generateDocument(type);
+        console.log('📥 Respuesta del servidor:', response);
 
         if (!response.success) {
+            console.error('❌ Error en respuesta del servidor:', response);
             throw new Error(response.error || 'Error al generar documento');
         }
 
+        console.log('✅ Documento generado exitosamente');
         showMessage('success', `${title} generado correctamente`);
 
         // Recargar lista de documentos
+        console.log('🔄 Recargando lista de documentos...');
         await loadUserDocuments();
 
     } catch (error) {
         console.error(`❌ Error generando ${title}:`, error);
+        console.error('📋 Error completo:', error.message);
+        console.error('📍 Stack trace:', error.stack);
         showMessage('error', `Error al generar ${title}: ${error.message}`);
     }
 }

@@ -475,3 +475,30 @@ console.log('🔐 AuthAPI inicializado');
 if (authAPI.isAuthenticated()) {
     console.log('✅ Usuario autenticado:', authAPI.getUser().email);
 }
+
+// Test backend connection
+async function testBackendConnection() {
+    try {
+        console.log('🔧 Probando conexión al backend:', API_URL());
+        const response = await fetch(API_URL() + '/health', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            console.log('✅ Backend respondiendo correctamente');
+            return true;
+        } else {
+            console.warn('⚠️ Backend respondió con status:', response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Error al conectar con backend:', error.message);
+        return false;
+    }
+}
+
+// Probar conexión al cargar
+testBackendConnection();
