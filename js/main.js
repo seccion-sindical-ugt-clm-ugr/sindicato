@@ -1456,15 +1456,45 @@ async function showMyDocumentsModal() {
 
 // Cargar documentos del usuario
 async function loadUserDocuments() {
+    const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
+
+    if (!documentsContent) {
+        console.error('❌ Contenedor de documentos no encontrado');
+        return;
+    }
+
     try {
+        // Mostrar loading
+        documentsContent.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <h4>Cargando documentos...</h4>
+            </div>
+        `;
+
         const response = await authAPI.getDocuments();
 
-        if (!response.success) {
-            throw new Error(response.error || 'Error al cargar documentos');
+        if (!response || !response.success) {
+            // Si la API no está disponible o devuelve error, mostrar mensaje amigable
+            console.warn('⚠️ Error cargando documentos:', response?.error);
+            documentsContent.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h4>Documentos</h4>
+                    <p>Los documentos sindicales estarán disponibles próximamente.</p>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                        <i class="fas fa-info-circle"></i> Estamos trabajando para traerte esta funcionalidad pronto.
+                    </p>
+                </div>
+            `;
+            return;
         }
 
-        const documents = response.data.documents || [];
-        const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
+        const documents = response.data?.documents || [];
 
         // Verificar si falta la ficha de afiliación
         const hasFicha = documents.some(doc => doc.type === 'ficha-afiliacion');
@@ -1540,17 +1570,18 @@ async function loadUserDocuments() {
 
     } catch (error) {
         console.error('❌ Error cargando documentos:', error);
-        const documentsContent = document.querySelector('#myDocumentsModal .documents-content');
+
+        // Mostrar mensaje amigable sin romper la UI
         documentsContent.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-file-alt"></i>
                 </div>
-                <h4>Error al cargar documentos</h4>
-                <p>${error.message}</p>
-                <button class="btn btn-primary" onclick="loadUserDocuments()">
-                    <i class="fas fa-sync"></i> Reintentar
-                </button>
+                <h4>Documentos</h4>
+                <p>Los documentos sindicales estarán disponibles próximamente.</p>
+                <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                    <i class="fas fa-info-circle"></i> Estamos trabajando para traerte esta funcionalidad pronto.
+                </p>
             </div>
         `;
     }
@@ -1620,10 +1651,31 @@ function formatFileSize(bytes) {
 
 // Load user events from backend
 async function loadUserEvents() {
+    const eventsContainer = document.getElementById('eventsContainer');
+
+    if (!eventsContainer) {
+        console.error('❌ Contenedor de eventos no encontrado');
+        return;
+    }
+
     try {
+        // Mostrar loading
+        eventsContainer.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-spinner fa-spin fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                <p style="color: #666;">Cargando eventos...</p>
+            </div>
+        `;
+
         const token = localStorage.getItem('accessToken');
         if (!token) {
-            console.error('No hay token de autenticación');
+            console.warn('⚠️ No hay token de autenticación');
+            eventsContainer.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-calendar fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                    <p style="color: #666;">Los eventos sindicales estarán disponibles próximamente</p>
+                </div>
+            `;
             return;
         }
 
@@ -1637,17 +1689,37 @@ async function loadUserEvents() {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.warn('⚠️ Error al cargar eventos:', response.status);
+            eventsContainer.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-calendar fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                    <p style="color: #666;">Los eventos sindicales estarán disponibles próximamente</p>
+                </div>
+            `;
+            return;
         }
 
         const result = await response.json();
         if (result.success) {
             displayUserEvents(result.data.events);
         } else {
-            console.error('Error cargando eventos:', result.error);
+            console.warn('⚠️ Error en respuesta de eventos:', result.error);
+            eventsContainer.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-calendar fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                    <p style="color: #666;">Los eventos sindicales estarán disponibles próximamente</p>
+                </div>
+            `;
         }
     } catch (error) {
-        console.error('Error cargando eventos del usuario:', error);
+        console.error('❌ Error cargando eventos del usuario:', error);
+        // Mostrar mensaje amigable en lugar de romper
+        eventsContainer.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-calendar fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
+                <p style="color: #666;">Los eventos sindicales estarán disponibles próximamente</p>
+            </div>
+        `;
     }
 }
 
