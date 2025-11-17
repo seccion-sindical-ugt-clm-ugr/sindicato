@@ -1382,11 +1382,18 @@ function showMemberDashboard() {
     }
 
     // Usar currentUser de la API real
+    // Si currentUser no está cargado, obtenerlo de authAPI
+    if (!currentUser && authAPI) {
+        currentUser = authAPI.getUser();
+    }
+
     const userName = currentUser ? currentUser.nombre : 'Afiliado';
     const userNameElement = document.getElementById('userName');
     if (userNameElement) {
         userNameElement.textContent = userName;
     }
+
+    console.log('👤 Usuario mostrado en dashboard:', userName);
 
     // Hide all main content sections except dashboard, but keep header visible
     document.querySelectorAll('.section:not(#memberDashboard)').forEach(section => {
