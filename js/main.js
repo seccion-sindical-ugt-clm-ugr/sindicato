@@ -23,33 +23,30 @@ const affiliateForm = document.querySelector('#affiliateForm');
 const contactForm = document.querySelector('#contactForm');
 const recoveryModal = document.querySelector('#recoveryModal');
 const recoveryForm = document.querySelector('#recoveryForm');
-const memberDashboard = document.querySelector('#memberDashboard');
-const logoutBtn = document.querySelector('#logoutBtn');
+// Dashboard elements - se obtienen dinámicamente después de inyección
+let memberDashboard = null;
+let logoutBtn = null;
+let editProfileModal = null;
+let closeEditProfile = null;
+let editProfileForm = null;
+let cancelEditBtn = null;
+let profilePhotoInput = null;
+let profileImagePreview = null;
+let defaultAvatar = null;
+let changePhotoBtn = null;
+let removePhotoBtn = null;
+let photoPreview = null;
+let myCoursesModal = null;
+let myDocumentsModal = null;
+let myEventsModal = null;
+let closeMyCourses = null;
+let closeMyDocuments = null;
+let closeMyEvents = null;
+
+// Elementos que existen en el HTML principal (no del dashboard inyectado)
 const forgotPasswordLink = document.querySelector('#forgotPasswordLink');
 const closeRecoveryBtn = document.querySelector('#closeRecovery');
 const backToLoginBtn = document.querySelector('#backToLogin');
-
-// Edit Profile Modal Elements
-const editProfileModal = document.querySelector('#editProfileModal');
-const closeEditProfile = document.querySelector('#closeEditProfile');
-const editProfileForm = document.querySelector('#editProfileForm');
-const cancelEditBtn = document.querySelector('#cancelEdit');
-
-// Profile Photo Elements
-const profilePhotoInput = document.querySelector('#profilePhoto');
-const profileImagePreview = document.querySelector('#profileImagePreview');
-const defaultAvatar = document.querySelector('#defaultAvatar');
-const changePhotoBtn = document.querySelector('#changePhotoBtn');
-const removePhotoBtn = document.querySelector('#removePhotoBtn');
-const photoPreview = document.querySelector('#photoPreview');
-
-// My Dashboard Modals Elements
-const myCoursesModal = document.querySelector('#myCoursesModal');
-const myDocumentsModal = document.querySelector('#myDocumentsModal');
-const myEventsModal = document.querySelector('#myEventsModal');
-const closeMyCourses = document.querySelector('#closeMyCourses');
-const closeMyDocuments = document.querySelector('#closeMyDocuments');
-const closeMyEvents = document.querySelector('#closeMyEvents');
 
 // Register Modal Elements
 const registerModal = document.querySelector('#registerModal');
@@ -920,36 +917,48 @@ editProfileForm.addEventListener('submit', async (e) => {
 // ============================================
 // LOGOUT CON API REAL
 // ============================================
-if (logoutBtn) {
-logoutBtn.addEventListener('click', async () => {
-    try {
-        // Logout usando API real
-        await authAPI.logout();
-        currentUser = null;
-
-        showMessage('success', 'Sesión cerrada correctamente');
-
-        // Hide dashboard and show main site
-        if (memberDashboard) {
-            memberDashboard.style.display = 'none';
-        }
-        document.querySelectorAll('.section').forEach(section => {
-            if (section.id !== 'memberDashboard') {
-                section.style.display = 'block';
-            }
-        });
-
-        updateLoginState();
-
-        console.log('✅ Logout exitoso');
-    } catch (error) {
-        console.error('❌ Error en logout:', error);
-        // Incluso si hay error, limpiamos localmente
-        authAPI.clearTokens();
-        currentUser = null;
-        updateLoginState();
+// Se inicializa dinámicamente cuando el dashboard se muestra
+function initLogoutButton() {
+    if (!logoutBtn) {
+        console.warn('⚠️ Botón de logout no encontrado');
+        return;
     }
-});
+
+    // Evitar añadir múltiples listeners
+    if (logoutBtn.dataset.initialized === 'true') {
+        return;
+    }
+    logoutBtn.dataset.initialized = 'true';
+
+    logoutBtn.addEventListener('click', async () => {
+        try {
+            // Logout usando API real
+            await authAPI.logout();
+            currentUser = null;
+
+            showMessage('success', 'Sesión cerrada correctamente');
+
+            // Hide dashboard and show main site
+            if (memberDashboard) {
+                memberDashboard.style.display = 'none';
+            }
+            document.querySelectorAll('.section').forEach(section => {
+                if (section.id !== 'memberDashboard') {
+                    section.style.display = 'block';
+                }
+            });
+
+            updateLoginState();
+
+            console.log('✅ Logout exitoso');
+        } catch (error) {
+            console.error('❌ Error en logout:', error);
+            // Incluso si hay error, limpiamos localmente
+            authAPI.clearTokens();
+            currentUser = null;
+            updateLoginState();
+        }
+    });
 }
 
 // Smooth scrolling for navigation links - Mejorado para hero buttons
@@ -1324,12 +1333,51 @@ recoveryForm.addEventListener('submit', async (e) => {
 });
 
 // ============================================
+// INICIALIZAR ELEMENTOS DEL DASHBOARD
+// ============================================
+function initDashboardElements() {
+    memberDashboard = document.querySelector('#memberDashboard');
+    logoutBtn = document.querySelector('#logoutBtn');
+    editProfileModal = document.querySelector('#editProfileModal');
+    closeEditProfile = document.querySelector('#closeEditProfile');
+    editProfileForm = document.querySelector('#editProfileForm');
+    cancelEditBtn = document.querySelector('#cancelEdit');
+    profilePhotoInput = document.querySelector('#profilePhoto');
+    profileImagePreview = document.querySelector('#profileImagePreview');
+    defaultAvatar = document.querySelector('#defaultAvatar');
+    changePhotoBtn = document.querySelector('#changePhotoBtn');
+    removePhotoBtn = document.querySelector('#removePhotoBtn');
+    photoPreview = document.querySelector('#photoPreview');
+    myCoursesModal = document.querySelector('#myCoursesModal');
+    myDocumentsModal = document.querySelector('#myDocumentsModal');
+    myEventsModal = document.querySelector('#myEventsModal');
+    closeMyCourses = document.querySelector('#closeMyCourses');
+    closeMyDocuments = document.querySelector('#closeMyDocuments');
+    closeMyEvents = document.querySelector('#closeMyEvents');
+
+    console.log('✅ Elementos del dashboard inicializados');
+}
+
+// ============================================
 // MOSTRAR DASHBOARD CON DATOS REALES
 // ============================================
 function showMemberDashboard() {
+    // Inicializar elementos del dashboard (obtenerlos del DOM)
+    initDashboardElements();
+
     // Verificar que el dashboard existe (puede que aún no se haya inyectado)
     if (!memberDashboard) {
         console.error('❌ Dashboard no encontrado en el DOM. Asegúrate de que user-dashboard-inject.js se haya ejecutado.');
+        // Intentar de nuevo después de un breve delay
+        setTimeout(() => {
+            initDashboardElements();
+            if (memberDashboard) {
+                console.log('✅ Dashboard encontrado después del retry');
+                showMemberDashboard();
+            } else {
+                console.error('❌ Dashboard sigue sin encontrarse. Verifica user-dashboard-inject.js');
+            }
+        }, 100);
         return;
     }
 
@@ -1348,8 +1396,9 @@ function showMemberDashboard() {
     // Show dashboard
     memberDashboard.style.display = 'block';
 
-    // Initialize dashboard buttons
+    // Initialize dashboard buttons and event listeners
     initDashboardButtons();
+    initLogoutButton();
 
     // Re-initialize navigation to ensure menu links work
     initHeaderNavigation();
