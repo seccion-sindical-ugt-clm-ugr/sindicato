@@ -1788,11 +1788,17 @@
                         // Mostrar información detallada de por qué falla
                         if (typeof authAPI !== 'undefined') {
                             const user = authAPI.getUser();
-                            console.error('❌ VERIFICACIÓN FALLÓ - Datos del usuario:', {
-                                role: user?.role,
-                                membershipStatus: user?.membershipStatus,
-                                esperado: { role: 'afiliado', membershipStatus: 'activo' }
-                            });
+                            console.error('');
+                            console.error('❌❌❌ VERIFICACIÓN FALLÓ ❌❌❌');
+                            console.error('Por qué no puedes inscribirte por 15€:');
+                            console.error('   user.role actual:', user?.role, '(debe ser "afiliado")');
+                            console.error('   user.membershipStatus actual:', user?.membershipStatus, '(debe ser "activo")');
+                            console.error('');
+                            console.error('💡 SOLUCIONES:');
+                            console.error('   1. Inscríbete como EXTERNO por 160€ (no requiere afiliación)');
+                            console.error('   2. Contacta al admin para activar tu cuenta');
+                            console.error('   3. Si ya pagaste la afiliación, puede estar en proceso');
+                            console.error('');
                         }
 
                         showNotification('❌ Debes ser afiliado activo para acceder al precio de 15€. Por favor, completa tu afiliación primero o inscríbete como externo.', 'error');
@@ -1837,7 +1843,11 @@
                 // Usar authAPI si está disponible
                 if (typeof authAPI !== 'undefined') {
                     const user = authAPI.getUser();
-                    console.log('👤 Datos del usuario para verificación:', user);
+                    console.log('👤 DATOS DEL USUARIO (localStorage):');
+                    console.log('   ├─ nombre:', user?.nombre);
+                    console.log('   ├─ email:', user?.email);
+                    console.log('   ├─ role:', user?.role);
+                    console.log('   └─ membershipStatus:', user?.membershipStatus);
 
                     if (!user) {
                         console.warn('⚠️ No hay usuario en authAPI');
@@ -1848,18 +1858,27 @@
                     try {
                         console.log('📡 Consultando membresía al backend...');
                         const result = await authAPI.request('/api/user/membership');
-                        console.log('📊 Respuesta de membresía:', result);
+                        console.log('📊 Respuesta de membresía COMPLETA:', JSON.stringify(result, null, 2));
 
                         if (result.success && result.data) {
                             const membership = result.data;
-                            console.log('🔍 Verificando:', {
-                                status: membership.status,
-                                role: membership.role,
-                                esperado: { status: 'activo', role: 'afiliado' }
-                            });
+
+                            // Imprimir cada campo por separado para evitar colapso
+                            console.log('🔍 VERIFICANDO CAMPOS INDIVIDUALMENTE:');
+                            console.log('   ├─ membership.role =', membership.role);
+                            console.log('   ├─ membership.status =', membership.status);
+                            console.log('   ├─ membership.isActive =', membership.isActive);
+                            console.log('   ├─ ESPERADO: role = "afiliado"');
+                            console.log('   └─ ESPERADO: status = "activo"');
+
+                            console.log('');
+                            console.log('✅ Comparación:');
+                            console.log('   ├─ role === "afiliado"?', membership.role === 'afiliado', membership.role === 'afiliado' ? '✅' : '❌');
+                            console.log('   └─ status === "activo"?', membership.status === 'activo', membership.status === 'activo' ? '✅' : '❌');
 
                             const isValid = membership.status === 'activo' && membership.role === 'afiliado';
-                            console.log('✅ Resultado verificación:', isValid);
+                            console.log('');
+                            console.log('🎯 RESULTADO FINAL:', isValid ? '✅ VÁLIDO' : '❌ NO VÁLIDO');
                             return isValid;
                         }
 
