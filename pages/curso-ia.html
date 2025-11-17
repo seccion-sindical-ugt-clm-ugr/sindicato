@@ -939,7 +939,7 @@
                         <i class="fas fa-download"></i>
                         Descargar Programa Completo (PDF)
                     </a>
-                    <button onclick="generateCertificate()" class="btn btn-success" style="background: #10b981; color: white; border: 2px solid #10b981; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <button onclick="generateCertificate('jornadas-ia', event)" class="btn btn-success" style="background: #10b981; color: white; border: 2px solid #10b981; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                         <i class="fas fa-certificate"></i>
                         Generar Certificado
                     </button>
@@ -1625,6 +1625,7 @@
         window.BACKEND_URL = 'https://sindicato-mu.vercel.app';
     </script>
     <script src="../js/backend-config.js"></script>
+    <script src="../js/auth-api.js"></script>
     <script src="../js/stripe-config.js"></script>
     <script src="../js/user-dashboard-inject.js"></script>
     <script src="../js/suggestions.js"></script>
@@ -1762,6 +1763,11 @@
 
         // Verificar si el usuario está autenticado
         function checkAuthentication() {
+            // Usar authAPI si está disponible
+            if (typeof authAPI !== 'undefined' && authAPI.isAuthenticated) {
+                return authAPI.isAuthenticated();
+            }
+            // Fallback a verificación manual
             const token = localStorage.getItem('accessToken');
             return !!token;
         }
@@ -1769,12 +1775,34 @@
         // Verificar si el usuario es afiliado
         async function verifyAffiliate() {
             try {
+                // Usar authAPI si está disponible
+                if (typeof authAPI !== 'undefined') {
+                    const user = authAPI.getUser();
+                    if (!user) {
+                        return false;
+                    }
+
+                    // Verificar membresía contra el backend
+                    try {
+                        const result = await authAPI.request('/api/user/membership');
+                        if (result.success && result.data) {
+                            const membership = result.data;
+                            return membership.status === 'activo' && membership.role === 'afiliado';
+                        }
+                    } catch (error) {
+                        console.error('Error verificando membresía:', error);
+                    }
+
+                    // Fallback: verificar desde datos en localStorage
+                    return user.role === 'afiliado' && user.membershipStatus === 'activo';
+                }
+
+                // Fallback a implementación manual
                 const token = localStorage.getItem('accessToken');
                 if (!token) {
                     return false;
                 }
 
-                // Verificar contra el backend para obtener estado actualizado
                 const backendUrl = window.BACKEND_URL || 'https://sindicato-mu.vercel.app';
                 const response = await fetch(`${backendUrl}/api/user/membership`, {
                     method: 'GET',
@@ -1791,7 +1819,6 @@
 
                 const data = await response.json();
 
-                // Verificar que sea afiliado activo
                 if (data.success && data.data) {
                     const membership = data.data;
                     return membership.status === 'activo' && membership.role === 'afiliado';
@@ -2567,7 +2594,10 @@
         }
 
         // Función para generar certificado del curso
-        async function generateCertificate(courseType = 'jornadas-ia') {
+        async function generateCertificate(courseType = 'jornadas-ia', event = null) {
+            let btn = null;
+            let originalHTML = '';
+
             try {
                 // Verificar si el usuario está autenticado
                 const token = localStorage.getItem('accessToken');
@@ -2577,11 +2607,15 @@
                     return;
                 }
 
-                // Mostrar indicador de carga
-                const btn = event.target.closest('button');
-                const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando certificado...';
-                btn.disabled = true;
+                // Mostrar indicador de carga si se llamó desde un botón
+                if (event && event.target) {
+                    btn = event.target.closest('button');
+                    if (btn) {
+                        originalHTML = btn.innerHTML;
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando certificado...';
+                        btn.disabled = true;
+                    }
+                }
 
                 // Obtener información del usuario
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -2602,8 +2636,10 @@
 
                 if (!eligibilityData.eligible) {
                     showNotification('❌ Aún no eres elegible para el certificado. Debes completar el curso primero.', 'error');
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
+                    if (btn) {
+                        btn.innerHTML = originalHTML;
+                        btn.disabled = false;
+                    }
                     return;
                 }
 
@@ -2642,15 +2678,17 @@
                 document.body.removeChild(a);
 
                 // Restaurar botón
-                btn.innerHTML = originalHTML;
-                btn.disabled = false;
+                if (btn) {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                }
 
                 showNotification('🎉 ¡Certificado generado y descargado exitosamente!', 'success');
 
             } catch (error) {
                 console.error('Error generando certificado:', error);
 
-                const btn = event.target.closest('button');
+                // Restaurar botón si existe
                 if (btn) {
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
