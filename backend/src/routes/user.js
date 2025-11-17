@@ -376,23 +376,51 @@ router.get('/membership',
         try {
             const user = req.user;
 
+            // Verificación adicional de seguridad
+            if (!user) {
+                console.error('❌ Usuario no encontrado en req.user');
+                return res.status(401).json({
+                    success: false,
+                    error: 'Usuario no autenticado'
+                });
+            }
+
+            // Obtener información de membresía de forma segura
+            let isActive = false;
+            try {
+                isActive = user.isMembershipActive();
+            } catch (err) {
+                console.error('❌ Error al verificar estado de membresía:', err);
+            }
+
+            let daysUntilExpiry = null;
+            try {
+                daysUntilExpiry = user.daysUntilExpiry;
+            } catch (err) {
+                console.error('❌ Error al calcular días hasta expiración:', err);
+            }
+
             res.status(200).json({
                 success: true,
                 data: {
-                    role: user.role,
-                    status: user.membershipStatus,
-                    isActive: user.isMembershipActive(),
-                    startDate: user.membershipStartDate,
-                    expiryDate: user.membershipExpiryDate,
-                    daysUntilExpiry: user.daysUntilExpiry
+                    role: user.role || 'afiliado',
+                    status: user.membershipStatus || 'pendiente',
+                    isActive: isActive,
+                    startDate: user.membershipStartDate || null,
+                    expiryDate: user.membershipExpiryDate || null,
+                    daysUntilExpiry: daysUntilExpiry
                 }
             });
 
+            console.log(`✅ Información de membresía enviada para: ${user.email}`);
+
         } catch (error) {
             console.error('❌ Error al obtener membresía:', error);
+            console.error('Stack:', error.stack);
             res.status(500).json({
                 success: false,
-                error: 'Error al obtener información de membresía'
+                error: 'Error al obtener información de membresía',
+                message: process.env.NODE_ENV === 'development' ? error.message : undefined
             });
         }
     }

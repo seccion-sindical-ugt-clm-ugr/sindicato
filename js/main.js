@@ -841,78 +841,94 @@ window.addEventListener('click', (e) => {
 // ============================================
 // ACTUALIZAR PERFIL - CON API REAL
 // ============================================
-editProfileForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearErrors();
-
-    const formData = new FormData(editProfileForm);
-    const submitBtn = editProfileForm.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-
-    // Extract form data
-    const profileData = {
-        nombre: formData.get('name')?.trim(),
-        telefono: formData.get('phone')?.trim(),
-        departamento: formData.get('department')?.trim()
-    };
-
-    // Validation
-    if (!profileData.nombre) {
-        showMessage('error', 'El nombre es obligatorio');
+// Función para inicializar el formulario de edición de perfil
+function initEditProfileForm() {
+    if (!editProfileForm) {
+        console.log('⚠️ editProfileForm no disponible, saltando inicialización');
         return;
     }
 
-    // Show loading state
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-    submitBtn.disabled = true;
+    editProfileForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
 
-    try {
-        // Actualizar perfil usando API real
-        const result = await authAPI.updateProfile(profileData);
+        const formData = new FormData(editProfileForm);
+        const submitBtn = editProfileForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
 
-        if (result.success) {
-            currentUser = result.data.user;
+        // Extract form data
+        const profileData = {
+            nombre: formData.get('name')?.trim(),
+            telefono: formData.get('phone')?.trim(),
+            departamento: formData.get('department')?.trim()
+        };
 
-            // Actualizar foto si existe
-            const hasPhoto = profileImagePreview.style.display === 'block' &&
-                            profileImagePreview.src &&
-                            profileImagePreview.src.startsWith('data:');
-
-            if (hasPhoto) {
-                console.log('📸 Subiendo foto de perfil...');
-                const photoResult = await authAPI.uploadPhoto(profileImagePreview.src);
-
-                if (photoResult.success) {
-                    console.log('✅ Foto actualizada');
-                } else {
-                    console.error('❌ Error al subir foto:', photoResult.error);
-                }
-            }
-
-            // Update dashboard display
-            document.getElementById('userName').textContent = currentUser.nombre;
-            updateLoginState();
-
-            showMessage('success', '¡Perfil actualizado correctamente!');
-
-            // Close modal
-            editProfileModal.style.display = 'none';
-            editProfileForm.reset();
-
-            console.log('✅ Perfil actualizado:', currentUser);
-
-        } else {
-            showMessage('error', result.error || 'Error al actualizar el perfil');
+        // Validation
+        if (!profileData.nombre) {
+            showMessage('error', 'El nombre es obligatorio');
+            return;
         }
 
-    } catch (error) {
-        showMessage('error', 'Error al actualizar el perfil');
-        console.error('❌ Profile update error:', error);
-    } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-    }
-});
+        // Show loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        submitBtn.disabled = true;
+
+        try {
+            // Actualizar perfil usando API real
+            const result = await authAPI.updateProfile(profileData);
+
+            if (result.success) {
+                currentUser = result.data.user;
+
+                // Actualizar foto si existe
+                const hasPhoto = profileImagePreview &&
+                                profileImagePreview.style.display === 'block' &&
+                                profileImagePreview.src &&
+                                profileImagePreview.src.startsWith('data:');
+
+                if (hasPhoto) {
+                    console.log('📸 Subiendo foto de perfil...');
+                    const photoResult = await authAPI.uploadPhoto(profileImagePreview.src);
+
+                    if (photoResult.success) {
+                        console.log('✅ Foto actualizada');
+                    } else {
+                        console.error('❌ Error al subir foto:', photoResult.error);
+                    }
+                }
+
+                // Update dashboard display
+                const userNameElement = document.getElementById('userName');
+                if (userNameElement) {
+                    userNameElement.textContent = currentUser.nombre;
+                }
+                updateLoginState();
+
+                showMessage('success', '¡Perfil actualizado correctamente!');
+
+                // Close modal
+                if (editProfileModal) {
+                    editProfileModal.style.display = 'none';
+                }
+                editProfileForm.reset();
+
+                console.log('✅ Perfil actualizado:', currentUser);
+
+            } else {
+                showMessage('error', result.error || 'Error al actualizar el perfil');
+            }
+
+        } catch (error) {
+            showMessage('error', 'Error al actualizar el perfil');
+            console.error('❌ Profile update error:', error);
+        } finally {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+
+    console.log('✅ Formulario de edición de perfil inicializado');
+}
 
 // ============================================
 // LOGOUT CON API REAL
@@ -1356,6 +1372,9 @@ function initDashboardElements() {
     closeMyEvents = document.querySelector('#closeMyEvents');
 
     console.log('✅ Elementos del dashboard inicializados');
+
+    // Inicializar formulario de edición de perfil si existe
+    initEditProfileForm();
 }
 
 // ============================================
