@@ -11,6 +11,11 @@ const PDFDocument = require('pdfkit');
 async function generateCertificadoAfiliado(userData) {
     return new Promise((resolve, reject) => {
         try {
+            // Validar datos requeridos
+            if (!userData || !userData.nombre || !userData.email) {
+                return reject(new Error('Datos de usuario incompletos para generar certificado'));
+            }
+
             const doc = new PDFDocument({ size: 'A4', margin: 40 });
             const chunks = [];
 
@@ -124,6 +129,14 @@ async function generateCertificadoAfiliado(userData) {
 async function generateReciboPago(userData, paymentData) {
     return new Promise((resolve, reject) => {
         try {
+            // Validar datos requeridos
+            if (!userData || !userData.nombre || !userData.email) {
+                return reject(new Error('Datos de usuario incompletos para generar recibo'));
+            }
+            if (!paymentData || !paymentData.amount || !paymentData.date) {
+                return reject(new Error('Datos de pago incompletos para generar recibo'));
+            }
+
             const doc = new PDFDocument({ size: 'A4', margin: 50 });
             const chunks = [];
 
@@ -180,9 +193,10 @@ async function generateReciboPago(userData, paymentData) {
                 .moveDown(1);
 
             // Importe (destacado)
+            const currency = (paymentData.currency || 'EUR').toUpperCase();
             doc.fontSize(16)
                 .fillColor(ugtRed)
-                .text(`IMPORTE: ${paymentData.amount.toFixed(2)} ${paymentData.currency.toUpperCase()}`, { align: 'center' })
+                .text(`IMPORTE: ${paymentData.amount.toFixed(2)} ${currency}`, { align: 'center' })
                 .moveDown(2);
 
             // Información adicional
@@ -209,6 +223,13 @@ async function generateReciboPago(userData, paymentData) {
 async function generateCertificadoCurso(userData, courseData) {
     return new Promise((resolve, reject) => {
         try {
+            // Validar datos requeridos
+            if (!userData || !userData.nombre) {
+                return reject(new Error('Datos de usuario incompletos para generar certificado de curso'));
+            }
+            if (!courseData || !courseData.courseName) {
+                return reject(new Error('Datos de curso incompletos para generar certificado'));
+            }
             const doc = new PDFDocument({ size: 'A4', margin: 50, layout: 'landscape' });
             const chunks = [];
 
@@ -306,6 +327,11 @@ async function generateCertificadoCurso(userData, courseData) {
 async function generateFichaAfiliacion(userData) {
     return new Promise((resolve, reject) => {
         try {
+            // Validar datos requeridos
+            if (!userData || !userData.nombre || !userData.email || !userData._id) {
+                return reject(new Error('Datos de usuario incompletos para generar ficha de afiliación'));
+            }
+
             const doc = new PDFDocument({ size: 'A4', margin: 40 });
             const chunks = [];
 
@@ -442,10 +468,18 @@ async function generateProgramaCursoIA() {
             doc.rect(0, 0, doc.page.width, doc.page.height)
                 .fill(darkBlue);
 
-            doc.image('assets/logo-ugt.png', (doc.page.width - 120) / 2, 100, { width: 120 })
-                .catch(() => {
-                    // Si no existe el logo, continuamos sin él
-                });
+            // Intentar añadir logo si existe (opcional)
+            try {
+                const fs = require('fs');
+                const path = require('path');
+                const logoPath = path.join(__dirname, '../../assets/logo-ugt.png');
+                if (fs.existsSync(logoPath)) {
+                    doc.image(logoPath, (doc.page.width - 120) / 2, 100, { width: 120 });
+                }
+            } catch (error) {
+                // Si no existe el logo, continuamos sin él
+                console.log('⚠️ Logo no encontrado, generando PDF sin logo');
+            }
 
             doc.fillColor('white')
                 .fontSize(28)

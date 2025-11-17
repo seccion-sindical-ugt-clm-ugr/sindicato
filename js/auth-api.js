@@ -72,6 +72,14 @@ class AuthAPI {
 
         } catch (error) {
             console.error('❌ Error en petición:', error);
+
+            // Mostrar error visual si el backend no responde
+            if (error.message.includes('fetch') || error.message.includes('Network')) {
+                if (window.showBackendError) {
+                    window.showBackendError('No se puede conectar con el servidor. Por favor, verifica tu conexión.');
+                }
+            }
+
             throw error;
         }
     }

@@ -38,6 +38,9 @@ const BACKEND_CONFIG = {
         // 4. ERROR: En producción DEBE estar configurado window.BACKEND_URL
         console.error('❌ BACKEND_URL no configurado');
         console.error('Añade al HTML: <script>window.BACKEND_URL = "https://tu-backend.vercel.app";</script>');
+
+        // Mostrar error visual al usuario
+        showBackendError('Backend no configurado. Por favor, contacta con el administrador.');
         throw new Error('Backend URL no configurado. Configura window.BACKEND_URL en producción.');
     },
 
@@ -125,12 +128,53 @@ async function checkBackendConnection() {
     }
 }
 
+/**
+ * Mostrar error visual de backend al usuario
+ */
+function showBackendError(message) {
+    // Crear elemento de alerta si no existe
+    let errorBanner = document.getElementById('backend-error-banner');
+
+    if (!errorBanner) {
+        errorBanner = document.createElement('div');
+        errorBanner.id = 'backend-error-banner';
+        errorBanner.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #d32f2f;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            z-index: 10000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        `;
+        document.body.prepend(errorBanner);
+    }
+
+    errorBanner.innerHTML = `
+        <strong>⚠️ Error de Conexión:</strong> ${message}
+        <button onclick="this.parentElement.remove()" style="
+            margin-left: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        ">Cerrar</button>
+    `;
+}
+
 // Exportar al scope global
 window.BACKEND_CONFIG = BACKEND_CONFIG;
 window.setBackendUrl = setBackendUrl;
 window.clearBackendUrl = clearBackendUrl;
 window.showBackendConfig = showBackendConfig;
 window.checkBackendConnection = checkBackendConnection;
+window.showBackendError = showBackendError;
 
 // Log de configuración inicial
 console.log('%c🔧 Backend API Configuration', 'background: #4CAF50; color: white; padding: 5px; font-weight: bold;');
