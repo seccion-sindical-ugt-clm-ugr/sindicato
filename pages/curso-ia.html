@@ -1773,13 +1773,38 @@
                     }
                     console.log('✅ Usuario autenticado');
 
+                    // DEBUG: Mostrar estado del usuario
+                    if (typeof authAPI !== 'undefined') {
+                        const currentUserData = authAPI.getUser();
+                        console.log('👤 DATOS USUARIO COMPLETO:', JSON.stringify(currentUserData, null, 2));
+                    }
+
                     // Verificar que sea afiliado
                     console.log('🔍 Verificando estado de afiliación...');
                     const isAffiliate = await verifyAffiliate();
                     console.log('📊 Resultado verificación afiliado:', isAffiliate);
 
                     if (!isAffiliate) {
+                        // Mostrar información detallada de por qué falla
+                        if (typeof authAPI !== 'undefined') {
+                            const user = authAPI.getUser();
+                            console.error('');
+                            console.error('❌❌❌ VERIFICACIÓN FALLÓ ❌❌❌');
+                            console.error('Por qué no puedes inscribirte por 15€:');
+                            console.error('   user.role actual:', user?.role, '(debe ser "afiliado")');
+                            console.error('   user.membershipStatus actual:', user?.membershipStatus, '(debe ser "activo")');
+                            console.error('');
+                            console.error('💡 SOLUCIONES:');
+                            console.error('   1. Inscríbete como EXTERNO por 160€ (no requiere afiliación)');
+                            console.error('   2. Contacta al admin para activar tu cuenta');
+                            console.error('   3. Si ya pagaste la afiliación, puede estar en proceso');
+                            console.error('');
+                        }
+
                         showNotification('❌ Debes ser afiliado activo para acceder al precio de 15€. Por favor, completa tu afiliación primero o inscríbete como externo.', 'error');
+
+                        // Mostrar modal con información detallada
+                        showDebugModal();
                         return;
                     }
                     console.log('✅ Usuario es afiliado activo');
@@ -1818,7 +1843,11 @@
                 // Usar authAPI si está disponible
                 if (typeof authAPI !== 'undefined') {
                     const user = authAPI.getUser();
-                    console.log('👤 Datos del usuario para verificación:', user);
+                    console.log('👤 DATOS DEL USUARIO (localStorage):');
+                    console.log('   ├─ nombre:', user?.nombre);
+                    console.log('   ├─ email:', user?.email);
+                    console.log('   ├─ role:', user?.role);
+                    console.log('   └─ membershipStatus:', user?.membershipStatus);
 
                     if (!user) {
                         console.warn('⚠️ No hay usuario en authAPI');
@@ -1829,18 +1858,27 @@
                     try {
                         console.log('📡 Consultando membresía al backend...');
                         const result = await authAPI.request('/api/user/membership');
-                        console.log('📊 Respuesta de membresía:', result);
+                        console.log('📊 Respuesta de membresía COMPLETA:', JSON.stringify(result, null, 2));
 
                         if (result.success && result.data) {
                             const membership = result.data;
-                            console.log('🔍 Verificando:', {
-                                status: membership.status,
-                                role: membership.role,
-                                esperado: { status: 'activo', role: 'afiliado' }
-                            });
+
+                            // Imprimir cada campo por separado para evitar colapso
+                            console.log('🔍 VERIFICANDO CAMPOS INDIVIDUALMENTE:');
+                            console.log('   ├─ membership.role =', membership.role);
+                            console.log('   ├─ membership.status =', membership.status);
+                            console.log('   ├─ membership.isActive =', membership.isActive);
+                            console.log('   ├─ ESPERADO: role = "afiliado"');
+                            console.log('   └─ ESPERADO: status = "activo"');
+
+                            console.log('');
+                            console.log('✅ Comparación:');
+                            console.log('   ├─ role === "afiliado"?', membership.role === 'afiliado', membership.role === 'afiliado' ? '✅' : '❌');
+                            console.log('   └─ status === "activo"?', membership.status === 'activo', membership.status === 'activo' ? '✅' : '❌');
 
                             const isValid = membership.status === 'activo' && membership.role === 'afiliado';
-                            console.log('✅ Resultado verificación:', isValid);
+                            console.log('');
+                            console.log('🎯 RESULTADO FINAL:', isValid ? '✅ VÁLIDO' : '❌ NO VÁLIDO');
                             return isValid;
                         }
 
@@ -1898,6 +1936,79 @@
             if (loginModal) {
                 loginModal.style.display = 'block';
             }
+        }
+
+        // Función para mostrar modal de debug con estado del usuario
+        function showDebugModal() {
+            let user = null;
+            if (typeof authAPI !== 'undefined') {
+                user = authAPI.getUser();
+            }
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                z-index: 999999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            `;
+
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 10px;
+                    max-width: 600px;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                ">
+                    <h2 style="color: #E30613; margin-bottom: 20px;">🔍 Debug: Estado de Afiliación</h2>
+
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                        <h3 style="margin-top: 0;">Datos del Usuario:</h3>
+                        <pre style="font-size: 12px; overflow-x: auto;">${JSON.stringify(user, null, 2)}</pre>
+                    </div>
+
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                        <h3 style="margin-top: 0;">Requisitos para precio de 15€:</h3>
+                        <ul style="margin: 0; padding-left: 20px;">
+                            <li><strong>role:</strong> debe ser "afiliado" → Actual: <code>${user?.role || 'undefined'}</code> ${user?.role === 'afiliado' ? '✅' : '❌'}</li>
+                            <li><strong>membershipStatus:</strong> debe ser "activo" → Actual: <code>${user?.membershipStatus || 'undefined'}</code> ${user?.membershipStatus === 'activo' ? '✅' : '❌'}</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #d4edda; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                        <h3 style="margin-top: 0;">Soluciones:</h3>
+                        <ol style="margin: 0; padding-left: 20px;">
+                            <li>Si no eres afiliado: <strong>Inscríbete como externo por 160€</strong></li>
+                            <li>Si ya pagaste la afiliación: Puede que el pago esté pendiente de procesamiento</li>
+                            <li>Contacta con el administrador en <strong>info@ugtclmgranada.org</strong></li>
+                        </ol>
+                    </div>
+
+                    <button onclick="this.parentElement.parentElement.remove()" style="
+                        background: #E30613;
+                        color: white;
+                        border: none;
+                        padding: 12px 30px;
+                        font-size: 16px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        width: 100%;
+                    ">Cerrar</button>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
         }
 
         function showEnrollmentForm(courseData) {
@@ -4038,6 +4149,85 @@
         const navStyleSheet = document.createElement('style');
         navStyleSheet.textContent = navStyles;
         document.head.appendChild(navStyleSheet);
+
+        // ============================================
+        // FUNCIÓN DE DIAGNÓSTICO GLOBAL
+        // ============================================
+        // Ejecuta: debugAfiliacion() en la consola del navegador para ver el estado completo
+        window.debugAfiliacion = async function() {
+            console.log('%c🔍 DIAGNÓSTICO DE AFILIACIÓN', 'background: #E30613; color: white; padding: 10px; font-size: 16px; font-weight: bold;');
+            console.log('='.repeat(80));
+
+            // 1. Verificar authAPI
+            console.log('\n1️⃣ Verificando authAPI...');
+            if (typeof authAPI === 'undefined') {
+                console.error('❌ authAPI no está disponible');
+                return;
+            }
+            console.log('✅ authAPI está disponible');
+
+            // 2. Verificar usuario
+            console.log('\n2️⃣ Obteniendo datos del usuario...');
+            const user = authAPI.getUser();
+            console.log('Datos del usuario:', user);
+
+            if (!user) {
+                console.error('❌ No hay usuario en localStorage');
+                return;
+            }
+
+            // 3. Verificar campos específicos
+            console.log('\n3️⃣ Verificando campos requeridos...');
+            console.log('   role:', user.role, user.role === 'afiliado' ? '✅' : '❌ (debe ser "afiliado")');
+            console.log('   membershipStatus:', user.membershipStatus, user.membershipStatus === 'activo' ? '✅' : '❌ (debe ser "activo")');
+
+            // 4. Verificar token
+            console.log('\n4️⃣ Verificando token...');
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.error('❌ No hay access token');
+                return;
+            }
+            console.log('✅ Token presente:', token.substring(0, 20) + '...');
+
+            // 5. Consultar backend
+            console.log('\n5️⃣ Consultando backend /api/user/membership...');
+            try {
+                const result = await authAPI.request('/api/user/membership');
+                console.log('Respuesta del backend:', result);
+
+                if (result.success && result.data) {
+                    console.log('\n📊 Datos de membresía del backend:');
+                    console.log('   role:', result.data.role, result.data.role === 'afiliado' ? '✅' : '❌');
+                    console.log('   status:', result.data.status, result.data.status === 'activo' ? '✅' : '❌');
+                    console.log('   isActive:', result.data.isActive, result.data.isActive ? '✅' : '❌');
+                    console.log('   startDate:', result.data.startDate);
+                    console.log('   expiryDate:', result.data.expiryDate);
+                }
+            } catch (error) {
+                console.error('❌ Error consultando backend:', error);
+            }
+
+            // 6. Conclusión
+            console.log('\n' + '='.repeat(80));
+            const isValid = user.role === 'afiliado' && user.membershipStatus === 'activo';
+            if (isValid) {
+                console.log('%c✅ DIAGNÓSTICO: Usuario válido para inscripción de 15€', 'background: #4CAF50; color: white; padding: 5px; font-weight: bold;');
+            } else {
+                console.log('%c❌ DIAGNÓSTICO: Usuario NO válido para inscripción de 15€', 'background: #f44336; color: white; padding: 5px; font-weight: bold;');
+                console.log('\n📝 Para resolver:');
+                if (user.role !== 'afiliado') {
+                    console.log('   - El rol debe ser "afiliado", actualmente es:', user.role);
+                }
+                if (user.membershipStatus !== 'activo') {
+                    console.log('   - El estado debe ser "activo", actualmente es:', user.membershipStatus);
+                }
+                console.log('   - Contacta con el administrador o inscríbete como externo (160€)');
+            }
+            console.log('='.repeat(80));
+        };
+
+        console.log('%c💡 TIP: Ejecuta debugAfiliacion() en la consola para diagnóstico completo', 'background: #2196F3; color: white; padding: 5px;');
     </script>
 </body>
 </html>
