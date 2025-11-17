@@ -903,7 +903,7 @@
                             <li><i class="fas fa-check"></i> Certificado UGT-CLM-UGR</li>
                             <li><i class="fas fa-check"></i> Seguimiento post-jornadas</li>
                         </ul>
-                        <button class="btn btn-secondary btn-full" onclick="enrollCourse('external')" style="background: #2196F3; border: none;">
+                        <button class="btn btn-secondary btn-full" onclick="handleEnrollClick(this, 'external')" style="background: #2196F3; border: none;">
                             Inscribirme por 160€
                         </button>
                     </div>
@@ -921,7 +921,7 @@
                             <li><i class="fas fa-check"></i> Prioridad en proyectos</li>
                             <li><i class="fas fa-check"></i> Red de contactos UGT</li>
                         </ul>
-                        <button class="btn btn-primary btn-full" onclick="enrollCourse('member')">
+                        <button class="btn btn-primary btn-full" onclick="handleEnrollClick(this, 'member')">
                             Inscribirme por 15€
                         </button>
                     </div>
@@ -1452,7 +1452,7 @@
                             <li><i class="fas fa-check"></i> Soporte técnico</li>
                             <li><i class="fas fa-check"></i> Seguimiento post-jornadas</li>
                         </ul>
-                        <button class="btn btn-secondary btn-full" onclick="enrollCourse('external')" style="background: #2196F3; color: white; border: none;">
+                        <button class="btn btn-secondary btn-full" onclick="handleEnrollClick(this, 'external')" style="background: #2196F3; color: white; border: none;">
                             Inscribirme por 160€
                         </button>
                     </div>
@@ -1472,7 +1472,7 @@
                             <li><i class="fas fa-check"></i> Prioridad en proyectos</li>
                             <li><i class="fas fa-check"></i> Red de contactos UGT</li>
                         </ul>
-                        <button class="btn btn-primary btn-full" onclick="enrollCourse('member')">
+                        <button class="btn btn-primary btn-full" onclick="handleEnrollClick(this, 'member')">
                             Inscribirme por 15€
                         </button>
                     </div>
@@ -1728,37 +1728,77 @@
         });
     </script>
     <script>
-        async function enrollCourse(type) {
-            const isMember = type === 'member';
-            const price = isMember ? 15 : 160;
-            const courseType = 'jornadas-ia'; // Específico para estas jornadas
-            const description = isMember ? 'Jornadas IA CLM - Afiliado UGT' : 'Jornadas IA CLM - Externo';
+        // Manejar click en botón de inscripción con loading state
+        async function handleEnrollClick(button, type) {
+            const originalHTML = button.innerHTML;
+            const originalDisabled = button.disabled;
 
-            // Si intenta inscribirse como afiliado, verificar autenticación
-            if (isMember) {
-                const isAuthenticated = checkAuthentication();
-                if (!isAuthenticated) {
-                    showLoginModal();
-                    return;
-                }
+            try {
+                // Mostrar loading
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+                button.disabled = true;
 
-                // Verificar que sea afiliado
-                const isAffiliate = await verifyAffiliate();
-                if (!isAffiliate) {
-                    showNotification('❌ Debes ser afiliado para acceder al precio de 15€. Por favor, completa tu afiliación primero.', 'error');
-                    return;
-                }
+                // Llamar a la función de inscripción
+                await enrollCourse(type);
+
+            } catch (error) {
+                console.error('❌ Error en handleEnrollClick:', error);
+                showNotification('❌ Error al procesar la inscripción', 'error');
+            } finally {
+                // Restaurar botón (si no se redirigió a Stripe)
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.disabled = originalDisabled;
+                }, 500);
             }
+        }
 
-            showEnrollmentForm({
-                courseType: courseType,
-                isMember: isMember,
-                price: price,
-                description: description,
-                courseName: 'Jornadas de Inteligencia Artificial para el CLM',
-                duration: '20 horas (30 sesiones)',
-                modality: 'Virtual por Zoom'
-            });
+        async function enrollCourse(type) {
+            try {
+                console.log('🎓 Iniciando proceso de inscripción...', { type });
+
+                const isMember = type === 'member';
+                const price = isMember ? 15 : 160;
+                const courseType = 'jornadas-ia'; // Específico para estas jornadas
+                const description = isMember ? 'Jornadas IA CLM - Afiliado UGT' : 'Jornadas IA CLM - Externo';
+
+                // Si intenta inscribirse como afiliado, verificar autenticación
+                if (isMember) {
+                    console.log('🔐 Verificando autenticación para inscripción de miembro...');
+                    const isAuthenticated = checkAuthentication();
+                    if (!isAuthenticated) {
+                        console.warn('⚠️ Usuario no autenticado, mostrando modal de login');
+                        showLoginModal();
+                        return;
+                    }
+                    console.log('✅ Usuario autenticado');
+
+                    // Verificar que sea afiliado
+                    console.log('🔍 Verificando estado de afiliación...');
+                    const isAffiliate = await verifyAffiliate();
+                    console.log('📊 Resultado verificación afiliado:', isAffiliate);
+
+                    if (!isAffiliate) {
+                        showNotification('❌ Debes ser afiliado activo para acceder al precio de 15€. Por favor, completa tu afiliación primero o inscríbete como externo.', 'error');
+                        return;
+                    }
+                    console.log('✅ Usuario es afiliado activo');
+                }
+
+                console.log('📝 Mostrando formulario de inscripción...');
+                showEnrollmentForm({
+                    courseType: courseType,
+                    isMember: isMember,
+                    price: price,
+                    description: description,
+                    courseName: 'Jornadas de Inteligencia Artificial para el CLM',
+                    duration: '20 horas (30 sesiones)',
+                    modality: 'Virtual por Zoom'
+                });
+            } catch (error) {
+                console.error('❌ Error en enrollCourse:', error);
+                showNotification('❌ Error al iniciar inscripción: ' + error.message, 'error');
+            }
         }
 
         // Verificar si el usuario está autenticado
@@ -1778,23 +1818,44 @@
                 // Usar authAPI si está disponible
                 if (typeof authAPI !== 'undefined') {
                     const user = authAPI.getUser();
+                    console.log('👤 Datos del usuario para verificación:', user);
+
                     if (!user) {
+                        console.warn('⚠️ No hay usuario en authAPI');
                         return false;
                     }
 
                     // Verificar membresía contra el backend
                     try {
+                        console.log('📡 Consultando membresía al backend...');
                         const result = await authAPI.request('/api/user/membership');
+                        console.log('📊 Respuesta de membresía:', result);
+
                         if (result.success && result.data) {
                             const membership = result.data;
-                            return membership.status === 'activo' && membership.role === 'afiliado';
-                        }
-                    } catch (error) {
-                        console.error('Error verificando membresía:', error);
-                    }
+                            console.log('🔍 Verificando:', {
+                                status: membership.status,
+                                role: membership.role,
+                                esperado: { status: 'activo', role: 'afiliado' }
+                            });
 
-                    // Fallback: verificar desde datos en localStorage
-                    return user.role === 'afiliado' && user.membershipStatus === 'activo';
+                            const isValid = membership.status === 'activo' && membership.role === 'afiliado';
+                            console.log('✅ Resultado verificación:', isValid);
+                            return isValid;
+                        }
+
+                        console.warn('⚠️ Respuesta de membresía sin éxito o sin data');
+                        return false;
+                    } catch (error) {
+                        console.error('❌ Error verificando membresía contra backend:', error);
+
+                        // Fallback: verificar desde datos en localStorage
+                        console.log('🔄 Usando fallback: verificación desde localStorage');
+                        const isValidFallback = user.role === 'afiliado' && user.membershipStatus === 'activo';
+                        console.log('📊 Fallback - user.role:', user.role, 'user.membershipStatus:', user.membershipStatus);
+                        console.log('✅ Resultado fallback:', isValidFallback);
+                        return isValidFallback;
+                    }
                 }
 
                 // Fallback a implementación manual
@@ -1840,6 +1901,15 @@
         }
 
         function showEnrollmentForm(courseData) {
+            console.log('📝 Creando formulario de inscripción...', courseData);
+
+            // Obtener datos del usuario si está autenticado
+            let userData = null;
+            if (typeof authAPI !== 'undefined') {
+                userData = authAPI.getUser();
+                console.log('👤 Datos del usuario autenticado:', userData);
+            }
+
             const enrollmentModal = document.createElement('div');
             enrollmentModal.className = 'modal';
             enrollmentModal.innerHTML = `
@@ -1862,15 +1932,15 @@
                         <form id="enrollmentForm">
                             <div class="form-group">
                                 <label>👤 Nombre completo *</label>
-                                <input type="text" name="name" placeholder="Tu nombre completo" required>
+                                <input type="text" name="name" placeholder="Tu nombre completo" value="${userData && userData.nombre ? userData.nombre : ''}" required>
                             </div>
                             <div class="form-group">
                                 <label>📧 Email *</label>
-                                <input type="email" name="email" placeholder="tu@email.com" required>
+                                <input type="email" name="email" placeholder="tu@email.com" value="${userData && userData.email ? userData.email : ''}" required ${userData && userData.email ? 'readonly style="background: #f5f5f5;"' : ''}>
                             </div>
                             <div class="form-group">
                                 <label>📱 Teléfono (opcional)</label>
-                                <input type="tel" name="phone" placeholder="600 000 000">
+                                <input type="tel" name="phone" placeholder="600 000 000" value="${userData && userData.telefono ? userData.telefono : ''}">
                             </div>
                             <div class="form-group">
                                 <label>🏢 Perfil profesional *</label>
