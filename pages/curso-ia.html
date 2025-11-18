@@ -1876,19 +1876,32 @@
                             console.log('   ├─ role === "afiliado"?', membership.role === 'afiliado', membership.role === 'afiliado' ? '✅' : '❌');
                             console.log('   └─ status === "activo"?', membership.status === 'activo', membership.status === 'activo' ? '✅' : '❌');
 
-                            const isValid = membership.status === 'activo' && membership.role === 'afiliado';
+                            // Verificación más permisiva - también aceptar si isActive es true
+                            const isValid = (membership.status === 'activo' && membership.role === 'afiliado') ||
+                                          (membership.isActive && membership.role === 'afiliado');
                             console.log('');
                             console.log('🎯 RESULTADO FINAL:', isValid ? '✅ VÁLIDO' : '❌ NO VÁLIDO');
-                            return isValid;
+
+                            if (isValid) {
+                                return true;
+                            }
                         }
 
-                        console.warn('⚠️ Respuesta de membresía sin éxito o sin data');
-                        return false;
+                        // Si llegamos aquí, el backend no dio respuesta válida
+                        console.warn('⚠️ Respuesta de membresía sin éxito o sin data, usando fallback');
+
+                        // Fallback: verificar desde datos en localStorage
+                        console.log('🔄 Usando fallback: verificación desde localStorage');
+                        const isValidFallback = user.role === 'afiliado' && user.membershipStatus === 'activo';
+                        console.log('📊 Fallback - user.role:', user.role, 'user.membershipStatus:', user.membershipStatus);
+                        console.log('✅ Resultado fallback:', isValidFallback);
+                        return isValidFallback;
+
                     } catch (error) {
                         console.error('❌ Error verificando membresía contra backend:', error);
 
                         // Fallback: verificar desde datos en localStorage
-                        console.log('🔄 Usando fallback: verificación desde localStorage');
+                        console.log('🔄 Usando fallback: verificación desde localStorage (error catch)');
                         const isValidFallback = user.role === 'afiliado' && user.membershipStatus === 'activo';
                         console.log('📊 Fallback - user.role:', user.role, 'user.membershipStatus:', user.membershipStatus);
                         console.log('✅ Resultado fallback:', isValidFallback);
